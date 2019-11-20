@@ -6,6 +6,7 @@ import edu.stanford.nlp.ling.Document;
 import edu.stanford.nlp.pipeline.CoreDocument;
 import edu.stanford.nlp.pipeline.CoreSentence;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import javafx.util.Pair;
 
 import java.util.*;
 
@@ -21,15 +22,27 @@ public class Parse {
     }
 
     public void parseDocument(IRDocument doc){
-        System.out.println(doc.id);
-        //System.out.println("breaking sentences");
+
+        // parse docID
+        String stringID = doc.id.split("-",2)[1].trim();
+        Integer intID = Integer.valueOf(stringID);
+        System.out.println("doc: " + intID);
+
+
+        // STATISTICS INIT
+        String mostPopularTerm = ""; //most popular term
+        int mostPopular_tf = 0; //most popular term frequency
+        int uniqueTermsInDocument; //amount of unique terms
+
+
+        // STANFORD NLP PARSE
         List<CoreSentence> sentences = breakSentences(doc.text);
 
-        //dictionary
+        //temp dictionary for parse
         LinkedHashMap<String, Integer> dictionary = new LinkedHashMap<String, Integer>();
 
 
-        int index = 0; //word counter in sentence?
+
         for (CoreSentence sentence : sentences){
             //System.out.println(index++ + " : " + sentence.toString());
             List<CoreLabel> coreLabelList = sentence.tokens();
@@ -41,46 +54,63 @@ public class Parse {
                 String ner = coreLabel.get(CoreAnnotations.NamedEntityTagAnnotation.class);
 
 
+                String term = token;
 
 
-                if (dictionary.containsKey(token)){
-                    dictionary.put(token,dictionary.get(token)+1);
+                // PARSE DONE
+                // SAVE TERM IN TEMP DICTIONARY
+
+                int term_frequency = 1;
+
+                if (dictionary.containsKey(term)){
+                    term_frequency = dictionary.get(term) + 1;
+                    dictionary.put(term,term_frequency);
                 }
                 else{
-                    dictionary.put(token,1);
+                    dictionary.put(term,1);
                 }
-                //System.out.println(token + " = " + pos + " | " + ner);
+
+                // STATISTICS
+
+                if (term_frequency>mostPopular_tf){
+                    mostPopular_tf=term_frequency;
+                    mostPopularTerm=term;
+                }
+
+
+
+
             }
 
 
 
-            //System.out.println("////////////////////////////////////////////");
+            //System.out.println("///////////////END OF DOC////////////////////");
         }
 
 
-        //System.out.println(dictionary.toString());
+        // ADD TERMS TO INDEXER
+        for (Map.Entry<String,Integer> entry : dictionary.entrySet()) {
+            String term = entry.getKey();
+            Integer value = entry.getValue();
 
-        /// https://www.javacodegeeks.com/2017/09/java-8-sorting-hashmap-values-ascending-descending-order.html
+            //System.out.println(term + " -> " + value);
+            if (Indexer.terms.containsKey(term)){
+                Indexer.terms.get(term).add(new Pair<Integer, Integer>(intID,value));
+            }
+            else{
+                List<Pair<Integer,Integer>> termList = new ArrayList<>();
+                termList.add(new Pair<Integer, Integer>(intID,value));
+                Indexer.terms.put(term,termList);
+            }
+        }
 
 
-        //Map<String, Integer> sorted = Indexer.sortDictionary(dictionary);
+        // ADD DOC DATA TO INDEXER
 
 
-        //String id = doc.id;
 
-
-        doc.terms=dictionary;
-
-        //pos
-        //stem
-        //lemme
-        //stop
-        //named entity rec.
-
-        //tracking words in sentence
-
-        //return doc;
-
+        String docData = intID + "^" + mostPopularTerm + "^" + mostPopular_tf ;
+        Indexer.docs.add(docData);
     }
 
 
@@ -109,25 +139,9 @@ private List<CoreSentence> breakSentences(String text){
     public void sortDocument(IRDocument doc) {
         sortByValueDec(doc);
         sortByKey(doc);
-        //System.out.println(doc.sortedTerms);
-        //System.out.println(doc.sortedValues);
-        findMaxOccurrences(doc);
-
     }
 
-    private void findMaxOccurrences(IRDocument document){
-        //System.out.println("in computeMaxOccurrences");
-        /*document.sortedValues.forEach((term, frequency) -> {
-            System.out.println(term + " => " + frequency);
-        });*/
 
-        Map.Entry<String, Integer> topOnList = document.sortedValues.entrySet().iterator().next();
-        document.mostPopular = topOnList.getKey();
-        document.mostPopular_tf = topOnList.getValue();
-
-        System.out.println("MaxOccurrences: " + document.mostPopular + " -> " + document.mostPopular_tf);
-
-    }
 
     private void sortByValueDec(IRDocument document){
         document.sortedValues = document.terms

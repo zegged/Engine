@@ -19,9 +19,7 @@ public class IRDocument {
     public LinkedHashMap<String, Integer> sortedTerms;
     public LinkedHashMap<String, Integer> sortedValues;
 
-    public String mostPopular; //most popular term
-    public int mostPopular_tf; //most popular term frequency
-    public int uniqueTermsInDocument;
+
 
     public IRDocument(String id, String title, String date, String text){
         this.id=id;

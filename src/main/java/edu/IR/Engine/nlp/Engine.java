@@ -2,7 +2,12 @@ package edu.IR.Engine.nlp;
 
 import javafx.util.Pair;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Engine {
     public static void main(String args[]) throws Exception {
@@ -14,48 +19,62 @@ public class Engine {
         String text = null;
         text = readFile.openFile(pathToCorpus);
 
+        String postingFile = "c:\\posting\\test.txt";
+
         //xml to documents
         IRDocument[] fileDocs = readFile.parseXML(text);
 
 
-
-        //posting(terms) cache memory
-        Map<String, Integer> db = new LinkedHashMap<String, Integer>();
-        //term^documentFrequency^termFrequency^ DocID-tf ^ DocID-tf ^
-
-
-        // term, List: doc,tf
-        Map<String, List<Pair<Integer,Integer>>> termSorted = new TreeMap<>();
-        //Documents data
 
 
 
         //parse documents
         Parse parser = new Parse();
         for (IRDocument doc : fileDocs){
-            //IRDocument unsortedDoc = parser.parseDocument(doc);
-            //db = Indexer.mergeMaps(db, unsortedDoc.terms);
             parser.parseDocument(doc);
-            parser.sortDocument(doc);
         }
 
-        //add to docs metadata
-        List<String> docsMetadata = new ArrayList<>();
-        for (IRDocument doc : fileDocs){
-            String line;
-            line = doc.id.concat("^").concat(doc.mostPopular).concat("^").concat(String.valueOf(doc.mostPopular_tf)).concat("\n");
-            docsMetadata.add(line);
+
+
+        // print interate terms in buffer
+        for (Map.Entry<String,List<Pair<Integer,Integer>>> entry : Indexer.terms.entrySet()) {
+            String term = entry.getKey();
+            List<Pair<Integer,Integer>> value = entry.getValue();
+
+            System.out.println(term + " : " + value);
+
+            //dump buffer
+            if(Indexer.termsPointers.containsKey(term)){
+                Pair<Integer,Integer> points = Indexer.termsPointers.get(term);
+                Integer begin = points.getKey();
+                Integer offset = points.getValue();
+
+
+            }
+            else{
+
+                //add to bottom of list
+            }
+
+
         }
-        System.out.println(docsMetadata);
-
-        System.out.println("Size: " + db.size());
 
 
-        String pathToPosting = "";
-        Indexer indexer = new Indexer(pathToPosting);
+
+
+        // print docs
+        for (String doc : Indexer.docs){
+            System.out.println(doc);
+        }
+
+
+
+
+
 
 
         //docs to db
+        /*
         String dataToFile = "";
         for (Map.Entry<String, Integer> entry : db.entrySet()) {
             String id = entry.getKey();
@@ -66,29 +85,11 @@ public class Engine {
             dataToFile = dataToFile.concat(expression);
             //System.out.println(dataToFile);
             //System.out.println("Item : " + entry.getKey() + " Count : " + entry.getValue());
-        }
-
-        System.out.println("data:");
-        System.out.println(dataToFile);
-        indexer.writeToFile(dataToFile);
-
-        //DocumentParsed unsortedDoc = parser.parseDocument(fileDocs[0]);
-        //DocumentParsed unsortedDoc2 = parser.parseDocument(fileDocs[1]);
-
-        //Indexer.mergeMaps(unsortedDoc.getTerms(),unsortedDoc2.getTerms());
-
-        //sort terms
-        //unsortedDoc.sort();
-
-        //DocumentParsed sortedDoc = unsortedDoc;
-
-        //calc max occ
-        //sortedDoc.computeMaxOccurrences();
+        }*/
 
 
 
-        //add document data to indexer
-
+        System.out.println("done");
 
 
     }

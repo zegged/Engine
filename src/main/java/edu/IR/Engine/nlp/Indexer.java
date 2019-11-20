@@ -1,9 +1,14 @@
 package edu.IR.Engine.nlp;
 
+import javafx.util.Pair;
+
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -12,17 +17,19 @@ import static java.util.Map.Entry.comparingByValue;
 import static java.util.stream.Collectors.toMap;
 
 public class Indexer {
+
+
+    //terms:
+    public static Map<String, List<Pair<Integer,Integer>>> terms = new LinkedHashMap<>();
+
+    //docs:
+    public static List<String> docs = new ArrayList<>();
+
+
+    public static Map<String,Pair<Integer,Integer>> termsPointers = new LinkedHashMap<>();
+
     public Indexer(String pathToPosting){
         System.out.println("Indexer init");
-        //create folders
-
-        //init dictionary
-        //add method w/ limit
-        //limit trigger or end of corpus for dump
-
-        //dump dic to new file, merge at the end.
-
-
     }
 
 
@@ -59,6 +66,9 @@ public class Indexer {
         channel.close();
 
     }
+
+
+
 
 
 }
