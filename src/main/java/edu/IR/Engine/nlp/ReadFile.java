@@ -17,7 +17,7 @@ public class ReadFile {
 
     public String openFile(String path) throws IOException {
         System.out.println("openFile " + path);
-        InputStream is = new FileInputStream("C:\\corpus\\corpus\\corpus\\FB396001\\FB396001");
+        InputStream is = new FileInputStream("C:\\Users\\Razi\\Desktop\\ehzor\\testing\\testMonth");
         BufferedReader buf = new BufferedReader(new InputStreamReader(is));
 
         String line = buf.readLine();

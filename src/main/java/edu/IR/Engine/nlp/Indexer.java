@@ -1,6 +1,5 @@
 package edu.IR.Engine.nlp;
-
-import javafx.util.Pair;
+//import javafx.util.Pair;
 
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
@@ -20,13 +19,13 @@ public class Indexer {
 
 
     //terms:
-    public static Map<String, List<Pair<Integer,Integer>>> terms = new LinkedHashMap<>();
+    //public static Map<String, List<Pair<Integer,Integer>>> terms = new LinkedHashMap<>();
 
     //docs:
     public static List<String> docs = new ArrayList<>();
 
 
-    public static Map<String,Pair<Integer,Integer>> termsPointers = new LinkedHashMap<>();
+    //public static Map<String,Pair<Integer,Integer>> termsPointers = new LinkedHashMap<>();
 
     public Indexer(String pathToPosting){
         System.out.println("Indexer init");

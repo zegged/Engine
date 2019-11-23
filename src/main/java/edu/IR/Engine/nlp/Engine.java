@@ -1,6 +1,6 @@
 package edu.IR.Engine.nlp;
 
-import javafx.util.Pair;
+//import javafx.util.Pair;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,6 +37,8 @@ public class Engine {
 
 
         // print interate terms in buffer
+        //deleted
+        /*
         for (Map.Entry<String,List<Pair<Integer,Integer>>> entry : Indexer.terms.entrySet()) {
             String term = entry.getKey();
             List<Pair<Integer,Integer>> value = entry.getValue();
@@ -60,7 +62,7 @@ public class Engine {
         }
 
 
-
+*/
 
         // print docs
         for (String doc : Indexer.docs){
@@ -74,6 +76,7 @@ public class Engine {
 
 
         //docs to db
+        //deleted
         /*
         String dataToFile = "";
         for (Map.Entry<String, Integer> entry : db.entrySet()) {
