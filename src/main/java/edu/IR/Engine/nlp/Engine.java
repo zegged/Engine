@@ -142,30 +142,30 @@ public class Engine {
         }
         boolean stamming=true;
         Parse parser = new Parse(stopword,stamming);
+        //Parse parser=new Parse();
 //        for (IRDocument doc : fileDocs){
 //            parser.parseDocument(doc);
 //        }
 
         //Parse parser = new Parse();
 
-
-
+        long startTime=0;
+        long endTime=0;
+        startTime = System.currentTimeMillis()/1000;
         for (String filePath : files) {
-
 
             double percent = (0.0 +  ++fileCounter ) / courpus_size*100;
             System.out.println(String.format("%.2f", percent)  + "% File: " + fileCounter + " " + filePath);
 
             text = readFile.openFile(filePath);
 
-
             //xml to documents
             IRDocument[] fileDocs = readFile.parseXML(text);
-
-
             //parse documents
-            System.out.println("parsing");
             int cnt=0;
+
+            List<ParseResult> parseResults = new ArrayList<>();
+            System.out.println("parsing");
             if (true) {
                 for (IRDocument doc : fileDocs) {
                     cnt++;
@@ -174,18 +174,30 @@ public class Engine {
 //                        continue;
 //                    }
                     ParseResult parseResult = parser.parseDocument(doc);
+                    parseResults.add(parseResult);
                     DocumentData documentData = parseResult.documentData;
                     DocumentTerms documentTerms = parseResult.documentTerms;
                     documentTerms.sort();
                     indexer.addTerms(documentTerms, documentData.docID);
                     indexer.addDocument(documentData);
-
                     if (indexer.isMemoryFull()) {
                         indexer.savePosting();
                     }
-
                 }
             }
+//            System.out.println("indexing");
+//            for (ParseResult parseResult : parseResults){
+//
+//                DocumentData documentData = parseResult.documentData;
+//                DocumentTerms documentTerms = parseResult.documentTerms;
+//                documentTerms.sort();
+//                indexer.addTerms(documentTerms, documentData.docID);
+//                indexer.addDocument(documentData);
+//                if (indexer.isMemoryFull()) {
+//                    indexer.savePosting();
+//                }
+//
+//            }
 
         }
         ///final dump
@@ -193,6 +205,9 @@ public class Engine {
         // merge sort - LIMITED to file size (logical,virtual,string,terms,lists)
         indexer.merge();
 
+        endTime=System.currentTimeMillis()/1000;
+        long totlaTime=endTime - startTime;
+        System.out.println("Run Time: "+totlaTime);
         System.out.println("Term Dictionary:");
 
 

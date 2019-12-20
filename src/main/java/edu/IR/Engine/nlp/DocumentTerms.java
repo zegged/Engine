@@ -31,7 +31,7 @@ public class DocumentTerms {
 
     public void sort() {
         List sortedKeys=new ArrayList(dictionary.keySet());
-        Collections.sort(sortedKeys);
+        //Collections.sort(sortedKeys);
         sortedTerms=sortedKeys;
     }
 }

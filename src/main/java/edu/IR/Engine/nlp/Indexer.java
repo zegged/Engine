@@ -214,8 +214,8 @@ public class Indexer {
     }
 
     public boolean isMemoryFull() {
-        if (Indexer.docs.size() % 10000==0){
-            System.out.println("Dumping 10K Documents.");
+        if (Indexer.docs.size() % 1000==0){
+            System.out.println("Dumping 1K Documents.");
             return true;
         }
         return false;

@@ -208,6 +208,7 @@ public class GUI extends Application {
             }
             boolean stamming=true;
             Parse parser = new Parse(stopword,stamming);
+
 //        for (IRDocument doc : fileDocs){
 //            parser.parseDocument(doc);
 //        }
