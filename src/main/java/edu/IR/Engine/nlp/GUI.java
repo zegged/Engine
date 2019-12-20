@@ -200,12 +200,12 @@ public class GUI extends Application {
             }
             String text = null;
             File pathofstopword=new File("\\\\stop_words.txt");
-            String []stops=(readFile.readStopword(pathofstopword));
+            //String []stops=(readFile.readStopword(pathofstopword));
             stopword = new HashMap<>();// why save stop?
-            for(int i=0;i<stops.length;i++)
-            {
-                stopword.put(stops[i],"");
-            }
+//            for(int i=0;i<stops.length;i++)
+//            {
+//                stopword.put(stops[i],"");
+//            }
             boolean stamming=true;
             Parse parser = new Parse(stopword,stamming);
 

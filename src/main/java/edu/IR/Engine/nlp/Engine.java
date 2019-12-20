@@ -111,6 +111,7 @@
 package edu.IR.Engine.nlp;
 import java.io.File;
 import java.util.*;
+import java.io.*;
 public class Engine {
     static Map<String,String> stopword ;
     public static void main(String args[]) throws Exception {
@@ -133,12 +134,12 @@ public class Engine {
         }
 
         String text = null;
-        File pathofstopword=new File("\\\\stop_words.txt");
-        String []stops=(readFile.readStopword(pathofstopword));
+        File pathofstopword=new File("C:\\Users\\razyal\\IdeaProjects\\Engine\\stop_words.txt");
+        BufferedReader br = new BufferedReader(new FileReader(pathofstopword));
+        String st;
         stopword = new HashMap<>();// why save stop?
-        for(int i=0;i<stops.length;i++)
-        {
-            stopword.put(stops[i],"");
+        while ((st = br.readLine()) != null){
+            stopword.put(st,"");
         }
         boolean stamming=true;
         Parse parser = new Parse(stopword,stamming);
@@ -178,11 +179,11 @@ public class Engine {
                     DocumentData documentData = parseResult.documentData;
                     DocumentTerms documentTerms = parseResult.documentTerms;
                     documentTerms.sort();
-                    indexer.addTerms(documentTerms, documentData.docID);
-                    indexer.addDocument(documentData);
-                    if (indexer.isMemoryFull()) {
-                        indexer.savePosting();
-                    }
+//                    indexer.addTerms(documentTerms, documentData.docID);
+//                    indexer.addDocument(documentData);
+//                    if (indexer.isMemoryFull()) {
+//                        indexer.savePosting();
+//                    }
                 }
             }
 //            System.out.println("indexing");

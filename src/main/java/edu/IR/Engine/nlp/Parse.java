@@ -992,7 +992,6 @@ public class Parse {
     public List<String> checkPercentage(String sentence){
         List<String> saved_Number= new ArrayList<String>();
         sentence = sentence.replaceAll("[\\.]$", "");
-        sentence = sentence.replaceAll("\\(", "");
         Pattern p = Pattern.compile("\\d*.\\d*%");
         Matcher m = p.matcher(sentence);
         Pattern p2 = Pattern.compile("\\d*.\\d* percent|\\d* percentage");
@@ -1010,11 +1009,7 @@ public class Parse {
 
     public List<String> checkPricesMoreThanMillion(String str){
         List<String> saved_Number= new ArrayList<String>();
-        try {
-            str=str.replaceAll("\\)","");
-            str=str.replaceAll("\\[","");
-            str=str.replaceAll("\\]","");
-            str=str.replaceAll("\\(","");
+
             //price Dollars
             Pattern p1=Pattern.compile("\\d*.\\d*.\\d* Dollars|\\d*.\\d*.\\d*.\\d* Dollars");
             Matcher m1 = p1.matcher(str);
@@ -1024,7 +1019,7 @@ public class Parse {
                 if(m1.group().contains("m")||m1.group().contains("bn")){
                     continue;
                 }else{
-                    try {
+
                         System.out.println(m1.group().split(" ")[0].split(",").toString());
                         if(m1.group().split(" ")[0].split(",").length<=9&&
                                 m1.group().split(" ")[0].split(",").length>=6){
@@ -1041,10 +1036,6 @@ public class Parse {
                         }
                         saved_Number.add(result);
                         str=str.replaceAll(m1.group(),"");
-                    }catch (Exception e){
-                        continue;
-                    }
-
 
                 }
 
@@ -1067,34 +1058,12 @@ public class Parse {
                         double num=0;
                         if(s.contains(" ")||s.contains("-")||s.contains(",")||s.contains(";")||s.contains(":")){
                             if(!(s.equals("")||s.equals(" "))&&s.length()!=0&&!(s.matches("^\\s+"))) {
-                                s=s.replaceAll("^ ","");
-                                if(s.contains("/")){
-                                    result2=s;
-                                }
-                                else {
-                                    if(s.split(" |-|,|;|:").length>0){
-                                        if(s.split(" |-|,|;|:")[0].equals(".")){
-                                            continue;
-                                        }else{
-                                            try {
-                                                num=Double.parseDouble(s.split(" |-|,|;|:|\\?|\\]|\\[")[0]);
-                                            }
-                                            catch (Exception e){
-
-                                            }
-                                        }
-                                    }
-                                }
+                                num=Double.parseDouble(s.split(" ")[0]);
                             }
                         }
                         else {
-                            if(s.contains("/")){
-                                result2=s;
-                                continue;
-                            }else{
-                                if(s.contains(" ")){
-                                    num=Double.parseDouble(s.split(" ")[0]);
-                                }
+                            if(s.contains(" ")){
+                                num=Double.parseDouble(s.split(" ")[0]);
                             }
                         }
                         if(num>=1000000000){
@@ -1104,7 +1073,6 @@ public class Parse {
                         }else{
                             result2=num+" Dollars";
                         }
-
                     }
                     if(!result2.equals("")){
                         saved_Number.add(result2);
@@ -1181,16 +1149,12 @@ public class Parse {
 
             }
 
-        }catch (Exception e){
-
-        }
         return saved_Number;
 
     }
     public List<String> checkPricesUnderMillion2(String str){
         //price under million
         List<String> saved_Number= new ArrayList<String>();
-        try {
             Pattern p_underMillion = Pattern.compile("\\$(?:[1-9][0-9]{0,4}(?:.\\d{1,3})?|100000|100000.000)|" +
                     "(?:[1-9][0-9]{0,4}(?:.\\d{1,3})?|100000|100000.000) (?:[1-9][0-9]{0,4}(?:.\\d{1,3})?|100000|100000.000) Dollars" +
                     "|(?:[1-9][0-9]{0,4}(?:.\\d{1,3})?|100000|100000.000) Dollars");
@@ -1198,14 +1162,8 @@ public class Parse {
             while(m_underMillion.find()) {
                 saved_Number.add(m_underMillion.group());
                 str=str.replaceAll(m_underMillion.group(),"");
-
             }
             this.s=str;
-
-        }catch (Exception e){
-
-        }
-
 //            List<String> saved_Number= new ArrayList<String>();
         return saved_Number;
     }
@@ -1258,47 +1216,55 @@ public class Parse {
         int uniqueTermsInDocument; //amount of unique terms
 
         // STANFORD NLP PARSE
+//        doc.text="the : , ( ) # + * @ ^";
+        doc.text=doc.text.replaceAll("[\\.$|\\(|;|'|:|\\^|\\)|\\]|\\[|\\#|\\]|\\+|\\*|\\@]", "");
         List<CoreSentence> sentences = breakSentences(doc.text);
+        //testtttttttttttttttttttttttttttt
+        //List<CoreSentence> sentences = breakSentences("it is,  MAY 1999-2000");
         //temp dictionary for parse
         DocumentTerms documentTerms = new DocumentTerms();
         int counter=0;
         for (CoreSentence sentence : sentences){
             List<CoreLabel> coreLabelList = sentence.tokens();
 
-            counter++;
-            if(counter<=1){
-                s=sentences.toString();
-                //for dates
-                List<String> allDates=new ArrayList<String>();
-                allDates=checkDate(s);
-                inserttoDic(allDates);
-                //for NUMBER %
-                List<String> allPercentage=new ArrayList<String>();
-                allPercentage=checkPercentage(s);
-                inserttoDic(allPercentage);
 
-                //for prices
-//                List<String> allPricesUnderMillion=new ArrayList<String>();
-//                allPricesUnderMillion=checkPricesMoreThanMillion(s);
-//                inserttoDic(allPricesUnderMillion);
-//                List<String> allPricesUnderMillion2=new ArrayList<String>();
-//                allPricesUnderMillion2=checkPricesUnderMillion2(s);
-//                inserttoDic(allPricesUnderMillion2);
-//
-//                //for numbers $,$$$, thousand , million , billion
-//                List<String> allNumbers=new ArrayList<String>();
-//                allNumbers=checkNumber(s);
-//                inserttoDic(allNumbers);
-            }
-
+//            counter++;
+ //           if(counter<=1){
+////
+//                s=sentences.toString();
+//                s=s.replaceAll("[\\.$|\\(|;|'|:|\\^|\\)|\\]|\\[|\\#|\\]|\\+|\\*|\\@]", "");
+//                //for dates
+//                List<String> allDates=new ArrayList<String>();
+//                allDates=checkDate(s);
+//                inserttoDic(allDates);
+////                //for NUMBER %
+//////                List<String> allPercentage=new ArrayList<String>();
+//////                allPercentage=checkPercentage(s);
+//////                inserttoDic(allPercentage);
+////
+////                //for prices
+//////                List<String> allPricesUnderMillion=new ArrayList<String>();
+//////                allPricesUnderMillion=checkPricesMoreThanMillion(s);
+//////                inserttoDic(allPricesUnderMillion);
+//////                List<String> allPricesUnderMillion2=new ArrayList<String>();
+//////                allPricesUnderMillion2=checkPricesUnderMillion2(s);
+//////                inserttoDic(allPricesUnderMillion2);
+////                //for numbers $,$$$, thousand , million , billion
+////                List<String> allNumbers=new ArrayList<String>();
+////                allNumbers=checkNumber(s);
+////                inserttoDic(allNumbers);
+////
+ //           }
+            String token="";
             for (CoreLabel coreLabel : coreLabelList){
                 // PARSE HERE
-                String token = coreLabel.originalText();
+                String prev_token=token;
+                token = coreLabel.originalText();
                 String term = token.trim();
                 // PARSE DONE
                 // SAVE TERM IN TEMP DICTIONARY
                 int term_frequency = 1;
-                if(m_StopWords.containsKey(term)){
+                if(m_StopWords.containsKey(term)||term.equals(",")||term.equals(".")){
                     continue;
                 }else {
                     //Porter's stemmer
@@ -1309,6 +1275,25 @@ public class Parse {
                         term=stemmer.getCurrent();//get the stemmed word
                     }
                     // SAVE TERM IN TEMP DICTIONARY
+                    if(term.equals("%")||term.equals("percent")||term.equals("percentage")){
+                        if(check_if_string_isNumber(prev_token)){
+                            documentTerms.deleteLastTerm(prev_token);
+                            documentTerms.add(prev_token+term);
+                        }
+                    }
+                    if(isDate(prev_token,term)){
+                        List<String> date_to_save=new ArrayList<>();
+                        if(Months.containsKey(term.toLowerCase())){
+                            date_to_save=DateListToSave(prev_token,term);
+                        }else{date_to_save=DateListToSave(term,prev_token);}
+                        String a="";
+                        if(date_to_save!=null){
+                            for(int i=0;i<date_to_save.size();i++){
+                                documentTerms.add(date_to_save.get(i));
+                            }
+                        }
+
+                    }
                     documentTerms.add(term);
 //                    // STATISTICS
 //                    if (term_frequency>mostPopular_tf){
@@ -1337,6 +1322,25 @@ public class Parse {
         List<CoreSentence> sentences = coreDocument.sentences();
 
         return sentences;
+    }
+
+    private boolean check_if_string_isNumber(String term){
+        if (term == null) {
+            return false;
+        }
+        try {
+            double d = Double.parseDouble(term);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isDate(String s1,String s2){
+        if(Months.containsKey(s1.toLowerCase())||Months.containsKey(s2.toLowerCase())){
+            return true;
+        }
+        return false;
     }
 
 

@@ -20,13 +20,15 @@ public class DocumentTerms {
             term_frequency=1;
             dictionary.put(term,1);
         }
-
         checkMostPopular(term,term_frequency);
-
     }
 
     private void checkMostPopular(String term, Integer term_frequency) {
 
+    }
+
+    public void deleteLastTerm(String s){
+        dictionary.remove(s);
     }
 
     public void sort() {

@@ -335,29 +335,29 @@ public class ReadFile {
 
         return allDocs;
     }
-        public String [] readStopword(File S){
-        //make a string Array from all the StopWords
-        File file = new File("C:\\Users\\Razi\\IdeaProjects\\Engine\\stop_words.txt");
-        String everything="";
-        try {
-            try(BufferedReader br = new BufferedReader(new FileReader(file))) {
-                StringBuilder sb = new StringBuilder();
-                String line = br.readLine();
-
-                while (line != null) {
-                    sb.append(line);
-                    sb.append(System.lineSeparator());
-                    line = br.readLine();
-                }
-                everything = sb.toString();
-
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        String []stopwords=everything.split("\\s+");
-        return  stopwords;
-    }
+//    public String [] readStopword(File S){
+//        //make a string Array from all the StopWords
+//        //File file = new File("C:\\Users\\Razi\\IdeaProjects\\Engine\\stop_words.txt");
+//        String everything="";
+//        try {
+//            try(BufferedReader br = new BufferedReader(new FileReader(S))) {
+//                StringBuilder sb = new StringBuilder();
+//                String line = br.readLine();
+//
+//                while (line != null) {
+//                    sb.append(line);
+//                    sb.append(System.lineSeparator());
+//                    line = br.readLine();
+//                }
+//                everything = sb.toString();
+//
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        String []stopwords=everything.split("\\s+");
+//        return  stopwords;
+//    }
 
 
 }
