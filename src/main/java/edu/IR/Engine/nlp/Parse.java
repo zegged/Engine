@@ -355,27 +355,35 @@ public class Parse {
         Matcher m3 = p3.matcher(str);
         String result3="";
         while(m3.find()) {
-            System.out.println(m3.group());
-            if(m3.group().contains("m")){
-                result3=checkNumber(m3.group()).get(0);
-                result3=result3.substring(0,result3.length()-1)+" M Dollars";
+            try {
+                if(m3.group().contains("m")){
+                    result3=checkNumber(m3.group()).get(0);
+                    result3=result3.substring(0,result3.length()-1)+" M Dollars";
+                }
+                else {
+                    result3=checkNumber(m3.group()).get(0);
+                    result3=result3.substring(0,result3.length()-1)+"000 M Dollars";
+                }
+                saved_Number.add(result3);
+                str=str.replaceAll(m3.group(),"");
+            }catch (Exception e){
+
             }
-            else {
-                result3=checkNumber(m3.group()).get(0);
-                result3=result3.substring(0,result3.length()-1)+"000 M Dollars";
-            }
-            saved_Number.add(result3);
-            str=str.replaceAll(m3.group(),"");
         }
 
         //price m Dollars
         Pattern p5=Pattern.compile("\\d*.\\d* m Dollars");
         Matcher m5 = p5.matcher(str);
         while (m5.find()){
-            String[] s=m5.group().split(" ");
-            double price = Double.parseDouble(s[0]);
-            saved_Number.add(""+price+" M Dollars");
-            str=str.replaceAll(m5.group(),"");
+            try {
+                String[] s=m5.group().split(" ");
+                double price = Double.parseDouble(s[0]);
+                saved_Number.add(""+price+" M Dollars");
+                str=str.replaceAll(m5.group(),"");
+            }catch (Exception e){
+
+            }
+
         }
 
 
@@ -383,26 +391,35 @@ public class Parse {
         Pattern p6=Pattern.compile("\\d*.\\d* bn Dollars");
         Matcher m6 = p6.matcher(str);
         while (m6.find()){
-            String[] s=m6.group().split("");
-            double price = Double.parseDouble(s[0])*100;
-            saved_Number.add(""+price*100+" M Dollars");
-            str=str.replaceAll(m6.group(),"");
+            try {
+                String[] s=m6.group().split("");
+                double price = Double.parseDouble(s[0])*100;
+                saved_Number.add(""+price*100+" M Dollars");
+                str=str.replaceAll(m6.group(),"");
+            }catch (Exception e){
+
+            }
+
         }
 
         //price billion/million/trillion U.S. dollars
         Pattern p7=Pattern.compile("\\d*.\\d* billion U.S. dollars|\\d*.\\d* million U.S. dollars|\\d*.\\d* trillion U.S. dollars");
         Matcher m7 = p7.matcher(str);
         while (m7.find()){
-            String[] s=m7.group().split(" ");
-            if(m7.group().contains("million")){
-                saved_Number.add(s[0]+" M Dollars");
+            try {
+                String[] s=m7.group().split(" ");
+                if(m7.group().contains("million")){
+                    saved_Number.add(s[0]+" M Dollars");
+                }
+                else if(m7.group().contains("billion")){
+                    saved_Number.add(s[0]+"000 M Dollars");
+                }else{
+                    saved_Number.add(s[0]+"000000 M Dollars");
+                }
+                str=str.replaceAll(m7.group(),"");
+            }catch (Exception e){
+
             }
-            else if(m7.group().contains("billion")){
-                saved_Number.add(s[0]+"000 M Dollars");
-            }else{
-                saved_Number.add(s[0]+"000000 M Dollars");
-            }
-            str=str.replaceAll(m7.group(),"");
         }
 
         return saved_Number;
@@ -411,16 +428,23 @@ public class Parse {
     public List<String> checkPricesUnderMillion2(String str){
         //price under million
         List<String> saved_Number= new ArrayList<String>();
-        Pattern p_underMillion = Pattern.compile("\\$(?:[1-9][0-9]{0,4}(?:.\\d{1,3})?|100000|100000.000)|" +
-                "(?:[1-9][0-9]{0,4}(?:.\\d{1,3})?|100000|100000.000) (?:[1-9][0-9]{0,4}(?:.\\d{1,3})?|100000|100000.000) Dollars" +
-                "|(?:[1-9][0-9]{0,4}(?:.\\d{1,3})?|100000|100000.000) Dollars");
-        Matcher m_underMillion=p_underMillion.matcher(str);
-        while(m_underMillion.find()) {
-            saved_Number.add(m_underMillion.group());
-            str=str.replaceAll(m_underMillion.group(),"");
+        try {
+//            List<String> saved_Number= new ArrayList<String>();
+            Pattern p_underMillion = Pattern.compile("\\$(?:[1-9][0-9]{0,4}(?:.\\d{1,3})?|100000|100000.000)|" +
+                    "(?:[1-9][0-9]{0,4}(?:.\\d{1,3})?|100000|100000.000) (?:[1-9][0-9]{0,4}(?:.\\d{1,3})?|100000|100000.000) Dollars" +
+                    "|(?:[1-9][0-9]{0,4}(?:.\\d{1,3})?|100000|100000.000) Dollars");
+            Matcher m_underMillion=p_underMillion.matcher(str);
+            while(m_underMillion.find()) {
+                saved_Number.add(m_underMillion.group());
+                str=str.replaceAll(m_underMillion.group(),"");
+
+            }
+            this.s=str;
+
+
+        }catch (Exception e){
 
         }
-        this.s=str;
         return saved_Number;
     }
 
@@ -464,12 +488,9 @@ public class Parse {
         String stringID = doc.id.split("-",2)[1].trim();
         Integer intID = Integer.valueOf(stringID);
         System.out.println("doc: " + intID);
-
-
         // STATISTICS INIT
         // STANFORD NLP PARSE
         // List<CoreSentence> sentences = breakSentences(doc.text);
-
         CoreDocument coreDocument=new CoreDocument(doc.text);
         stanfordCoreNLP.annotate(coreDocument);
         List<CoreSentence> sentences=coreDocument.sentences();
