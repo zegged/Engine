@@ -134,7 +134,9 @@ public class Engine {
         }
 
         String text = null;
-        File pathofstopword=new File("C:\\Users\\razyal\\IdeaProjects\\Engine\\stop_words.txt");
+        String path = System.getProperty("user.dir")+"/stop_words.txt";
+        File pathofstopword=new File(path);
+       // File projectDir = new File(System.getProperty("user.dir"));
         BufferedReader br = new BufferedReader(new FileReader(pathofstopword));
         String st;
         stopword = new HashMap<>();// why save stop?

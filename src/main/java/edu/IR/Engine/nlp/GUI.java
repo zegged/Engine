@@ -175,19 +175,16 @@ public class GUI extends Application {
 
     public void StartButton (String s1, String s2, boolean box1) throws Exception
     {
-        long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis()/1000;
         if(s1.length()>0&&s2.length()>0) {//the fields are filled
 
             pathToCorpus = s1;
             pathToPosting = s2;
             //change secene to alert and back to the main window to let write again
-            //RadioButton chk = (RadioButton)box1.getToggleGroup().getSelectedToggle(); // Cast object to radio button
             if (box1) {
-                //  System.out.println("i checked yes");
                 doStemming = true;
             } else {
                 doStemming = false;
-                // System.out.println("i checked no");
             }
             Indexer indexer = new Indexer(pathToPosting);
             ReadFile readFile = new ReadFile();
@@ -199,23 +196,16 @@ public class GUI extends Application {
                 fileCounter++;
             }
             String text = null;
-            File pathofstopword=new File("\\\\stop_words.txt");
-            //String []stops=(readFile.readStopword(pathofstopword));
+            String path = System.getProperty("user.dir")+"/stop_words.txt";
+            File pathofstopword=new File(path);
+            BufferedReader br = new BufferedReader(new FileReader(pathofstopword));
+            String st;
             stopword = new HashMap<>();// why save stop?
-//            for(int i=0;i<stops.length;i++)
-//            {
-//                stopword.put(stops[i],"");
-//            }
+            while ((st = br.readLine()) != null){
+                stopword.put(st,"");
+            }
             boolean stamming=true;
             Parse parser = new Parse(stopword,stamming);
-
-//        for (IRDocument doc : fileDocs){
-//            parser.parseDocument(doc);
-//        }
-
-            //Parse parser = new Parse();
-
-
 
             for (String filePath : files) {
                 double percent = (0.0 +  ++fileCounter ) / courpus_size*100;
@@ -231,12 +221,12 @@ public class GUI extends Application {
                         DocumentData documentData = parseResult.documentData;
                         DocumentTerms documentTerms = parseResult.documentTerms;
                         documentTerms.sort();
-                        indexer.addTerms(documentTerms, documentData.docID);
-                        indexer.addDocument(documentData);
-
-                        if (indexer.isMemoryFull()) {
-                            indexer.savePosting();
-                        }
+//                        indexer.addTerms(documentTerms, documentData.docID);
+//                        indexer.addDocument(documentData);
+//
+//                        if (indexer.isMemoryFull()) {
+//                            indexer.savePosting();
+//                        }
 
                     }
                 }
@@ -245,13 +235,14 @@ public class GUI extends Application {
             ///final dump
             indexer.savePosting();
             // merge sort - LIMITED to file size (logical,virtual,string,terms,lists)
-            indexer.merge();
+            //indexer.merge();
             int i = 0;
-            long endTime = System.currentTimeMillis();
+            long endTime = System.currentTimeMillis()/1000;
             totalTime = endTime - startTime;
-            System.out.println(totalTime / 1000 / 60);
+            System.out.println(totalTime);
             finish = true;
             finishData();
+
         }
         else {// the fields are missing
             //change scene to alert and back to the main window to let write again
@@ -261,11 +252,7 @@ public class GUI extends Application {
 
             }
         }
-
-
-
     }
-
 
     //opens another window with the dictionary table display
     //if not working well try listView

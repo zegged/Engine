@@ -1011,7 +1011,7 @@ public class Parse {
 
     public List<String> checkPricesMoreThanMillion(String str){
         List<String> saved_Number= new ArrayList<String>();
-
+        try {
             //price Dollars
             Pattern p1=Pattern.compile("\\d*.\\d*.\\d* Dollars|\\d*.\\d*.\\d*.\\d* Dollars");
             Matcher m1 = p1.matcher(str);
@@ -1022,22 +1022,22 @@ public class Parse {
                     continue;
                 }else{
 
-                        System.out.println(m1.group().split(" ")[0].split(",").toString());
-                        if(m1.group().split(" ")[0].split(",").length<=9&&
-                                m1.group().split(" ")[0].split(",").length>=6){
+                    System.out.println(m1.group().split(" ")[0].split(",").toString());
+                    if(m1.group().split(" ")[0].split(",").length<=9&&
+                            m1.group().split(" ")[0].split(",").length>=6){
+                        result=checkNumber(m1.group()).get(0);
+                        result=result.substring(0,result.length()-1)+" M Dollars";
+                    }
+                    else {
+                        if( m1.group().split(" ")[0].split(",").length>6){
                             result=checkNumber(m1.group()).get(0);
-                            result=result.substring(0,result.length()-1)+" M Dollars";
+                            result=result.substring(0,result.length()-1)+"000 M Dollars";
+                        }else{
+                            continue;
                         }
-                        else {
-                            if( m1.group().split(" ")[0].split(",").length>6){
-                                result=checkNumber(m1.group()).get(0);
-                                result=result.substring(0,result.length()-1)+"000 M Dollars";
-                            }else{
-                                continue;
-                            }
-                        }
-                        saved_Number.add(result);
-                        str=str.replaceAll(m1.group(),"");
+                    }
+                    saved_Number.add(result);
+                    str=str.replaceAll(m1.group(),"");
 
                 }
 
@@ -1151,6 +1151,10 @@ public class Parse {
 
             }
 
+        }catch (Exception e){
+
+        }
+
         return saved_Number;
 
     }
@@ -1219,8 +1223,13 @@ public class Parse {
 
         // STANFORD NLP PARSE
        //doc.text="6 3/5 million sdgdfgk sdjkds kjsdgk 35 3/4 dfd ";
+        doc.text="'s class";
         doc.text=doc.text.replaceAll("[\\(|;|'|:|\\^|\\)|\\]|\\[|\\#|\\]|\\+|\\*|\\@]", "");
         List<CoreSentence> sentences = breakSentences(doc.text);
+        //for prices
+        List<String> allPricesUnderMillion=new ArrayList<String>();
+        allPricesUnderMillion=checkPricesMoreThanMillion(doc.text);
+        inserttoDic(allPricesUnderMillion);
         //testtttttttttttttttttttttttttttt
         //List<CoreSentence> sentences = breakSentences("it is,  MAY 1999-2000");
         //temp dictionary for parse
@@ -1230,10 +1239,10 @@ public class Parse {
             List<CoreLabel> coreLabelList = sentence.tokens();
 
 
-//            counter++;
- //           if(counter<=1){
+                counter++;
+                if(counter<=1){
 ////
-//                s=sentences.toString();
+
 //                s=s.replaceAll("[\\.$|\\(|;|'|:|\\^|\\)|\\]|\\[|\\#|\\]|\\+|\\*|\\@]", "");
 //                //for dates
 //                List<String> allDates=new ArrayList<String>();
@@ -1244,10 +1253,10 @@ public class Parse {
 //////                allPercentage=checkPercentage(s);
 //////                inserttoDic(allPercentage);
 ////
-////                //for prices
-//////                List<String> allPricesUnderMillion=new ArrayList<String>();
-//////                allPricesUnderMillion=checkPricesMoreThanMillion(s);
-//////                inserttoDic(allPricesUnderMillion);
+                    //for prices
+//                    List<String> allPricesUnderMillion=new ArrayList<String>();
+//                    allPricesUnderMillion=checkPricesMoreThanMillion(s);
+//                    inserttoDic(allPricesUnderMillion);
 //////                List<String> allPricesUnderMillion2=new ArrayList<String>();
 //////                allPricesUnderMillion2=checkPricesUnderMillion2(s);
 //////                inserttoDic(allPricesUnderMillion2);
@@ -1256,7 +1265,7 @@ public class Parse {
 ////                allNumbers=checkNumber(s);
 ////                inserttoDic(allNumbers);
 ////
- //           }
+            }
             String token="";
             for (CoreLabel coreLabel : coreLabelList){
                 // PARSE HERE
@@ -1271,7 +1280,9 @@ public class Parse {
                     continue;
                 }else {
                     //Porter's stemmer
-                    if(this.doSteming==true&&!(term.toLowerCase().equals("percent")||term.toLowerCase().equals("percentage"))){
+                    if(this.doSteming==true&&!(term.toLowerCase().equals("percent")||term.toLowerCase().equals("percentage"))
+                            &&!(term.toLowerCase().equals("dollars")||term.toLowerCase().equals("million"))
+                            &&!(term.toLowerCase().equals("thousand")||term.toLowerCase().equals("billion"))){
                         PorterStemmer stemmer=new PorterStemmer();
                         stemmer.setCurrent(term); //set string you need to stem
                         stemmer.stem();  //stem the word
@@ -1353,7 +1364,6 @@ public class Parse {
                             Flag=true;
                         }
                     }
-
                     if(term.toLowerCase().equals("million")&&(handleNumbers(prev_token)||isNumeric(prev_token))){
                         documentTerms.add(prev_token+"M");
                         Flag=true;
@@ -1366,11 +1376,27 @@ public class Parse {
                         documentTerms.add(prev_token+"B");
                         Flag=true;
                     }
-//                    if(term.contains("/")&&(handleNumbers(prev_token)||check_if_string_isNumber(prev_token))){
-//                        documentTerms.add(prev_token+" "+term);
-//                        Flag=true;
-//                    }
 
+                    //Prices
+                    if(token.toLowerCase().equals("dollars")){
+                        if(check_if_string_isNumber(prev_token)){
+                            if(Double.parseDouble(prev_token)<1000000){
+                                documentTerms.add(prev_token+" Dollars");
+                                Flag=true;
+                                continue;
+                            }
+                        }
+                        if(handleNumbers(prev_token)){
+                            if(prev_token.contains(" ")){
+                                if(Double.parseDouble(prev_token.split(" ")[0])<1000000){
+                                    documentTerms.add(prev_token+" Dollars");
+                                    Flag=true;
+                                    continue;
+                                }
+                            }
+                        }
+
+                    }
                     if(Flag==false){
                         documentTerms.add(term);
                     }
@@ -1473,6 +1499,9 @@ public class Parse {
             }
         }
         if(term.contains("/")&&!(term.contains(" "))){
+            if(term.split("/").length<1){
+                return false;
+            }
             return (handleNumbers(term.split("/")[0])||check_if_string_isNumber(term.split("/")[0]))&&
                     (handleNumbers(term.split("/")[1])||check_if_string_isNumber(term.split("/")[1]));
         }
