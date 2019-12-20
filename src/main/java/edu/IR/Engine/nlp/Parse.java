@@ -1223,7 +1223,7 @@ public class Parse {
 
         // STANFORD NLP PARSE
        //doc.text="6 3/5 million sdgdfgk sdjkds kjsdgk 35 3/4 dfd ";
-        doc.text="'s class";
+        doc.text="Rnj Yjn Ydsd Razyu sdfds Ksc-Asdf";
         doc.text=doc.text.replaceAll("[\\(|;|'|:|\\^|\\)|\\]|\\[|\\#|\\]|\\+|\\*|\\@]", "");
         List<CoreSentence> sentences = breakSentences(doc.text);
         //for prices
@@ -1267,6 +1267,7 @@ public class Parse {
 ////
             }
             String token="";
+            String upper_words="";
             for (CoreLabel coreLabel : coreLabelList){
                 // PARSE HERE
                 boolean Flag=false;
@@ -1396,6 +1397,14 @@ public class Parse {
                             }
                         }
 
+                    }
+
+                    //upper case
+                    if (Character.isUpperCase(term.charAt(0))){
+                        upper_words=upper_words+" "+term;
+                    }else{
+                        documentTerms.add(upper_words);
+                        upper_words="";
                     }
                     if(Flag==false){
                         documentTerms.add(term);
