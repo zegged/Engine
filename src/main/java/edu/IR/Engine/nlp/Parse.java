@@ -939,34 +939,36 @@ public class Parse {
     //recive number like x,xxx and change it to k/m/b
     public String regular_NumberHandle(String term,String prev){
         String number_to_save="";
-        if(term.length()!=0){
-            number_to_save=term.split(",")[0]+"."+term.split(",")[1];
-            if((isNumeric(term)&&term.length()<=7)){
-                number_to_save=number_to_save+"K";
-                //System.out.println(number_to_save);
-            }
-            else if((isNumeric(term)&&term.length()>=11)){
-                number_to_save=number_to_save+"B";
-                //System.out.println(number_to_save);
-            }
-            else{
-                number_to_save=number_to_save+"M";
-                //System.out.println(number_to_save);
-            }
-            char lastchar=number_to_save.charAt(number_to_save.length()-2);
-            char lastchar2=number_to_save.charAt(number_to_save.length()-3);
-            if(lastchar=='0'&&lastchar2!='0'){
-                number_to_save=number_to_save.substring(0,number_to_save.length()-2)+
-                        number_to_save.substring(number_to_save.length()-1);
-            }
-            if(lastchar=='0'&&lastchar2=='0'){
-                number_to_save=number_to_save.substring(0,number_to_save.length()-3)+
-                        number_to_save.substring(number_to_save.length()-1);
-            }
-            if(term.split(",")[1].equals("000") ){
-                number_to_save=term.split(",")[0]+number_to_save.substring(number_to_save.length()-1);
-            }
+        try {
+            if(term.length()!=0) {
+                number_to_save = term.split(",")[0] + "." + term.split(",")[1];
+                if ((isNumeric(term) && term.length() <= 7)) {
+                    number_to_save = number_to_save + "K";
+                    //System.out.println(number_to_save);
+                } else if ((isNumeric(term) && term.length() >= 11)) {
+                    number_to_save = number_to_save + "B";
+                    //System.out.println(number_to_save);
+                } else {
+                    number_to_save = number_to_save + "M";
+                    //System.out.println(number_to_save);
+                }
+                char lastchar = number_to_save.charAt(number_to_save.length() - 2);
+                char lastchar2 = number_to_save.charAt(number_to_save.length() - 3);
+                if (lastchar == '0' && lastchar2 != '0') {
+                    number_to_save = number_to_save.substring(0, number_to_save.length() - 2) +
+                            number_to_save.substring(number_to_save.length() - 1);
+                }
+                if (lastchar == '0' && lastchar2 == '0') {
+                    number_to_save = number_to_save.substring(0, number_to_save.length() - 3) +
+                            number_to_save.substring(number_to_save.length() - 1);
+                }
+                if (term.split(",")[1].equals("000")) {
+                    number_to_save = term.split(",")[0] + number_to_save.substring(number_to_save.length() - 1);
+                }
 
+            }
+        }catch (Exception e){
+            System.out.println(term);
         }
         return number_to_save;
     }
@@ -1207,7 +1209,7 @@ public class Parse {
         // parse docID
         String stringID = doc.id.split("-",2)[1].trim();
         Integer intID = Integer.valueOf(stringID);
-        //System.out.println( "doc: " +  ++countDocs + " id: " + intID);
+        //System.out.println( "doc: " + intID);
 
 
         // STATISTICS INIT
@@ -1216,8 +1218,8 @@ public class Parse {
         int uniqueTermsInDocument; //amount of unique terms
 
         // STANFORD NLP PARSE
-//        doc.text="the : , ( ) # + * @ ^";
-        doc.text=doc.text.replaceAll("[\\.$|\\(|;|'|:|\\^|\\)|\\]|\\[|\\#|\\]|\\+|\\*|\\@]", "");
+       //doc.text="6 3/5 million sdgdfgk sdjkds kjsdgk 35 3/4 dfd ";
+        doc.text=doc.text.replaceAll("[\\(|;|'|:|\\^|\\)|\\]|\\[|\\#|\\]|\\+|\\*|\\@]", "");
         List<CoreSentence> sentences = breakSentences(doc.text);
         //testtttttttttttttttttttttttttttt
         //List<CoreSentence> sentences = breakSentences("it is,  MAY 1999-2000");
@@ -1258,6 +1260,7 @@ public class Parse {
             String token="";
             for (CoreLabel coreLabel : coreLabelList){
                 // PARSE HERE
+                boolean Flag=false;
                 String prev_token=token;
                 token = coreLabel.originalText();
                 String term = token.trim();
@@ -1268,19 +1271,23 @@ public class Parse {
                     continue;
                 }else {
                     //Porter's stemmer
-                    if(this.doSteming==true){
+                    if(this.doSteming==true&&!(term.toLowerCase().equals("percent")||term.toLowerCase().equals("percentage"))){
                         PorterStemmer stemmer=new PorterStemmer();
                         stemmer.setCurrent(term); //set string you need to stem
                         stemmer.stem();  //stem the word
                         term=stemmer.getCurrent();//get the stemmed word
                     }
                     // SAVE TERM IN TEMP DICTIONARY
+                    //percent
                     if(term.equals("%")||term.equals("percent")||term.equals("percentage")){
                         if(check_if_string_isNumber(prev_token)){
                             documentTerms.deleteLastTerm(prev_token);
-                            documentTerms.add(prev_token+term);
+                            documentTerms.add(prev_token+"%");
+                            Flag=true;
                         }
                     }
+
+                    //dates
                     if(isDate(prev_token,term)){
                         List<String> date_to_save=new ArrayList<>();
                         if(Months.containsKey(term.toLowerCase())){
@@ -1290,11 +1297,83 @@ public class Parse {
                         if(date_to_save!=null){
                             for(int i=0;i<date_to_save.size();i++){
                                 documentTerms.add(date_to_save.get(i));
+                                Flag=true;
                             }
                         }
-
                     }
-                    documentTerms.add(term);
+
+                    //numbers
+                    if(term.contains(",")){
+                        List<String> n=new ArrayList<>();
+                        String s_n="";
+                        for(int i=0;i<term.split(",").length;i++){
+                            if(isNumeric(term.split(",")[i])){
+                                if(i==term.split(",").length-1){
+                                    s_n=s_n+term.split(",")[i];
+                                }else{
+                                    s_n=s_n+term.split(",")[i]+",";
+                                }
+
+                            }
+                            else{
+                                s_n=term;
+                                break;
+                            }
+                        }
+                        if(term==s_n){
+                            continue;
+                        }else{
+                            term=s_n;
+                            term=term.replace(",$","");
+                            documentTerms.add(regular_NumberHandle(term,prev_token));
+                            Flag=true;
+                        }
+                    }
+                    if(term.contains(".")){
+                        List<String> n=new ArrayList<>();
+                        String s_n="";
+                        for(int i=0;i<term.split("\\.").length;i++){
+                            if(isNumeric(term.split("\\.")[i])&&term.split("\\.").length<2){
+                                if(i==term.split("\\.").length-1){
+                                    s_n=s_n+term.split("\\.")[i];
+                                }else{
+                                    s_n=s_n+term.split("\\,")[i]+".";
+                                }
+                            }
+                            else{
+                                s_n=term;
+                                break;
+                            }
+                        }
+                        if(term==s_n){
+                            continue;
+                        }else {
+                            term = s_n;
+                            documentTerms.add(splitNumberWithPoint(term));
+                            Flag=true;
+                        }
+                    }
+
+                    if(term.toLowerCase().equals("million")&&(handleNumbers(prev_token)||isNumeric(prev_token))){
+                        documentTerms.add(prev_token+"M");
+                        Flag=true;
+                    }
+                    if(term.toLowerCase().equals("thousand")&&(handleNumbers(prev_token)||isNumeric(prev_token))){
+                        documentTerms.add(prev_token+"K");
+                        Flag=true;
+                    }
+                    if(term.toLowerCase().equals("billion")&&(handleNumbers(prev_token)||isNumeric(prev_token))){
+                        documentTerms.add(prev_token+"B");
+                        Flag=true;
+                    }
+//                    if(term.contains("/")&&(handleNumbers(prev_token)||check_if_string_isNumber(prev_token))){
+//                        documentTerms.add(prev_token+" "+term);
+//                        Flag=true;
+//                    }
+
+                    if(Flag==false){
+                        documentTerms.add(term);
+                    }
 //                    // STATISTICS
 //                    if (term_frequency>mostPopular_tf){
 //                        mostPopular_tf=term_frequency;
@@ -1343,6 +1422,67 @@ public class Parse {
         return false;
     }
 
+    private boolean handleNumbers(String term){
+        if(term.contains(",")){
+            List<String> n=new ArrayList<>();
+            String s_n="";
+            for(int i=0;i<term.split(",").length;i++){
+                if(isNumeric(term.split(",")[i])){
+                    if(i==term.split(",").length-1){
+                        s_n=s_n+term.split(",")[i];
+                    }else{
+                        s_n=s_n+term.split(",")[i]+",";
+                    }
+
+                }
+                else{
+                    s_n=term;
+                    break;
+                }
+            }
+            if(term==s_n){
+                return false;
+            }
+            else{
+                term=s_n;
+                term=term.replace(",$","");
+                return true;
+            }
+        }
+        if(term.contains(".")){
+            List<String> n=new ArrayList<>();
+            String s_n="";
+            for(int i=0;i<term.split("\\.").length;i++){
+                if(isNumeric(term.split("\\.")[i])&&term.split("\\.").length<2){
+                    if(i==term.split("\\.").length-1){
+                        s_n=s_n+term.split("\\.")[i];
+                    }else{
+                        s_n=s_n+term.split("\\,")[i]+".";
+                    }
+                }
+                else{
+                    s_n=term;
+                    break;
+                }
+            }
+            if(term==s_n){
+                return false;
+            }else {
+                term = s_n;
+                return true;
+            }
+        }
+        if(term.contains("/")&&!(term.contains(" "))){
+            return (handleNumbers(term.split("/")[0])||check_if_string_isNumber(term.split("/")[0]))&&
+                    (handleNumbers(term.split("/")[1])||check_if_string_isNumber(term.split("/")[1]));
+        }
+        if(term.contains(" ")){
+            return (handleNumbers(term.split(" ")[0])||check_if_string_isNumber(term.split(" ")[0]))&&
+                    (handleNumbers(term.split(" ")[1])||check_if_string_isNumber(term.split(" ")[1]));
+
+        }
+        return false;
+    }
 
 
 }

@@ -170,10 +170,6 @@ public class Engine {
             if (true) {
                 for (IRDocument doc : fileDocs) {
                     cnt++;
-//                   if(cnt<1568){
-//                        System.out.println("s");
-//                        continue;
-//                    }
                     ParseResult parseResult = parser.parseDocument(doc);
                     parseResults.add(parseResult);
                     DocumentData documentData = parseResult.documentData;
