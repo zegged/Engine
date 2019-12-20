@@ -118,11 +118,10 @@ public class Engine {
 
         //read corpus
         ReadFile readFile = new ReadFile();
-        String pathToCorpus = "C:\\Users\\Razi\\Desktop\\ehzor\\corpus\\"; //CORPUS folder
+        String pathToCorpus = "D:\\corpus\\"; //CORPUS folder
         //String postingFile = "C:\\Users\\Razi\\Desktop\\ehzor\\corpus\\FB396001\\FB396001";
-        String postingFilePath = "C:\\Users\\Razi\\Desktop\\ehzor\\posting";
+        String postingFilePath = "D:\\New folder\\";
         Indexer indexer = new Indexer(postingFilePath);
-
         List<String> files = readFile.getAllFiles(pathToCorpus);
 
         Integer courpus_size = files.size();
@@ -165,15 +164,15 @@ public class Engine {
 
 
             //parse documents
-
             System.out.println("parsing");
             int cnt=0;
             if (true) {
                 for (IRDocument doc : fileDocs) {
                     cnt++;
-                    if(cnt==20){
-                        System.out.println("s");
-                    }
+//                   if(cnt<1568){
+//                        System.out.println("s");
+//                        continue;
+//                    }
                     ParseResult parseResult = parser.parseDocument(doc);
                     DocumentData documentData = parseResult.documentData;
                     DocumentTerms documentTerms = parseResult.documentTerms;

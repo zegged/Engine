@@ -29,8 +29,6 @@ import javafx.scene.layout.Background;
 
 import static java.nio.file.Files.deleteIfExists;
 
-
-
 public class GUI extends Application {
 
     Stage window;

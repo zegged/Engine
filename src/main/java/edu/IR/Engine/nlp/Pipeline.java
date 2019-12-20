@@ -9,7 +9,7 @@ public class Pipeline {
 
     private static Properties properties;
     //private static String propertiesNames = "tokenize,  ssplit, pos, lemma, ner";
-    private static String propertiesNames = "tokenize,  ssplit, pos";
+    private static String propertiesNames = "tokenize,  ssplit";
     private static StanfordCoreNLP stanfordCoreNLP;
 
     private Pipeline(){

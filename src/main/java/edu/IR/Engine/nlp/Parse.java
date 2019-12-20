@@ -7,6 +7,7 @@ import edu.stanford.nlp.pipeline.CoreSentence;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import org.tartarus.snowball.ext.PorterStemmer;
 
+import javax.swing.plaf.synth.SynthOptionPaneUI;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,7 +25,6 @@ public class Parse {
     int uniqueTermsInDocument; //amount of unique terms
     String mostPopularTerm = ""; //most popular term
     String s="";
-
 
     //razy------------------------------------------------
     static Map <String,String> Months=new HashMap<String, String>(){{
@@ -201,7 +201,7 @@ public class Parse {
     //recive number like x,xxx and change it to k/m/b
     public String regular_NumberHandle(String term,String prev){
         String number_to_save="";
-        try {
+        if(term.length()!=0){
             number_to_save=term.split(",")[0]+"."+term.split(",")[1];
             if((isNumeric(term)&&term.length()<=7)){
                 number_to_save=number_to_save+"K";
@@ -228,7 +228,6 @@ public class Parse {
             if(term.split(",")[1].equals("000") ){
                 number_to_save=term.split(",")[0]+number_to_save.substring(number_to_save.length()-1);
             }
-        }catch (Exception e){
 
         }
         return number_to_save;
@@ -277,7 +276,10 @@ public class Parse {
 
     public List<String> checkPricesMoreThanMillion(String str){
         List<String> saved_Number= new ArrayList<String>();
-
+        str=str.replaceAll("\\)","");
+        str=str.replaceAll("\\[","");
+        str=str.replaceAll("\\]","");
+        str=str.replaceAll("\\(","");
         //price Dollars
         Pattern p1=Pattern.compile("\\d*.\\d*.\\d* Dollars|\\d*.\\d*.\\d*.\\d* Dollars");
         Matcher m1 = p1.matcher(str);
@@ -319,34 +321,46 @@ public class Parse {
         String result2="";
         while(m2.find()) {
             //if(!((m2.group().contains("m"))||((m2.group().contains("b"))))){
+            if(m2.group().length()!=0&&!(m2.group().matches(".*[a-zA-Z]+.*"))){
                 if(m2.group().split("\\$")[0].split(",").length<=9&&
                         m2.group().split("\\$")[0].split(",").length>6){
-                    try{
-                        result2=checkNumber(m2.group()).get(0);
-                        result2=result2.substring(0,result2.length()-1)+" M Dollars";
-                    }catch (Exception e){
-                        continue;
-                    }
-
+                    result2=checkNumber(m2.group()).get(0);
+                    result2=result2.substring(0,result2.length()-1)+" M Dollars";
                 }
                 else {
-                    try {
-                        result2=checkNumber(m2.group()).get(0);
+                    String s=m2.group().split("\\$")[1];
+                    double num=0;
+                    if(s.contains(" ")||s.contains("-")||s.contains(",")){
+                        if(!(s.equals("")||s.equals(" "))&&s.length()!=0&&!(s.matches("^\\s+"))) {
+                            s=s.replaceAll("^ ","");
+                            System.out.println(s);
+                            num=Double.parseDouble(s.split(" |-|,")[0]);
+                        }
+                    }
+                    else {
+                        if(s.contains("/")){
+                            result2=s;
+                            continue;
+                        }else{
+                            num=Double.parseDouble(s);
+                        }
+
+                    }
+                    if(num>=1000000000){
+                        result2=checkNumber(m2.group().split(" ")[0]).get(0);
+                        double n=Double.parseDouble(result)*100;
                         result2=result2.substring(0,result2.length()-1)+"000 M Dollars";
-                    }catch (Exception e){
-                        continue;
+                    }else{
+                        result2=num+" Dollars";
                     }
 
                 }
-            //}
-            saved_Number.add(result2);
-                try {
-                    str=str.replaceAll(m2.group(),"");
-                }catch (Exception e){
-
+                if(!result2.equals("")){
+                    saved_Number.add(result2);
+                    str=str.replaceFirst(m2.group(),"");
                 }
 
-
+            }
         }
 
 
@@ -354,8 +368,9 @@ public class Parse {
         Pattern p3=Pattern.compile("\\$\\d*.\\d* million|\\$\\d*.\\d* billion");
         Matcher m3 = p3.matcher(str);
         String result3="";
+
         while(m3.find()) {
-            try {
+            if(!(m3.group().split("\\s")[1].split(" ")[0].matches(".*[a-zA-Z]+.*"))){
                 if(m3.group().contains("m")){
                     result3=checkNumber(m3.group()).get(0);
                     result3=result3.substring(0,result3.length()-1)+" M Dollars";
@@ -366,23 +381,20 @@ public class Parse {
                 }
                 saved_Number.add(result3);
                 str=str.replaceAll(m3.group(),"");
-            }catch (Exception e){
-
             }
+
         }
 
         //price m Dollars
         Pattern p5=Pattern.compile("\\d*.\\d* m Dollars");
         Matcher m5 = p5.matcher(str);
         while (m5.find()){
-            try {
+
                 String[] s=m5.group().split(" ");
                 double price = Double.parseDouble(s[0]);
                 saved_Number.add(""+price+" M Dollars");
                 str=str.replaceAll(m5.group(),"");
-            }catch (Exception e){
 
-            }
 
         }
 
@@ -391,14 +403,12 @@ public class Parse {
         Pattern p6=Pattern.compile("\\d*.\\d* bn Dollars");
         Matcher m6 = p6.matcher(str);
         while (m6.find()){
-            try {
+
                 String[] s=m6.group().split("");
                 double price = Double.parseDouble(s[0])*100;
                 saved_Number.add(""+price*100+" M Dollars");
                 str=str.replaceAll(m6.group(),"");
-            }catch (Exception e){
 
-            }
 
         }
 
@@ -406,7 +416,7 @@ public class Parse {
         Pattern p7=Pattern.compile("\\d*.\\d* billion U.S. dollars|\\d*.\\d* million U.S. dollars|\\d*.\\d* trillion U.S. dollars");
         Matcher m7 = p7.matcher(str);
         while (m7.find()){
-            try {
+
                 String[] s=m7.group().split(" ");
                 if(m7.group().contains("million")){
                     saved_Number.add(s[0]+" M Dollars");
@@ -417,9 +427,7 @@ public class Parse {
                     saved_Number.add(s[0]+"000000 M Dollars");
                 }
                 str=str.replaceAll(m7.group(),"");
-            }catch (Exception e){
 
-            }
         }
 
         return saved_Number;
@@ -428,7 +436,7 @@ public class Parse {
     public List<String> checkPricesUnderMillion2(String str){
         //price under million
         List<String> saved_Number= new ArrayList<String>();
-        try {
+
 //            List<String> saved_Number= new ArrayList<String>();
             Pattern p_underMillion = Pattern.compile("\\$(?:[1-9][0-9]{0,4}(?:.\\d{1,3})?|100000|100000.000)|" +
                     "(?:[1-9][0-9]{0,4}(?:.\\d{1,3})?|100000|100000.000) (?:[1-9][0-9]{0,4}(?:.\\d{1,3})?|100000|100000.000) Dollars" +
@@ -441,10 +449,6 @@ public class Parse {
             }
             this.s=str;
 
-
-        }catch (Exception e){
-
-        }
         return saved_Number;
     }
 
@@ -464,16 +468,19 @@ public class Parse {
     public String splitNumberWithPoint(String s){
         String[] arr=String.valueOf(s).split("\\.");
         String result="";
-        try {
-            if(arr[0].length()<3){
-                return arr[0]+"."+arr[1];
+        if(arr.length!=0) {
+            if(arr.length==1){
+                return arr[0];
             }
-            if(arr[0].length()<7){ result= arr[0].substring(0, arr[0].length()-3) + "," + arr[0].substring(arr[0].length()-3, arr[0].length()); }
-            else if(arr[0].length()>6&&arr[0].length()<10){ result= arr[0].substring(0, arr[0].length()-6) + "," + arr[0].substring(arr[0].length()-6, arr[0].length()-3) + "," + arr[0].substring(arr[0].length()-3, arr[0].length()); }
-            else result= arr[0].substring(0, arr[0].length()-9) + "," + arr[0].substring(arr[0].length()-9, arr[0].length()-6) + "," + arr[0].substring(arr[0].length()-6, arr[0].length()-3) + "," + arr[0].substring(arr[0].length()-3, arr[0].length());
-
-        }catch (Exception e){
-
+            if (arr[0].length() < 3) {
+                return arr[0] + "." + arr[1];
+            }
+            if (arr[0].length() < 7) {
+                result = arr[0].substring(0, arr[0].length() - 3) + "," + arr[0].substring(arr[0].length() - 3, arr[0].length());
+            } else if (arr[0].length() > 6 && arr[0].length() < 10) {
+                result = arr[0].substring(0, arr[0].length() - 6) + "," + arr[0].substring(arr[0].length() - 6, arr[0].length() - 3) + "," + arr[0].substring(arr[0].length() - 3, arr[0].length());
+            } else
+                result = arr[0].substring(0, arr[0].length() - 9) + "," + arr[0].substring(arr[0].length() - 9, arr[0].length() - 6) + "," + arr[0].substring(arr[0].length() - 6, arr[0].length() - 3) + "," + arr[0].substring(arr[0].length() - 3, arr[0].length());
         }
         return regular_NumberHandle(result,"");
     }
@@ -548,8 +555,8 @@ public class Parse {
                 // PARSE HERE
                 String prev= token;
                 token = coreLabel.originalText();
-                String pos = coreLabel.get(CoreAnnotations.PartOfSpeechAnnotation.class);
-                String ner = coreLabel.get(CoreAnnotations.NamedEntityTagAnnotation.class);
+//                String pos = coreLabel.get(CoreAnnotations.PartOfSpeechAnnotation.class);
+//                String ner = coreLabel.get(CoreAnnotations.NamedEntityTagAnnotation.class);
                 String term = token;
 
                 // PARSE DONE
