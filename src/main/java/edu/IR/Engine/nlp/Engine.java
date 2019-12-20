@@ -203,7 +203,7 @@ public class Engine {
         ///final dump
         indexer.savePosting();
         // merge sort - LIMITED to file size (logical,virtual,string,terms,lists)
-        indexer.merge();
+        //indexer.merge();
 
         endTime=System.currentTimeMillis()/1000;
         long totlaTime=endTime - startTime;
