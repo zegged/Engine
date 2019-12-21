@@ -66,7 +66,6 @@ public class GUI extends Application {
         grid.setVgap(10);
         grid.setHgap(10);
 
-
         ImageView iv=new ImageView();
         Image image = new Image("file:just-google-it.jpg");
         iv.setImage(image);
@@ -133,7 +132,6 @@ public class GUI extends Application {
         GridPane.setConstraints(resetLabel, 1, 5);
         resetButton.setOnAction(e->deleteReset());
 
-
         //Display dictionary
         Button dictionaryDisplayButton = new Button("Dictionary");
         GridPane.setConstraints(dictionaryDisplayButton, 2, 7);
@@ -142,10 +140,10 @@ public class GUI extends Application {
         dictionaryDisplayButton.setOnAction(e->displayDictTable());
 
 
+        //load
         Button browseButton4 = new Button("browse");
         GridPane.setConstraints(browseButton4, 2, 9);
         browseButton4.setOnAction(e-> browserLoad());
-
 
         //load the created files
         Button loadButton = new Button("LOAD");
@@ -186,7 +184,7 @@ public class GUI extends Application {
             } else {
                 doStemming = false;
             }
-            Indexer indexer = new Indexer(pathToPosting);
+            indexer = new Indexer(pathToPosting);
             ReadFile readFile = new ReadFile();
             List<String> files = readFile.getAllFiles(pathToCorpus);
             Integer courpus_size = files.size();
@@ -221,21 +219,21 @@ public class GUI extends Application {
                         DocumentData documentData = parseResult.documentData;
                         DocumentTerms documentTerms = parseResult.documentTerms;
                         documentTerms.sort();
-//                        indexer.addTerms(documentTerms, documentData.docID);
-//                        indexer.addDocument(documentData);
-//
-//                        if (indexer.isMemoryFull()) {
-//                            indexer.savePosting();
-//                        }
+                        indexer.addTerms(documentTerms, documentData.docID);
+                        indexer.addDocument(documentData);
+
+                        if (indexer.isMemoryFull()) {
+                            indexer.savePosting();
+                        }
 
                     }
                 }
-
             }
             ///final dump
             indexer.savePosting();
             // merge sort - LIMITED to file size (logical,virtual,string,terms,lists)
             //indexer.merge();
+            getDictinary();
             int i = 0;
             long endTime = System.currentTimeMillis()/1000;
             totalTime = endTime - startTime;
@@ -253,6 +251,27 @@ public class GUI extends Application {
             }
         }
     }
+
+    public ObservableList<String> getDictinary(){
+        dictionary =new ListView<>();
+        SortedSet<String> sortedKeys;
+        ObservableList<String> termsDictionary= FXCollections.observableArrayList();
+        Map<String,List<TermData>>dict;
+        if(indexer!=null) {
+            //dict = indexer.getTerms();
+            //sortedKeys = new TreeSet<>(dict.keySet());
+        }
+//        else {
+//
+//            dict = loadDictinary;
+//            sortedKeys = new TreeSet<>(dict.keySet());
+//        }
+
+        dictionary.setItems(termsDictionary);
+        return termsDictionary;
+
+    }
+
 
     //opens another window with the dictionary table display
     //if not working well try listView
@@ -341,7 +360,6 @@ public class GUI extends Application {
                 }
             }
             else {
-                //it is a simple file. Proceed for deletion
                 file.delete();
             }
     }

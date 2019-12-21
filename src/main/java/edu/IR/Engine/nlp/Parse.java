@@ -1235,18 +1235,18 @@ public class Parse {
 
         // STANFORD NLP PARSE
        //doc.text="6 3/5 million sdgdfgk sdjkds kjsdgk 35 3/4 dfd ";
-        doc.text="between 2 and 5 , dfd ,between 2 and between 3 ";
+        //doc.text="between 2 and 5 , dfd ,between 2 and between 3 ";
         doc.text=doc.text.replaceAll("[\\(|;|'|:|\\^|\\)|\\]|\\[|\\#|\\]|\\+|\\*|\\@]", "");
         List<CoreSentence> sentences = breakSentences(doc.text);
-        //for prices
-        List<String> allPricesUnderMillion=new ArrayList<String>();
-        allPricesUnderMillion=checkPricesMoreThanMillion(doc.text);
-        inserttoDic(allPricesUnderMillion);
+//        //for prices
+//        List<String> allPricesUnderMillion=new ArrayList<String>();
+//        allPricesUnderMillion=checkPricesMoreThanMillion(doc.text);
+//        inserttoDic(allPricesUnderMillion);
 
         //between
-        List<String> betweenNumbers=new ArrayList<String>();
-        betweenNumbers=betweenFunc(doc.text);
-        inserttoDic(betweenNumbers);
+//        List<String> betweenNumbers=new ArrayList<String>();
+//        betweenNumbers=betweenFunc(doc.text);
+//        inserttoDic(betweenNumbers);
 
         //testtttttttttttttttttttttttttttt
         //List<CoreSentence> sentences = breakSentences("it is,  MAY 1999-2000");
@@ -1302,10 +1302,10 @@ public class Parse {
                     if(this.doSteming==true&&!(term.toLowerCase().equals("percent")||term.toLowerCase().equals("percentage"))
                             &&!(term.toLowerCase().equals("dollars")||term.toLowerCase().equals("million"))
                             &&!(term.toLowerCase().equals("thousand")||term.toLowerCase().equals("billion"))){
-                        PorterStemmer stemmer=new PorterStemmer();
-                        stemmer.setCurrent(term); //set string you need to stem
-                        stemmer.stem();  //stem the word
-                        term=stemmer.getCurrent();//get the stemmed word
+                            PorterStemmer stemmer=new PorterStemmer();
+                            stemmer.setCurrent(term); //set string you need to stem
+                            stemmer.stem();  //stem the word
+                            term=stemmer.getCurrent();//get the stemmed word
                     }
                     // SAVE TERM IN TEMP DICTIONARY
                     //percent
@@ -1418,20 +1418,23 @@ public class Parse {
                     }
 
                     //upper case
-                    if (Character.isUpperCase(term.charAt(0))){
-                        upper_words=upper_words+" "+term;
-                    }else{
-                        documentTerms.add(upper_words);
-                        upper_words="";
+                    if(term.matches("[a-zA-Z]+")){
+                        if (Character.isUpperCase(term.charAt(0))){
+                            upper_words=upper_words+" "+term;
+                        }else{
+                            documentTerms.add(upper_words);
+                            upper_words="";
+                        }
                     }
+
                     if(Flag==false){
                         documentTerms.add(term);
                     }
-//                    // STATISTICS
-//                    if (term_frequency>mostPopular_tf){
-//                        mostPopular_tf=term_frequency;
-//                        mostPopularTerm=term;
-//                    }
+////                    // STATISTICS
+////                    if (term_frequency>mostPopular_tf){
+////                        mostPopular_tf=term_frequency;
+////                        mostPopularTerm=term;
+////                    }
                 }
             }
         }

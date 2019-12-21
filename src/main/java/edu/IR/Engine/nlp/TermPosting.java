@@ -30,7 +30,7 @@ public class TermPosting {
         while (matcher.find()) {
             MatchResult result = matcher.toMatchResult();
 
-          //  String res = result.group(0);
+            //  String res = result.group(0);
             Integer frequency =  Integer.valueOf(result.group(1));
             Integer document = Integer.valueOf(result.group(2));
 

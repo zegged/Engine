@@ -187,8 +187,6 @@ public class ReadFile {
         List<String> ans = Files.walk(Paths.get(pathToCorpus))
                 .filter(Files::isRegularFile)
                 .map(x -> x.toString()).collect(Collectors.toList());
-
-
         return ans;
     }
 
