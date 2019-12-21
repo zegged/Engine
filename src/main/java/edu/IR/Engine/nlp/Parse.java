@@ -785,6 +785,7 @@ public class Parse {
         put("apr","04");put("may","05");put("jun","06");put("jul","07");put("aug","08");put("sep","09");
         put("oct","10");put("nov","11");put("dec","12");}};
 
+
     public Parse(Map<String,String> m_StopWords ,boolean doStemming){
         System.out.println("Parse init");
         stanfordCoreNLP = Pipeline.getPipeline();
@@ -1208,6 +1209,17 @@ public class Parse {
         return regular_NumberHandle(result,"");
     }
 
+    public List<String> betweenFunc(String s){
+        List<String> result=new ArrayList<>();
+        s=s.toLowerCase();
+        Pattern p=Pattern.compile("between \\d+ and \\d+");
+        Matcher m = p.matcher(s);
+        while (m.find()){
+            result.add(m.group());
+        }
+        return result;
+    }
+
     public ParseResult parseDocument(IRDocument doc){
 
         // parse docID
@@ -1223,13 +1235,19 @@ public class Parse {
 
         // STANFORD NLP PARSE
        //doc.text="6 3/5 million sdgdfgk sdjkds kjsdgk 35 3/4 dfd ";
-        doc.text="Rnj Yjn Ydsd Razyu sdfds Ksc-Asdf";
+        doc.text="between 2 and 5 , dfd ,between 2 and between 3 ";
         doc.text=doc.text.replaceAll("[\\(|;|'|:|\\^|\\)|\\]|\\[|\\#|\\]|\\+|\\*|\\@]", "");
         List<CoreSentence> sentences = breakSentences(doc.text);
         //for prices
         List<String> allPricesUnderMillion=new ArrayList<String>();
         allPricesUnderMillion=checkPricesMoreThanMillion(doc.text);
         inserttoDic(allPricesUnderMillion);
+
+        //between
+        List<String> betweenNumbers=new ArrayList<String>();
+        betweenNumbers=betweenFunc(doc.text);
+        inserttoDic(betweenNumbers);
+
         //testtttttttttttttttttttttttttttt
         //List<CoreSentence> sentences = breakSentences("it is,  MAY 1999-2000");
         //temp dictionary for parse
@@ -1417,10 +1435,10 @@ public class Parse {
                 }
             }
         }
-        // RETURN DOC DATA AND TERMS
-//        for(int i=0;i<this.alldictionaryFor_Hokem.size();i++){
-//            documentTerms.add(this.alldictionaryFor_Hokem.get(i));
-//        }
+         //RETURN DOC DATA AND TERMS
+        for(int i=0;i<this.alldictionaryFor_Hokem.size();i++){
+            documentTerms.add(this.alldictionaryFor_Hokem.get(i));
+        }
         DocumentData documentData = new DocumentData(intID,mostPopularTerm,mostPopular_tf);
         return new ParseResult(documentData,documentTerms);
     }
