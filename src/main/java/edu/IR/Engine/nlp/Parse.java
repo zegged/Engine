@@ -1239,6 +1239,7 @@ public class Parse {
         doc.text=doc.text.replaceAll("[\\(|;|'|:|\\^|\\)|\\]|\\[|\\#|\\]|\\+|\\*|\\@|!|?]", "");
         doc.text=doc.text.replaceAll("-{2,}","");
 
+
         List<CoreSentence> sentences = breakSentences(doc.text);
 //        //for prices
 //        List<String> allPricesUnderMillion=new ArrayList<String>();
@@ -1421,6 +1422,12 @@ public class Parse {
                             }
                         }
 
+                    }
+                    if(term.charAt(0)=='$'){
+                        if(check_if_string_isNumber(term.substring(1,term.length()-1))){
+                            documentTerms.add(term.substring(1,term.length()-1)+" Dollars");
+                            Flag=true;
+                        }
                     }
 
                     //upper case

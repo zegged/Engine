@@ -127,7 +127,6 @@ public class Engine {
         //Map<String, List<TermData>> lastDictionaryToView =  new TreeMap<>();
         Indexer indexer = new Indexer(postingFilePath);
         List<String> files = readFile.getAllFiles(pathToCorpus);
-
         Integer courpus_size = files.size();
         // FOR DEBUG ONLY
         Integer fileCounter = 0;
@@ -186,8 +185,19 @@ public class Engine {
                     }
                 }
             }
-//            System.out.println("indexing");
-//            for (ParseResult parseResult : parseResults){
+////            System.out.println("indexing");
+////            for (ParseResult parseResult : parseResults){
+////
+////                DocumentData documentData = parseResult.documentData;
+////                DocumentTerms documentTerms = parseResult.documentTerms;
+////                documentTerms.sort();
+////                indexer.addTerms(documentTerms, documentData.docID);
+////                indexer.addDocument(documentData);
+////                if (indexer.isMemoryFull()) {
+////                   indexer.savePosting();
+////                }
+////
+////            }
 //
 //                DocumentData documentData = parseResult.documentData;
 //                DocumentTerms documentTerms = parseResult.documentTerms;
@@ -201,8 +211,9 @@ public class Engine {
 //            }
 
         }
+//        }
         ///final dump
-        indexer.savePosting();
+        //indexer.savePosting();
         //merge sort - LIMITED to file size (logical,virtual,string,terms,lists)
         indexer.merge();
 
