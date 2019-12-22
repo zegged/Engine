@@ -250,10 +250,41 @@ public class Indexer {
     }
 
     //merge for last 2 files
-    public void merge_two_last_files(String path1,String path2,String strPostingShardPath) throws FileNotFoundException {
+    public void merge_two_last_files(String path1,String path2,String mergeFile) throws IOException {
         System.out.println("merging: " + path1 + " w/ " + path2);
         BufferedReader firstFile = new BufferedReader(new FileReader(path1));
         BufferedReader secondFile = new BufferedReader(new FileReader(path2));
+        List<TermMerge> ans = new ArrayList<>();
+        String line1 = firstFile.readLine();
+        String line2 = secondFile.readLine();
+        SortedMap<String, List<TermData>> sm = new TreeMap<String, List<TermData>>();
+        while (line1!=null) {
+            String term , value;
+            Integer index;
+            index = line1.indexOf(':');
+            term = line1.substring(0, index);
+            value = line1.substring(index + 1);
+            TermPosting termPosting1 = new TermPosting(value);
+            sm.put(term,termPosting1.m_postingList);
+            line1 = firstFile.readLine();
+
+        }
+        while (line2!=null) {
+            String term , value;
+            Integer index;
+            index = line2.indexOf(':');
+            term = line2.substring(0, index);
+            value = line2.substring(index + 1);
+            TermPosting termPosting1 = new TermPosting(value);
+            sm.put(term,termPosting1.m_postingList);
+            line2 = secondFile.readLine();
+        }
+        firstFile.close();
+        secondFile.close();
+        System.out.println("reformat");
+        //TODO: retuen or save ans
+        saveMerge(mergeFile,sm);
+
 
     }
 
