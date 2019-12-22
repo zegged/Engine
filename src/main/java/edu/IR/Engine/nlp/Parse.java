@@ -1235,8 +1235,10 @@ public class Parse {
 
         // STANFORD NLP PARSE
        //doc.text="6 3/5 million sdgdfgk sdjkds kjsdgk 35 3/4 dfd ";
-        //doc.text="between 2 and 5 , dfd ,between 2 and between 3 ";
-        doc.text=doc.text.replaceAll("[\\(|;|'|:|\\^|\\)|\\]|\\[|\\#|\\]|\\+|\\*|\\@]", "");
+        //doc.text=",k ,140 ! --------- .135";
+        doc.text=doc.text.replaceAll("[\\(|;|'|:|\\^|\\)|\\]|\\[|\\#|\\]|\\+|\\*|\\@|!|?]", "");
+        doc.text=doc.text.replaceAll("-{2,}","");
+
         List<CoreSentence> sentences = breakSentences(doc.text);
 //        //for prices
 //        List<String> allPricesUnderMillion=new ArrayList<String>();
@@ -1308,6 +1310,10 @@ public class Parse {
                             term=stemmer.getCurrent();//get the stemmed word
                     }
                     // SAVE TERM IN TEMP DICTIONARY
+                    term=term.replaceAll("^\\.","");
+                    term=term.replaceAll("^\\,","");
+                    //if term begins with '|,
+
                     //percent
                     if(term.equals("%")||term.equals("percent")||term.equals("percentage")){
                         if(check_if_string_isNumber(prev_token)){
@@ -1433,7 +1439,14 @@ public class Parse {
                     }
 
                     if(Flag==false){
-                        documentTerms.add(term);
+                        if(!(term.equals("%")||term.equals(",k")||term.equals("$")||term.equals("")||term.equals("-"))){
+                            if(term.charAt(0)=='.'||term.charAt(0)=='.'){
+                                documentTerms.add(term.split(""+term.charAt(0))[0]);
+                            }else{
+                                documentTerms.add(term);
+                            }
+
+                        }
                     }
 ////                    // STATISTICS
 ////                    if (term_frequency>mostPopular_tf){
