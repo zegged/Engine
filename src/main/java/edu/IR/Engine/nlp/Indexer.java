@@ -18,6 +18,7 @@ public class Indexer {
 
     //terms:
     public static Map<String, List<TermData>> terms = new TreeMap<>();
+    List<String> lastDictionaryToView ;
 
     //docs:
     public static List<String> docs = new ArrayList<>();
@@ -31,6 +32,7 @@ public class Indexer {
 
     public Indexer(String path) {
         m_strPostingFolderPath = path;
+        lastDictionaryToView=new ArrayList<>();
         System.out.println("Indexer init");
     }
 
@@ -230,7 +232,17 @@ public class Indexer {
         OpenFileToWrite(strPostingShardPath, Indexer.terms);
 
         // clear dictionary
+        // Get keys and values
+        this.lastDictionaryToView.clear();
+        for (Map.Entry<String, List<TermData>> entry : terms.entrySet()) {
+            String k = entry.getKey();
+            this.lastDictionaryToView.add(k);
+        }
         Indexer.terms.clear();
+    }
+
+    public List<String> getDictionaryForView(){
+        return this.lastDictionaryToView;
     }
 
     private String getPath(Integer prefix , Integer num) {
@@ -605,5 +617,7 @@ public class Indexer {
         }
 
     }
+
+
 
 }

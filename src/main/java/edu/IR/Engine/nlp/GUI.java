@@ -52,7 +52,8 @@ public class GUI extends Application {
     long totalTime;
     boolean finish=false;
     static Map<String,String> stopword ;
-
+    Map<String, List<TermData>> loadDictinary;
+    //Map<String,List<TermData>>dict;
     public static void main(String[] args) {
         launch(args);
     }
@@ -184,6 +185,7 @@ public class GUI extends Application {
             } else {
                 doStemming = false;
             }
+            Map<String, List<TermData>> lastDictionaryToView = null;
             indexer = new Indexer(pathToPosting);
             ReadFile readFile = new ReadFile();
             List<String> files = readFile.getAllFiles(pathToCorpus);
@@ -232,8 +234,8 @@ public class GUI extends Application {
             ///final dump
             indexer.savePosting();
             // merge sort - LIMITED to file size (logical,virtual,string,terms,lists)
-            //indexer.merge();
-            getDictinary();
+            indexer.merge();
+            getDictionaryTermGui();
             int i = 0;
             long endTime = System.currentTimeMillis()/1000;
             totalTime = endTime - startTime;
@@ -252,40 +254,52 @@ public class GUI extends Application {
         }
     }
 
-    public ObservableList<String> getDictinary(){
+    public ObservableList<String> getDictionaryTermGui()
+    {//get the items for the dictionary
         dictionary =new ListView<>();
         SortedSet<String> sortedKeys;
         ObservableList<String> termsDictionary= FXCollections.observableArrayList();
-        Map<String,List<TermData>>dict;
+        List<String> dict;
         if(indexer!=null) {
-            //dict = indexer.getTerms();
-            //sortedKeys = new TreeSet<>(dict.keySet());
-        }
-//        else {
-//
-//            dict = loadDictinary;
+            dict = indexer.lastDictionaryToView;//change to public for dictionary in indexer
 //            sortedKeys = new TreeSet<>(dict.keySet());
-//        }
-
+        }
+        else {
+            dict = new ArrayList<>();
+        }
+        for(int i=0;i<dict.size();i++){
+            termsDictionary.add(dict.get(i));
+        }
         dictionary.setItems(termsDictionary);
         return termsDictionary;
-
     }
 
-
-    //opens another window with the dictionary table display
-    //if not working well try listView
-    //https://stackoverflow.com/questions/27414689/a-java-advanced-text-logging-pane-for-large-output
     public void displayDictTable()
-    {
+    {//opens another window with the dictionary table display
+        //if not working well try listView
+        //https://stackoverflow.com/questions/27414689/a-java-advanced-text-logging-pane-for-large-output
         dictionary = new ListView<>();
         //dictionary.setItems(getDictionaryTermGui());
         ObservableList<String> termsDictionary= FXCollections.observableArrayList();
+        List<String> dict;
+        if(indexer!=null)
+            dict= indexer.getDictionaryForView();//change to public for dictionary in indexer
+        else
+            dict=new ArrayList<>();
+
+
+
+            for(int i=0;i<dict.size();i++){
+                termsDictionary.add(dict.get(i));
+            }
+
         dictionary.setItems(termsDictionary);
+
         VBox vBox = new VBox();
         vBox.getChildren().addAll(dictionary);
         Scene dictionaryScene=new Scene(vBox);
         Stage dicwindow = new Stage();
+
         //Block events to other windows
         dicwindow.initModality(Modality.APPLICATION_MODAL);
         dicwindow.setTitle("THE DICTIONARY");
@@ -293,6 +307,8 @@ public class GUI extends Application {
         dicwindow.setScene(dictionaryScene);
         dicwindow.show();
     }
+
+
 
     public void loadFiles()  {
 

@@ -120,10 +120,11 @@ public class Engine {
         //read corpus
         ReadFile readFile = new ReadFile();
 //        String pathToCorpus = "d:\\documents\\users\\razyal\\Downloads\\corpus\\corpus"; //CORPUS folder
-        String pathToCorpus = "d:\\documents\\users\\razyal\\Downloads\\corpus\\FB396001"; //CORPUS folder
+        String pathToCorpus = "C:\\Users\\Razi\\Desktop\\ehzor\\corpus2"; //CORPUS folder
 
         //String postingFile = "C:\\Users\\Razi\\Desktop\\ehzor\\corpus\\FB396001\\FB396001";
-        String postingFilePath = "d:\\documents\\users\\razyal\\Downloads\\corpus\\newpost\\";
+        String postingFilePath = "C:\\Users\\Razi\\Desktop\\ehzor\\posting\\";
+        //Map<String, List<TermData>> lastDictionaryToView =  new TreeMap<>();
         Indexer indexer = new Indexer(postingFilePath);
         List<String> files = readFile.getAllFiles(pathToCorpus);
 
@@ -134,7 +135,6 @@ public class Engine {
             files.remove(0);
             fileCounter++;
         }
-
         String text = null;
         String path = System.getProperty("user.dir")+"/stop_words.txt";
         File pathofstopword=new File(path);
@@ -195,7 +195,7 @@ public class Engine {
 //                indexer.addTerms(documentTerms, documentData.docID);
 //                indexer.addDocument(documentData);
 //                if (indexer.isMemoryFull()) {
-//                    indexer.savePosting();
+//                   indexer.savePosting();
 //                }
 //
 //            }
@@ -205,6 +205,7 @@ public class Engine {
         indexer.savePosting();
         //merge sort - LIMITED to file size (logical,virtual,string,terms,lists)
         indexer.merge();
+        List<String>dict=indexer.getDictionaryForView();
         endTime=System.currentTimeMillis()/1000;
         long totlaTime=endTime - startTime;
         System.out.println("Run Time: "+totlaTime);

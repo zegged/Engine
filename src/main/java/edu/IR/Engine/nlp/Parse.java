@@ -1420,7 +1420,12 @@ public class Parse {
                     //upper case
                     if(term.matches("[a-zA-Z]+")){
                         if (Character.isUpperCase(term.charAt(0))){
-                            upper_words=upper_words+" "+term;
+                            if(upper_words.equals("")){
+                                upper_words=term;
+                            }else{
+                                upper_words=upper_words+" "+term;
+                            }
+
                         }else{
                             documentTerms.add(upper_words);
                             upper_words="";
