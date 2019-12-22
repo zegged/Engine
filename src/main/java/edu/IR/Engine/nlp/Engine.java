@@ -127,7 +127,6 @@ public class Engine {
         //Map<String, List<TermData>> lastDictionaryToView =  new TreeMap<>();
         Indexer indexer = new Indexer(postingFilePath);
         List<String> files = readFile.getAllFiles(pathToCorpus);
-
         Integer courpus_size = files.size();
         // FOR DEBUG ONLY
         Integer fileCounter = 0;
