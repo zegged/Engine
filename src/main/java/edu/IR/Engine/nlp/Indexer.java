@@ -265,7 +265,10 @@ public class Indexer {
             term = line1.substring(0, index);
             value = line1.substring(index + 1);
             TermPosting termPosting1 = new TermPosting(value);
-            sm.put(term,termPosting1.m_postingList);
+            TermMerge newTermMerge =  new TermMerge(term,termPosting1);
+            newTermMerge.concatenateLists();
+            sm.put(term,newTermMerge.m_termData);
+            //ans.add(newTermMerge);
             line1 = firstFile.readLine();
 
         }
@@ -276,12 +279,19 @@ public class Indexer {
             term = line2.substring(0, index);
             value = line2.substring(index + 1);
             TermPosting termPosting1 = new TermPosting(value);
-            sm.put(term,termPosting1.m_postingList);
+            TermMerge newTermMerge =  new TermMerge(term,termPosting1);
+            newTermMerge.concatenateLists();
+            sm.put(term,newTermMerge.m_termData);
+            //ans.add(newTermMerge);
             line2 = secondFile.readLine();
         }
         firstFile.close();
         secondFile.close();
         System.out.println("reformat");
+//        for (TermMerge termMerge : ans){
+//            termMerge.concatenateLists();
+//            sm.put(termMerge.m_term,termMerge.m_termData);
+//        }
         //TODO: retuen or save ans
         saveMerge(mergeFile,sm);
 
@@ -300,25 +310,27 @@ public class Indexer {
         String path3=getPath(Iteration,i+2);
         if(checkFilesExists(path3)==false){
             merge_two_last_files(path1,path2,strPostingShardPath);
+            deleteFile(path1);
+            deleteFile(path2);
         }
-
-        while (checkFilesExists(path1)){
-            if ( checkFilesExists(path2) ){
-                mergeTwoFiles(path1,path2,strPostingShardPath);
-                deleteFile(path1);
-                deleteFile(path2);
+        else {
+            while (checkFilesExists(path1)){
+                if ( checkFilesExists(path2) ){
+                    mergeTwoFiles(path1,path2,strPostingShardPath);
+                    deleteFile(path1);
+                    deleteFile(path2);
+                }
+                else{
+                    //last odd . just copy
+                    mergeLastFile(path1, strPostingShardPath);
+                }
+                i+=2;
+                mergeIdx++;
+                path1 = getPath(Iteration,i+0);
+                path2 = getPath(Iteration,i+1);
+                strPostingShardPath = getPath(Iteration+1,mergeIdx);
             }
-            else{
-                //last odd . just copy
-                mergeLastFile(path1, strPostingShardPath);
-            }
-            i+=2;
-            mergeIdx++;
-            path1 = getPath(Iteration,i+0);
-            path2 = getPath(Iteration,i+1);
-            strPostingShardPath = getPath(Iteration+1,mergeIdx);
         }
-
     }
 
 //    public void mergeTwoFiles(String path1, String path2, String mergeFile) throws IOException {
@@ -341,19 +353,11 @@ public class Indexer {
        // Map< String,Integer> map = new HashMap< String,Integer>();
        // Map<String, List<TermData>> stringListMap = new LinkedHashMap<>();
         String strAns = "";
-        boolean readLeft = true;
-        boolean readRight = true;
         String line1, line2;
         line1="";
         line2="";
-        if (readLeft){
-            line1 = firstFile.readLine();
-        }
-        if (readRight) {
-            line2 = secondFile.readLine();
-        }
-        readLeft= false;
-        readRight = false;
+        line1 = firstFile.readLine();
+        line2 = secondFile.readLine();
         while (line1!=null  && line2!=null  ) {
             String term1, term2, value1, value2;
             Integer index1, index2;
@@ -370,32 +374,23 @@ public class Indexer {
                 TermMerge newTermMerge =  new TermMerge(term1,termPosting1,termPosting2);
 //                stringListMap.put(newTermMerge.m_term,newTermMerge.m_termData);
                 ans.add(newTermMerge);
-                readLeft = true;
-                readRight = true;
             }
             else {
                 if(term1.compareTo(term2)<0){
                     TermMerge newTermMerge =  new TermMerge(term1,termPosting1);
                     //stringListMap.put(newTermMerge.m_term,newTermMerge.m_termData);
                     ans.add(newTermMerge);
-                    readLeft = true;
 
                 }
                 else{
                     TermMerge newTermMerge =  new TermMerge(term2,termPosting2);
                     //stringListMap.put(newTermMerge.m_term,newTermMerge.m_termData);
                     ans.add(newTermMerge);
-                    readRight = true;
                 }
             }
-            if (readLeft){
-                line1 = firstFile.readLine();
-            }
-            if (readRight) {
-                line2 = secondFile.readLine();
-            }
-            readLeft= false;
-            readRight = false;
+            line1 = firstFile.readLine();
+            line2 = secondFile.readLine();
+
         }
         String line1T = firstFile.readLine();
         while (line1T!=null) {
