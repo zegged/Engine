@@ -3,6 +3,7 @@ package edu.IR.Engine.nlp;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -270,20 +271,12 @@ public class Indexer {
 
     public void mergePostingFile(Integer Iteration) throws IOException {
         System.out.println("merging");
-
         String path = m_strPostingFolderPath;
-
-
-
-
         Integer i = 0;
         Integer mergeIdx=0;
-
         String path1 = getPath(Iteration,i+0);
         String path2 = getPath(Iteration,i+1);
         String strPostingShardPath = getPath(Iteration+1,0);
-
-
         while (checkFilesExists(path1)){
             if ( checkFilesExists(path2) ){
                 mergeTwoFiles(path1,path2,strPostingShardPath);
@@ -303,185 +296,68 @@ public class Indexer {
 
     }
 
+//    public void mergeTwoFiles(String path1, String path2, String mergeFile) throws IOException {
+//        BufferedReader firstFile = new BufferedReader(new FileReader(path1));
+//        BufferedReader secondFile = new BufferedReader(new FileReader(path2));
+//        String st;
+//        while ((st = firstFile.readLine()) != null)
+//            System.out.println(st);
+//    }
+
+
 //////////////
 
 
-    public void mergeTwoFiles(String path1, String path2, String mergeFile) {
-
-
+    public void mergeTwoFiles(String path1, String path2, String mergeFile) throws IOException {
         System.out.println("merging: " + path1 + " w/ " + path2);
-
-
-        //Path pathT1  = Paths.get(path1);
-        //Path pathT2  = Paths.get(path2);
-
-        //System.out.println("loading files");
-        //ArrayList<String> lines1 = (ArrayList<String>) Files.readAllLines(pathT1);
-        //ArrayList<String> lines2 = (ArrayList<String>) Files.readAllLines(pathT2);
-        //System.out.println("merging");
-        //File file1 = new File(path1);
-        //File file2 = new File(path2);
-
-        //RandomAccessFile raf1 = new RandomAccessFile(file1, "r");
-        //RandomAccessFile raf2 = new RandomAccessFile(file2, "r");
-
-
-
-        FileInputStream inputStream1 = null;
-        FileInputStream inputStream2 = null;
-        Scanner sc1 = null;
-        Scanner sc2 = null;
-
-
-        try {
-            inputStream1 = new FileInputStream(path1);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        try {
-            inputStream2 = new FileInputStream(path2);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        sc1 = new Scanner(inputStream1, "UTF-8");
-        sc2 = new Scanner(inputStream2, "UTF-8");
-
-
-
+        BufferedReader firstFile = new BufferedReader(new FileReader(path1));
+        BufferedReader secondFile = new BufferedReader(new FileReader(path2));
+//        FileInputStream inputStream1 = null;
+//        FileInputStream inputStream2 = null;
+//        Scanner sc1 = null;
+//        Scanner sc2 = null;
+//        try {
+//            inputStream1 = new FileInputStream(path1);
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            inputStream2 = new FileInputStream(path2);
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        sc1 = new Scanner((Path) firstFile, "UTF-8");
+//        sc2 = new Scanner((Path) secondFile, "UTF-8");
         List<TermMerge> ans = new ArrayList<>();
-
         String strAns = "";
-
-        // reading lines from the files.
-        // should wrap with a first if
-
-        //boolean readRight = true;
-        //boolean readLeft = true;
-
-
-
-        /*
-
-        int leftIndex = 0;
-        int rightIndex = 0;
-        int size = lines1.size() + lines2.size();
-        for (int i = 0; i < size + 1; i++){
-
-            if (i % 100 == 0) {
-                System.out.println((i + 0.0) / size);
-            }
-
-            line1 = lines1.get(leftIndex);
-            line2 = lines2.get(rightIndex);
-
-            String[] splitLine1 = line1.split(":");
-            String[] splitLine2 = line2.split(":");
-
-            //index1 = line1.indexOf(':');
-            //index2 = line2.indexOf(':');
-
-
-            // separating name and number.
-            term1 = splitLine1[0]; //.substring(0, index1);
-            value1 = splitLine1[1]; //.substring(index1 + 1);
-
-            term2 = splitLine2[0]; //.substring(0, index2);
-            value2 = splitLine2[1]; //.substring(index2 + 1);
-
-            TermPosting termPosting1 = new TermPosting(value1);
-            TermPosting termPosting2 = new TermPosting(value2);
-
-            if (leftIndex < lines1.size() && rightIndex < lines2.size()) {
-                if (term1.equals(term2)){
-
-                    TermMerge newTermMerge =  new TermMerge(term1,termPosting1,termPosting2);
-                    //System.out.println(newTermMerge);
-                    ans.add(newTermMerge);
-
-                }
-                else
-                if (term1.compareTo(term2)<0) {
-                    //TermPosting termPosting1 = new TermPosting(value1);
-                    TermMerge newTermMerge =  new TermMerge(term1,termPosting1);
-                    ans.add(newTermMerge);
-                    leftIndex++;
-                } else {
-                    //TermPosting termPosting2 = new TermPosting(value2);
-                    TermMerge newTermMerge =  new TermMerge(term2,termPosting2);
-                    ans.add(newTermMerge);
-                    rightIndex++;
-                }
-            } else if (leftIndex < lines1.size()) {
-                // If all elements have been copied from rightArray, copy rest of leftArray
-                //TermPosting termPosting1 = new TermPosting(value1);
-                TermMerge newTermMerge =  new TermMerge(term1,termPosting1);
-                ans.add(newTermMerge);
-                leftIndex++;
-            } else if (rightIndex < lines2.size()) {
-                // If all elements have been copied from leftArray, copy rest of rightArray
-                //TermPosting termPosting2 = new TermPosting(value2);
-                TermMerge newTermMerge =  new TermMerge(term2,termPosting2);
-                ans.add(newTermMerge);
-                rightIndex++;
-            }
-
-
-
-
-        }
-
-         */
-
         boolean readLeft = true;
         boolean readRight = true;
-
         String line1, line2;
         line1="";
         line2="";
-
-        while (sc1.hasNextLine()  && sc2.hasNextLine()  ) {
+        while (firstFile.readLine()!=null  && secondFile.readLine()!=null  ) {
             String term1, term2, value1, value2;
             Integer index1, index2;
-
-
-
             if (readLeft){
-                line1 = sc1.nextLine();
+                line1 = firstFile.readLine();
             }
             if (readRight) {
-                line2 = sc2.nextLine();
+                line2 = secondFile.readLine();
             }
             readLeft= false;
             readRight = false;
-
             index1 = line1.indexOf(':');
             index2 = line2.indexOf(':');
-
-
-            // separating name and number.
             term1 = line1.substring(0, index1);
             value1 = line1.substring(index1 + 1);
-
             term2 = line2.substring(0, index2);
             value2 = line2.substring(index2 + 1);
-
-            //System.out.println(term1 + " = " + term1.compareTo(term2) + " = " +  term2);
-
             TermPosting termPosting1 = new TermPosting(value1);
             TermPosting termPosting2 = new TermPosting(value2);
-
-
             // INTERSECT
-
             if (term1.equals(term2)){
-                //System.out.println(term1);
-                //System.out.println(termPosting1.m_postingList);
-                //System.out.println(termPosting2.m_postingList);
                 TermMerge newTermMerge =  new TermMerge(term1,termPosting1,termPosting2);
-                //System.out.println(newTermMerge);
                 ans.add(newTermMerge);
-                //line1 = raf1.readLine();
-                //line2 = raf2.readLine();
                 readLeft = true;
                 readRight = true;
             }
@@ -490,34 +366,29 @@ public class Indexer {
                 if(term1.compareTo(term2)<0){
                     TermMerge newTermMerge =  new TermMerge(term1,termPosting1);
                     ans.add(newTermMerge);
-                    //line1 = raf1.readLine();
                     readLeft = true;
 
                 }
                 else{
                     TermMerge newTermMerge =  new TermMerge(term2,termPosting2);
                     ans.add(newTermMerge);
-                    //line2 = raf2.readLine();
                     readRight = true;
                 }
             }
         }
 
-        while (sc1.hasNextLine()) {
-            String line1T = sc1.nextLine();
-            //System.out.println("line1:" + line1T);
+        while (firstFile.readLine()!=null) {
+            String line1T = firstFile.readLine();
             Integer index1 = line1T.indexOf(':');
             String term1 = line1T.substring(0, index1);
             String value1 = line1T.substring(index1 + 1);
             TermPosting termPosting1 = new TermPosting(value1);
             TermMerge newTermMerge =  new TermMerge(term1,termPosting1);
             ans.add(newTermMerge);
-            //System.out.println(termPosting1.m_postingList);
         }
 
-        while (sc2.hasNextLine()  ) {
-            String line2T = sc2.nextLine();
-            //System.out.println("line2:" + line2T);
+        while (secondFile.readLine()!=null  ) {
+            String line2T = secondFile.readLine();
             Integer index2 = line2T.indexOf(':');
             String term2 = line2T.substring(0, index2);
             String value2 = line2T.substring(index2 + 1);
@@ -525,21 +396,11 @@ public class Indexer {
             TermMerge newTermMerge =  new TermMerge(term2,termPosting2);
             ans.add(newTermMerge);
         }
-
-        //System.out.println(ans);
-
-        //raf1.close();
-        //raf2.close();
-
-        sc1.close();
-        sc2.close();
-
-        // List<Pair<String,List<TermData>>>
-        //List<TermData> termData = new ArrayList<>();
+        firstFile.close();
+        secondFile.close();
         Map<String, List<TermData>> stringListMap = new LinkedHashMap<>();
         System.out.println("reformat");
         for (TermMerge termMerge : ans){
-            //System.out.println(termMerge.m_term);
             termMerge.concatenateLists();
             stringListMap.put(termMerge.m_term,termMerge.m_termData);
         }
@@ -550,9 +411,7 @@ public class Indexer {
 
 
     public void saveMerge(String filePath, Map<String, List<TermData>> terms) {
-        //String strPostingShardPath = getPath("Merge",0);
         OpenFileToWrite(filePath, terms);
-
         // TODO: clear old files
     }
 
@@ -570,14 +429,12 @@ public class Indexer {
 
 
 
-
     private void mergeLastFile(String path1, String mergeFile) throws IOException {
         System.out.println("merging: " + path1);
         File file1 = new File(path1);
         File file2 = new File(mergeFile);
         file1.renameTo(file2);
     }
-
 
     private boolean checkFilesExists(String path1) {
         File file = new File(path1);

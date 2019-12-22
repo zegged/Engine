@@ -1,5 +1,4 @@
 package edu.IR.Engine.nlp;
-
 import edu.IR.Engine.nlp.*;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -24,9 +23,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-
 import javafx.scene.layout.Background;
-
 import static java.nio.file.Files.deleteIfExists;
 
 public class GUI extends Application {
