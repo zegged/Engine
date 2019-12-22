@@ -185,21 +185,21 @@ public class Engine {
 //                    }
 //                }
 //            }
-//            System.out.println("indexing");
-//            for (ParseResult parseResult : parseResults){
+////            System.out.println("indexing");
+////            for (ParseResult parseResult : parseResults){
+////
+////                DocumentData documentData = parseResult.documentData;
+////                DocumentTerms documentTerms = parseResult.documentTerms;
+////                documentTerms.sort();
+////                indexer.addTerms(documentTerms, documentData.docID);
+////                indexer.addDocument(documentData);
+////                if (indexer.isMemoryFull()) {
+////                   indexer.savePosting();
+////                }
+////
+////            }
 //
-//                DocumentData documentData = parseResult.documentData;
-//                DocumentTerms documentTerms = parseResult.documentTerms;
-//                documentTerms.sort();
-//                indexer.addTerms(documentTerms, documentData.docID);
-//                indexer.addDocument(documentData);
-//                if (indexer.isMemoryFull()) {
-//                   indexer.savePosting();
-//                }
-//
-//            }
-
-      //  }
+//        }
         ///final dump
         //indexer.savePosting();
         //merge sort - LIMITED to file size (logical,virtual,string,terms,lists)

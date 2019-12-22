@@ -258,6 +258,41 @@ public class Indexer {
         String line1 = firstFile.readLine();
         String line2 = secondFile.readLine();
         SortedMap<String, List<TermData>> sm = new TreeMap<String, List<TermData>>();
+
+        while (line1!=null &&line2!=null){
+            String term1, term2, value1, value2;
+            Integer index1, index2;
+            index1 = line1.indexOf(':');
+            index2 = line2.indexOf(':');
+            term1 = line1.substring(0, index1);
+            value1 = line1.substring(index1 + 1);
+            term2 = line2.substring(0, index2);
+            value2 = line2.substring(index2 + 1);
+            TermPosting termPosting1 = new TermPosting(value1);
+            TermPosting termPosting2 = new TermPosting(value2);
+            // INTERSECT
+            if (term1.equals(term2)){
+                TermMerge newTermMerge =  new TermMerge(term1,termPosting1,termPosting2);
+//                stringListMap.put(newTermMerge.m_term,newTermMerge.m_termData);
+                ans.add(newTermMerge);
+            }
+            else {
+                if(term1.compareTo(term2)<0){
+                    TermMerge newTermMerge =  new TermMerge(term1,termPosting1);
+                    //stringListMap.put(newTermMerge.m_term,newTermMerge.m_termData);
+                    ans.add(newTermMerge);
+
+                }
+                else{
+                    TermMerge newTermMerge =  new TermMerge(term2,termPosting2);
+                    //stringListMap.put(newTermMerge.m_term,newTermMerge.m_termData);
+                    ans.add(newTermMerge);
+                }
+            }
+            line1 = firstFile.readLine();
+            line2 = secondFile.readLine();
+        }
+
         while (line1!=null) {
             String term , value;
             Integer index;
@@ -288,14 +323,13 @@ public class Indexer {
         firstFile.close();
         secondFile.close();
         System.out.println("reformat");
-//        for (TermMerge termMerge : ans){
-//            termMerge.concatenateLists();
-//            sm.put(termMerge.m_term,termMerge.m_termData);
-//        }
+
+        for (TermMerge termMerge : ans){
+            termMerge.concatenateLists();
+            sm.put(termMerge.m_term,termMerge.m_termData);
+        }
         //TODO: retuen or save ans
         saveMerge(mergeFile,sm);
-
-
     }
 
     public void mergePostingFile(Integer Iteration) throws IOException {
