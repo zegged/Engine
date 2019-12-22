@@ -198,8 +198,8 @@ public class Indexer {
     }
 
     public boolean isMemoryFull() {
-        if (Indexer.docs.size() % 5000==0){
-            System.out.println("Dumping 5K Documents.");
+        if (Indexer.docs.size() % 50000==0){
+            System.out.println("Dumping 50K Documents.");
             return true;
         }
         return false;
@@ -246,6 +246,31 @@ public class Indexer {
             path1 = getPath(iteration,1);
         }
 
+        path1 = getPath(iteration,0);
+        String postingFile = getPath(0,0);
+        mergeLastFile(path1,postingFile);
+
+    }
+
+
+    public void createDictionary() throws IOException {
+
+        System.out.println("creating dictionary.");
+        String path1 = getPath(0,0);
+        BufferedReader firstFile = new BufferedReader(new FileReader(path1));
+
+        String line; ;
+        while ( (line= firstFile.readLine() )!=null) {
+            Integer index1 = line.indexOf(':');
+            String term1 = line.substring(0, index1);
+            String value1 = line.substring(index1 + 1);
+
+            TermStats termStats = new TermStats(term1, value1);
+
+            TermPosting termPosting1 = new TermPosting(value1);
+            TermMerge newTermMerge =  new TermMerge(term1,termPosting1);
+           // ans.add(newTermMerge);
+        }
 
     }
 

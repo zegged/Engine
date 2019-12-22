@@ -120,13 +120,14 @@ public class Engine {
         //read corpus
         ReadFile readFile = new ReadFile();
 //        String pathToCorpus = "d:\\documents\\users\\razyal\\Downloads\\corpus\\corpus"; //CORPUS folder
-        String pathToCorpus = "d:\\documents\\users\\razyal\\Downloads\\corpus"; //CORPUS folder
+        String pathToCorpus = "C:\\corpus\\corpus\\corpus2"; //CORPUS folder
 
         //String postingFile = "C:\\Users\\Razi\\Desktop\\ehzor\\corpus\\FB396001\\FB396001";
-        String postingFilePath = "d:\\documents\\users\\razyal\\Downloads\\posting\\";
+        String postingFilePath = "C:\\Posting\\";
         //Map<String, List<TermData>> lastDictionaryToView =  new TreeMap<>();
         Indexer indexer = new Indexer(postingFilePath);
         List<String> files = readFile.getAllFiles(pathToCorpus);
+
         Integer courpus_size = files.size();
         // FOR DEBUG ONLY
         Integer fileCounter = 0;
@@ -204,6 +205,11 @@ public class Engine {
         indexer.savePosting();
         //merge sort - LIMITED to file size (logical,virtual,string,terms,lists)
         indexer.merge();
+
+
+
+        //indexer.createDictionary();
+
         List<String>dict=indexer.getDictionaryForView();
         endTime=System.currentTimeMillis()/1000;
         long totlaTime=endTime - startTime;
