@@ -57,14 +57,16 @@ public class Indexer {
     }
 
 
-    private void dumpPosting(String fileNameToSave, RandomAccessFile raf, Map<String, List<TermData>> terms) throws IOException {
+    private void dumpPosting(String fileNameToSave, FileWriter raf, Map<String, List<TermData>> terms) throws IOException {
 
         for (Map.Entry<String,List<TermData>> entry : terms.entrySet()) {
             String term = entry.getKey();
             List<TermData> value = entry.getValue();
             String lineToAdd = term + ":" + value;
-            raf.writeBytes(lineToAdd);
-            raf.writeBytes(System.lineSeparator());
+            raf.write(lineToAdd);
+            raf.write(System.lineSeparator());
+//            raf.writeBytes(lineToAdd);
+//            raf.writeBytes(System.lineSeparator());
         }
 
     }
@@ -114,11 +116,11 @@ public class Indexer {
             // Create a new file if not exists.
             try {
                 file.createNewFile();
-                RandomAccessFile raf = new RandomAccessFile(file, "rw");
-                dumpPosting(filename,raf, terms);
-
+                FileWriter writer = new FileWriter(file);
+                //RandomAccessFile raf = new RandomAccessFile(file, "rw");
+                dumpPosting(filename,writer, terms);
                 // Closing the resources.
-                raf.close();
+                writer.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -146,7 +148,6 @@ public class Indexer {
         System.out.println(line);
 
     }
-
 
 
     // ARCHIVE
@@ -293,6 +294,7 @@ public class Indexer {
         BufferedReader secondFile = new BufferedReader(new FileReader(path2));
         List<TermMerge> ans = new ArrayList<>();
         Map< String,Integer> map = new HashMap< String,Integer>();
+        Map<String, List<TermData>> stringListMap = new LinkedHashMap<>();
         String strAns = "";
         boolean readLeft = true;
         boolean readRight = true;
@@ -321,20 +323,23 @@ public class Indexer {
             // INTERSECT
             if (term1.equals(term2)){
                 TermMerge newTermMerge =  new TermMerge(term1,termPosting1,termPosting2);
-                ans.add(newTermMerge);
+                stringListMap.put(newTermMerge.m_term,newTermMerge.m_termData);
+//                ans.add(newTermMerge);
                 readLeft = true;
                 readRight = true;
             }
             else {
                 if(term1.compareTo(term2)<0){
                     TermMerge newTermMerge =  new TermMerge(term1,termPosting1);
-                    ans.add(newTermMerge);
+                    stringListMap.put(newTermMerge.m_term,newTermMerge.m_termData);
+                    //ans.add(newTermMerge);
                     readLeft = true;
 
                 }
                 else{
                     TermMerge newTermMerge =  new TermMerge(term2,termPosting2);
-                    ans.add(newTermMerge);
+                    stringListMap.put(newTermMerge.m_term,newTermMerge.m_termData);
+                    //ans.add(newTermMerge);
                     readRight = true;
                 }
             }
@@ -354,7 +359,8 @@ public class Indexer {
             String value1 = line1T.substring(index1 + 1);
             TermPosting termPosting1 = new TermPosting(value1);
             TermMerge newTermMerge =  new TermMerge(term1,termPosting1);
-            ans.add(newTermMerge);
+            stringListMap.put(newTermMerge.m_term,newTermMerge.m_termData);
+            //ans.add(newTermMerge);
             line1T=firstFile.readLine();
         }
 
@@ -365,18 +371,20 @@ public class Indexer {
             String value2 = line2T.substring(index2 + 1);
             TermPosting termPosting2 = new TermPosting(value2);
             TermMerge newTermMerge =  new TermMerge(term2,termPosting2);
-            ans.add(newTermMerge);
+            stringListMap.put(newTermMerge.m_term,newTermMerge.m_termData);
+            //ans.add(newTermMerge);
             line2T=secondFile.readLine();
         }
 
         firstFile.close();
         secondFile.close();
-        Map<String, List<TermData>> stringListMap = new LinkedHashMap<>();
+        //Map<String, List<TermData>> stringListMap = new LinkedHashMap<>();
         System.out.println("reformat");
-        for (TermMerge termMerge : ans){
-            termMerge.concatenateLists();
-            stringListMap.put(termMerge.m_term,termMerge.m_termData);
-        }
+//
+//        for (TermMerge termMerge : ans){
+//            termMerge.concatenateLists();
+//            stringListMap.put(termMerge.m_term,termMerge.m_termData);
+//        }
 
         //TODO: retuen or save ans
         saveMerge(mergeFile,stringListMap);
