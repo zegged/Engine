@@ -69,8 +69,6 @@ public class Indexer {
 
     }
 
-
-
     private void dumpPostingSavePointers(String fileNameToSave, RandomAccessFile raf) throws IOException {
         for (Map.Entry<String,List<TermData>> entry : Indexer.terms.entrySet()) {
             String term = entry.getKey();
@@ -112,30 +110,11 @@ public class Indexer {
     private boolean OpenFileToWrite(String filename, Map<String, List<TermData>> terms){
 
         File file = new File(filename);
-
         if (!file.exists()) {
             // Create a new file if not exists.
             try {
                 file.createNewFile();
-
                 RandomAccessFile raf = new RandomAccessFile(file, "rw");
-
-                //System.out.println("poiner at: " + raf.getFilePointer());
-
-                // writeBytes function to write a string
-                // as a sequence of bytes.
-                //raf.writeBytes("hello world");
-
-                //System.out.println("poiner at: " + raf.getFilePointer());
-
-                // To insert the next record in new line.
-                //raf.writeBytes(System.lineSeparator());
-
-                //System.out.println("poiner at: " + raf.getFilePointer());
-
-                // Print the message
-                //System.out.println(" line added. ");
-
                 dumpPosting(filename,raf, terms);
 
                 // Closing the resources.
@@ -312,40 +291,25 @@ public class Indexer {
         System.out.println("merging: " + path1 + " w/ " + path2);
         BufferedReader firstFile = new BufferedReader(new FileReader(path1));
         BufferedReader secondFile = new BufferedReader(new FileReader(path2));
-//        FileInputStream inputStream1 = null;
-//        FileInputStream inputStream2 = null;
-//        Scanner sc1 = null;
-//        Scanner sc2 = null;
-//        try {
-//            inputStream1 = new FileInputStream(path1);
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            inputStream2 = new FileInputStream(path2);
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        sc1 = new Scanner((Path) firstFile, "UTF-8");
-//        sc2 = new Scanner((Path) secondFile, "UTF-8");
         List<TermMerge> ans = new ArrayList<>();
+        Map< String,Integer> map = new HashMap< String,Integer>();
         String strAns = "";
         boolean readLeft = true;
         boolean readRight = true;
         String line1, line2;
         line1="";
         line2="";
-        while (firstFile.readLine()!=null  && secondFile.readLine()!=null  ) {
+        if (readLeft){
+            line1 = firstFile.readLine();
+        }
+        if (readRight) {
+            line2 = secondFile.readLine();
+        }
+        readLeft= false;
+        readRight = false;
+        while (line1!=null  && line2!=null  ) {
             String term1, term2, value1, value2;
             Integer index1, index2;
-            if (readLeft){
-                line1 = firstFile.readLine();
-            }
-            if (readRight) {
-                line2 = secondFile.readLine();
-            }
-            readLeft= false;
-            readRight = false;
             index1 = line1.indexOf(':');
             index2 = line2.indexOf(':');
             term1 = line1.substring(0, index1);
@@ -362,7 +326,6 @@ public class Indexer {
                 readRight = true;
             }
             else {
-
                 if(term1.compareTo(term2)<0){
                     TermMerge newTermMerge =  new TermMerge(term1,termPosting1);
                     ans.add(newTermMerge);
@@ -375,27 +338,37 @@ public class Indexer {
                     readRight = true;
                 }
             }
+            if (readLeft){
+                line1 = firstFile.readLine();
+            }
+            if (readRight) {
+                line2 = secondFile.readLine();
+            }
+            readLeft= false;
+            readRight = false;
         }
-
-        while (firstFile.readLine()!=null) {
-            String line1T = firstFile.readLine();
+        String line1T = firstFile.readLine();
+        while (line1T!=null) {
             Integer index1 = line1T.indexOf(':');
             String term1 = line1T.substring(0, index1);
             String value1 = line1T.substring(index1 + 1);
             TermPosting termPosting1 = new TermPosting(value1);
             TermMerge newTermMerge =  new TermMerge(term1,termPosting1);
             ans.add(newTermMerge);
+            line1T=firstFile.readLine();
         }
 
+        String line2T = secondFile.readLine();
         while (secondFile.readLine()!=null  ) {
-            String line2T = secondFile.readLine();
             Integer index2 = line2T.indexOf(':');
             String term2 = line2T.substring(0, index2);
             String value2 = line2T.substring(index2 + 1);
             TermPosting termPosting2 = new TermPosting(value2);
             TermMerge newTermMerge =  new TermMerge(term2,termPosting2);
             ans.add(newTermMerge);
+            line2T=secondFile.readLine();
         }
+
         firstFile.close();
         secondFile.close();
         Map<String, List<TermData>> stringListMap = new LinkedHashMap<>();
