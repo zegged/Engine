@@ -28,7 +28,7 @@ public class TermStats {
         tf += t.frequency;
     }
 
-        System.out.println(term + " tf=" + tf + " df=" + df);
+        //System.out.println(term + " tf=" + tf + " df=" + df);
 
 
     }
@@ -62,8 +62,12 @@ public class TermStats {
 
 
 
+    public String toString() {
 
-
-
-
+        return term + "|tf:"+tf+"|df:"+df;
+    }
 }
+
+
+
+

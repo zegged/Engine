@@ -151,9 +151,10 @@ public class Indexer {
 
 
     // ARCHIVE
-    public void writeToFile(String data) throws Exception {
+    public void writeToFile(String data, String path) throws Exception {
         //System.out.println(data);
-        String fileName = "c:\\posting\\test.txt";
+        String fileName = path;
+        //"c:\\posting\\test.txt";
         RandomAccessFile stream = new RandomAccessFile(fileName, "rw");
         FileChannel channel = stream.getChannel();
         String value = data;
@@ -193,13 +194,13 @@ public class Indexer {
     }
 
     public void addDocument(DocumentData documentData) {
-        String docData = documentData.docID + "^" + documentData.mostPopularTerm + "^" + documentData.mostPopulatFrequency ;
-        Indexer.docs.add(docData);
+        //String docData = documentData.docID + "^" + documentData.mostPopularTerm + "^" + documentData.mostPopulatFrequency ;
+        Indexer.docs.add(documentData.toString());
     }
 
     public boolean isMemoryFull() {
-        if (Indexer.docs.size() % 50000==0){
-            System.out.println("Dumping 50K Documents.");
+        if (Indexer.docs.size() % 1000==0){
+            System.out.println("Dumping 1K Documents.");
             return true;
         }
         return false;
@@ -236,6 +237,17 @@ public class Indexer {
         return path;
     }
 
+    private String getPath(String arg) {
+        if (arg == "dic") {
+            return m_strPostingFolderPath + "dictionary.txt";
+        }
+        if (arg == "doc"){
+            return m_strPostingFolderPath + "documents.txt";
+        }
+
+        return "";
+    }
+
 
     public void merge() throws IOException {
         Integer iteration = 0;
@@ -253,12 +265,14 @@ public class Indexer {
     }
 
 
-    public void createDictionary() throws IOException {
+    public void createDictionary() throws Exception {
 
         System.out.println("creating dictionary.");
+
         String path1 = getPath(0,0);
         BufferedReader firstFile = new BufferedReader(new FileReader(path1));
 
+        List<TermStats> dic = new ArrayList<>();
         String line; ;
         while ( (line= firstFile.readLine() )!=null) {
             Integer index1 = line.indexOf(':');
@@ -266,12 +280,32 @@ public class Indexer {
             String value1 = line.substring(index1 + 1);
 
             TermStats termStats = new TermStats(term1, value1);
+            dic.add(termStats);
 
-            TermPosting termPosting1 = new TermPosting(value1);
-            TermMerge newTermMerge =  new TermMerge(term1,termPosting1);
+
            // ans.add(newTermMerge);
         }
 
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (TermStats termStats : dic){
+            stringBuilder.append(termStats).append(System.lineSeparator());
+        }
+
+        String path = getPath("dic");
+        System.out.println(stringBuilder);
+
+        writeToFile(stringBuilder.toString(),path);
+
+    }
+
+    void saveDocuments() throws Exception {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String line : docs){
+            stringBuilder.append(line).append(System.lineSeparator());
+        }
+        String path = getPath("doc");
+        writeToFile(stringBuilder.toString(),path);
     }
 
     //merge for last 2 files

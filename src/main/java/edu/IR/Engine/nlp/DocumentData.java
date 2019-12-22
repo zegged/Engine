@@ -11,4 +11,12 @@ public class DocumentData {
         this.mostPopularTerm=mostPopularTerm;
         this.mostPopulatFrequency=mostPopular_tf;
     }
+
+    public String toString() {
+
+        return docID + "> |mostPopular:"+mostPopularTerm + " |freq:"+mostPopulatFrequency;
+    }
+
+
+
 }

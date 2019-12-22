@@ -1423,12 +1423,12 @@ public class Parse {
                         }
 
                     }
-                    if(term.charAt(0)=='$'){
-                        if(check_if_string_isNumber(term.substring(1,term.length()-1))){
-                            documentTerms.add(term.substring(1,term.length()-1)+" Dollars");
-                            Flag=true;
-                        }
-                    }
+//                    if(term.charAt(0)=='$'){
+//                        if(check_if_string_isNumber(term.substring(1,term.length()-1))){
+//                            documentTerms.add(term.substring(1,term.length()-1)+" Dollars");
+//                            Flag=true;
+//                        }
+//                    }
 
                     //upper case
                     if(term.matches("[a-zA-Z]+")){

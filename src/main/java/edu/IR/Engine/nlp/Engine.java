@@ -156,6 +156,7 @@ public class Engine {
         long startTime=0;
         long endTime=0;
         startTime = System.currentTimeMillis()/1000;
+
         for (String filePath : files) {
 
             double percent = (0.0 +  ++fileCounter ) / courpus_size*100;
@@ -185,41 +186,20 @@ public class Engine {
                     }
                 }
             }
-////            System.out.println("indexing");
-////            for (ParseResult parseResult : parseResults){
-////
-////                DocumentData documentData = parseResult.documentData;
-////                DocumentTerms documentTerms = parseResult.documentTerms;
-////                documentTerms.sort();
-////                indexer.addTerms(documentTerms, documentData.docID);
-////                indexer.addDocument(documentData);
-////                if (indexer.isMemoryFull()) {
-////                   indexer.savePosting();
-////                }
-////
-////            }
-//
-//                DocumentData documentData = parseResult.documentData;
-//                DocumentTerms documentTerms = parseResult.documentTerms;
-//                documentTerms.sort();
-//                indexer.addTerms(documentTerms, documentData.docID);
-//                indexer.addDocument(documentData);
-//                if (indexer.isMemoryFull()) {
-//                   indexer.savePosting();
-//                }
-//
-//            }
 
         }
-//        }
+
         ///final dump
-        //indexer.savePosting();
+        indexer.savePosting();
         //merge sort - LIMITED to file size (logical,virtual,string,terms,lists)
         indexer.merge();
 
 
 
-        //indexer.createDictionary();
+        indexer.createDictionary();
+
+
+
 
         List<String>dict=indexer.getDictionaryForView();
         endTime=System.currentTimeMillis()/1000;
@@ -230,24 +210,15 @@ public class Engine {
 
 
 
-        //String fileToSave = "c:\\posting\\test3.txt";
-
-
-
-        // TEST FOR POINTERS - WORKS
-        /*
-        String term = "turn";
-        String fileNameTerm = Indexer.termsPointers.get(term).m_pointers.get(0).first;
-        Long plStart = Indexer.termsPointers.get(term).m_pointers.get(0).second;
-        Long plEnd = Indexer.termsPointers.get(term).m_pointers.get(0).third;
-        indexer.findTerm(fileNameTerm,plStart,plEnd);
-        */
 
 
 
         // print docs
         System.out.println("\\\\\\\\\\\\\\\\\\\\\\\\");
         System.out.println("Document Dictionary:");
+
+        indexer.saveDocuments();
+
         for (String doc : Indexer.docs){
             //System.out.println(doc);
         }
