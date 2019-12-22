@@ -287,11 +287,9 @@ public class GUI extends Application {
         else
             dict=new ArrayList<>();
 
-
-
-            for(int i=0;i<dict.size();i++){
-                termsDictionary.add(dict.get(i));
-            }
+        for(int i=0;i<dict.size();i++){
+            termsDictionary.add(dict.get(i));
+        }
 
         dictionary.setItems(termsDictionary);
 
@@ -355,29 +353,20 @@ public class GUI extends Application {
 
     public void deleteReset() {
         //https://docs.oracle.com/javase/tutorial/essential/io/delete.html
-    }
-
-    private static void deleteDirectory(String filePath) throws IOException {
-
-            File file  = new File(filePath);
-            if(file.isDirectory()){
-                String[] childFiles = file.list();
-                if(childFiles == null) {
-                    //Directory is empty. Proceed for deletion
-                    file.delete();
-                }
-                else {
-                    //Directory has other files.
-                    //Need to delete them first
-                    for (String childFilePath :  childFiles) {
-                        //recursive delete the files
-                        deleteDirectory(childFilePath);
-                    }
-                }
-            }
-            else {
+        indexer.deleteDictionary();
+        //post0-0
+        File readFile=new File(pathToPosting);
+        if(readFile.isDirectory()) {
+            for(File file : readFile.listFiles()) {
+                //process all files in the directory
                 file.delete();
             }
+        } else {
+            //process single file
+            readFile.delete();
+        }
+        AlertBox.display("Reset","The dictionary and the posting file are deleted ");
+
     }
 
     public void finishData()

@@ -241,8 +241,13 @@ public class Indexer {
         Indexer.terms.clear();
     }
 
+
     public List<String> getDictionaryForView(){
         return this.lastDictionaryToView;
+    }
+
+    public void deleteDictionary(){
+        this.lastDictionaryToView.clear();
     }
 
     private String getPath(Integer prefix , Integer num) {
