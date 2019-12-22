@@ -157,6 +157,8 @@ public class Engine {
         long endTime=0;
         startTime = System.currentTimeMillis()/1000;
 
+
+
         for (String filePath : files) {
 
             double percent = (0.0 +  ++fileCounter ) / courpus_size*100;
@@ -191,7 +193,11 @@ public class Engine {
 
         ///final dump
         indexer.savePosting();
+
+
         //merge sort - LIMITED to file size (logical,virtual,string,terms,lists)
+
+
         indexer.merge();
 
 
