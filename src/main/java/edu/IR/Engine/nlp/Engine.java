@@ -120,7 +120,7 @@ public class Engine {
         //read corpus
         ReadFile readFile = new ReadFile();
 //        String pathToCorpus = "d:\\documents\\users\\razyal\\Downloads\\corpus\\corpus"; //CORPUS folder
-        String pathToCorpus = "C:\\corpus\\corpus\\corpus2"; //CORPUS folder
+        String pathToCorpus = "C:\\corpus\\corpus\\corpus"; //CORPUS folder
 
         //String postingFile = "C:\\Users\\Razi\\Desktop\\ehzor\\corpus\\FB396001\\FB396001";
         String postingFilePath = "C:\\Posting\\";

@@ -199,8 +199,8 @@ public class Indexer {
     }
 
     public boolean isMemoryFull() {
-        if (Indexer.docs.size() % 1000==0){
-            System.out.println("Dumping 1K Documents.");
+        if (Indexer.docs.size() % 10000==0){
+            System.out.println("Dumping 10K Documents.");
             return true;
         }
         return false;
@@ -429,19 +429,19 @@ public class Indexer {
         String path3=getPath(Iteration,i+2);
         if(checkFilesExists(path3)==false){
             merge_two_last_files(path1,path2,strPostingShardPath);
-            //deleteFile(path1);
-            //deleteFile(path2);
+            deleteFile(path1);
+            deleteFile(path2);
         }
         else {
             while (checkFilesExists(path1)){
                 if ( checkFilesExists(path2) ){
                     mergeTwoFiles(path1,path2,strPostingShardPath);
-                    //deleteFile(path1);
-                    //deleteFile(path2);
+                    deleteFile(path1);
+                    deleteFile(path2);
                 }
                 else{
                     //last odd . just copy
-                    //mergeLastFile(path1, strPostingShardPath);
+                    mergeLastFile(path1, strPostingShardPath);
                 }
                 i+=2;
                 mergeIdx++;
