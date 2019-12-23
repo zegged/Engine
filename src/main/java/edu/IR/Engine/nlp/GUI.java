@@ -134,10 +134,11 @@ public class GUI extends Application {
         resetButton.setOnAction(e-> {
             try {
                 deleteReset();
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
             }
         });
+
 
         //Display dictionary
         Button dictionaryDisplayButton = new Button("Dictionary");
@@ -195,19 +196,19 @@ public class GUI extends Application {
             if (box1) {
                 doStemming = true;
                 //stemming
-                fullPath=pathToPosting + "\\yesStem\\";
+                //fullPath=pathToPosting + "\\yesStem\\";
             } else {
                 doStemming = false;
                 //no stemming
-                fullPath=pathToPosting + "\\noStem\\";
+                //fullPath=pathToPosting + "\\noStem\\";
             }
 
-            File dir=new File(fullPath);
-            if(!dir.exists()){
-                dir.mkdir();
-            }
+//            File dir=new File(fullPath);
+//            if(!dir.exists()){
+//                dir.mkdir();
+//            }
             Map<String, List<TermData>> lastDictionaryToView = null;
-            indexer = new Indexer(fullPath);
+            indexer = new Indexer(pathToPosting+"\\");
             ReadFile readFile = new ReadFile();
             List<String> files = readFile.getAllFiles(pathToCorpus);
             Integer courpus_size = files.size();
@@ -256,9 +257,9 @@ public class GUI extends Application {
             indexer.savePosting();
             // merge sort - LIMITED to file size (logical,virtual,string,terms,lists)
             indexer.merge();
-            indexer.createDictionary();
+            //indexer.createDictionary();  here is the problem
             indexer.saveDocuments();
-            getDictionaryTermGui();
+            //getDictionaryTermGui();
             int i = 0;
             long endTime = System.currentTimeMillis()/1000;
             totalTime = endTime - startTime;
@@ -275,6 +276,7 @@ public class GUI extends Application {
 
             }
         }
+
     }
 
     public ObservableList<String> getDictionaryTermGui() throws Exception {//get the items for the dictionary
@@ -385,46 +387,76 @@ public class GUI extends Application {
     }
 
     public void deleteReset() throws IOException {
-        //https://docs.oracle.com/javase/tutorial/essential/io/delete.html
-//        indexer.deleteDictionary();
-        //post0-0
-//        FileUtils ss;
-        File readFile=new File(pathToPosting+"\\yesStem\\");
-        Path path= Paths.get(pathToPosting);
-        Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-//        try {
-//            Files.delete(path);
-//        } catch (NoSuchFileException x) {
-//            System.err.format("%s: no such" + " file or directory%n", path);
-//        } catch (DirectoryNotEmptyException x) {
-//            System.err.format("%s not empty%n", path);
-//        } catch (IOException x) {
-//            // File permission problems are caught here.
-//            System.err.println(x);
-//        }
-//        File readFile2=new File(pathToPosting+"\\noStem\\");
-//        if(readFile.isDirectory()) {
-//            for(String s : readFile.list()) {
-//                //process all files in the directory
-//                File currentFile = new File(readFile.getPath(),s);
-//                currentFile.delete();
-//            }
-//        } else {
-//            //process single file
-//            readFile.delete();
-//        }
-//        if(readFile2.isDirectory()) {
-//            for(String s : readFile2.list()) {
-//                //process all files in the directory
-//                File currentFile = new File(readFile2.getPath(),s);
-//                currentFile.delete();
-//            }
-//        } else {
-//            //process single file
-//            readFile.delete();
-//        }
+        dictionary = null;
+        cache = null;
+        //pathToPosting=pathToPosting+"\\yesStem";
+        try {
+            File file = new File(pathToPosting+"/dictionary.txt");
+            File file2 = new File(pathToPosting+"/documents.txt");
+            File file3= new File(pathToPosting+"/post0-0.txt");
+
+            try {
+                if(file.exists())
+                    file.delete();
+                if(file2.exists())
+                    file2.delete();
+                if(file3.exists())
+                    file3.delete();
+            } catch (Exception e) {
+            }
+            try {
+                //String directoryPath = pathToSave;
+                String directoryPath = pathToPosting;
+                for (int i = 1; i <= 8; i++) {
+                    File file5 = new File(directoryPath + "/" + i);
+                    try {
+                        //Deleting the directory recursively.
+                        deleteDirectory(file5.getAbsolutePath());
+                        System.out.println("Directory has been deleted recursively !");
+                    } catch (IOException e) {
+                        System.out.println("Problem occurs when deleting the directory : " + directoryPath);
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+
+            }
+
+        }
+        catch(Exception e){}
         AlertBox.display("Reset","The dictionary and the posting file are deleted ");
 
+    }
+
+    private static void deleteDirectory(String filePath) throws IOException {
+        try {
+            File file  = new File(filePath);
+            if(file.isDirectory()){
+                String[] childFiles = file.list();
+                if(childFiles == null) {
+                    //Directory is empty. Proceed for deletion
+                    file.delete();
+                }
+                else {
+                    //Directory has other files.
+                    //Need to delete them first
+                    for (String childFilePath :  childFiles) {
+                        //recursive delete the files
+                        deleteDirectory(childFilePath);
+                    }
+                }
+
+            }
+            else {
+                //it is a simple file. Proceed for deletion
+                file.delete();
+            }
+        }
+
+        catch (Exception e)
+        {
+
+        }
     }
 
     public void finishData()

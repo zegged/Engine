@@ -286,7 +286,7 @@ public class Indexer {
         BufferedReader firstFile = new BufferedReader(new FileReader(path1));
 
         List<TermStats> dic = new ArrayList<>();
-        String line; ;
+        String line;
 
 //        SortedMap<Integer,String> sortedTerms = new TreeMap<>();
 
