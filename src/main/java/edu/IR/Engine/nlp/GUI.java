@@ -22,8 +22,11 @@ import javafx.scene.image.ImageView;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import javafx.scene.layout.Background;
+import org.joda.time.field.FieldUtils;
+
 import static java.nio.file.Files.deleteIfExists;
 
 public class GUI extends Application {
@@ -128,15 +131,26 @@ public class GUI extends Application {
         //reset Label
         Label resetLabel = new Label("To reset the posting and dictionary:");
         GridPane.setConstraints(resetLabel, 1, 5);
-        resetButton.setOnAction(e->deleteReset());
+        resetButton.setOnAction(e-> {
+            try {
+                deleteReset();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
 
         //Display dictionary
         Button dictionaryDisplayButton = new Button("Dictionary");
         GridPane.setConstraints(dictionaryDisplayButton, 2, 7);
         Label displayDictionaryLabel = new Label("View Dictionary:");
         GridPane.setConstraints(displayDictionaryLabel, 1, 7);
-        dictionaryDisplayButton.setOnAction(e->displayDictTable());
-
+        dictionaryDisplayButton.setOnAction(e->{
+            try {
+                displayDictTable(postingInput.getText(),stemmerCheck.isSelected());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
 
         //load
         Button browseButton4 = new Button("browse");
@@ -176,14 +190,24 @@ public class GUI extends Application {
 
             pathToCorpus = s1;
             pathToPosting = s2;
+            String fullPath="";
             //change secene to alert and back to the main window to let write again
             if (box1) {
                 doStemming = true;
+                //stemming
+                fullPath=pathToPosting + "\\yesStem\\";
             } else {
                 doStemming = false;
+                //no stemming
+                fullPath=pathToPosting + "\\noStem\\";
+            }
+
+            File dir=new File(fullPath);
+            if(!dir.exists()){
+                dir.mkdir();
             }
             Map<String, List<TermData>> lastDictionaryToView = null;
-            indexer = new Indexer(pathToPosting);
+            indexer = new Indexer(fullPath);
             ReadFile readFile = new ReadFile();
             List<String> files = readFile.getAllFiles(pathToCorpus);
             Integer courpus_size = files.size();
@@ -232,6 +256,8 @@ public class GUI extends Application {
             indexer.savePosting();
             // merge sort - LIMITED to file size (logical,virtual,string,terms,lists)
             indexer.merge();
+            indexer.createDictionary();
+            indexer.saveDocuments();
             getDictionaryTermGui();
             int i = 0;
             long endTime = System.currentTimeMillis()/1000;
@@ -251,12 +277,12 @@ public class GUI extends Application {
         }
     }
 
-    public ObservableList<String> getDictionaryTermGui()
-    {//get the items for the dictionary
+    public ObservableList<String> getDictionaryTermGui() throws Exception {//get the items for the dictionary
         dictionary =new ListView<>();
         SortedSet<String> sortedKeys;
         ObservableList<String> termsDictionary= FXCollections.observableArrayList();
         List<String> dict;
+        indexer.createDictionary();
         if(indexer!=null) {
             dict = indexer.lastDictionaryToView;//change to public for dictionary in indexer
 //            sortedKeys = new TreeSet<>(dict.keySet());
@@ -271,16 +297,26 @@ public class GUI extends Application {
         return termsDictionary;
     }
 
-    public void displayDictTable()
-    {//opens another window with the dictionary table display
-        //if not working well try listView
+    public void displayDictTable(String s2,boolean box1) throws IOException {//opens another window with the dictionary table display
+
         //https://stackoverflow.com/questions/27414689/a-java-advanced-text-logging-pane-for-large-output
+        String fullPath="";
+        pathToPosting=s2;
+        if (box1) {
+            doStemming = true;
+            //stemming
+            fullPath=pathToPosting + "\\yesStem\\";
+        } else {
+            doStemming = false;
+            //no stemming
+            fullPath=pathToPosting + "\\noStem\\";
+        }
         dictionary = new ListView<>();
         //dictionary.setItems(getDictionaryTermGui());
         ObservableList<String> termsDictionary= FXCollections.observableArrayList();
         List<String> dict;
         if(indexer!=null)
-            dict= indexer.getDictionaryForView();//change to public for dictionary in indexer
+            dict= indexer.getDictionaryForView(fullPath+"\\dictionary.txt");//change to public for dictionary in indexer
         else
             dict=new ArrayList<>();
 
@@ -348,20 +384,45 @@ public class GUI extends Application {
         pathToLoad=s;
     }
 
-    public void deleteReset() {
+    public void deleteReset() throws IOException {
         //https://docs.oracle.com/javase/tutorial/essential/io/delete.html
-        indexer.deleteDictionary();
+//        indexer.deleteDictionary();
         //post0-0
-        File readFile=new File(pathToPosting);
-        if(readFile.isDirectory()) {
-            for(File file : readFile.listFiles()) {
-                //process all files in the directory
-                file.delete();
-            }
-        } else {
-            //process single file
-            readFile.delete();
-        }
+//        FileUtils ss;
+        File readFile=new File(pathToPosting+"\\yesStem\\");
+        Path path= Paths.get(pathToPosting);
+        Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+//        try {
+//            Files.delete(path);
+//        } catch (NoSuchFileException x) {
+//            System.err.format("%s: no such" + " file or directory%n", path);
+//        } catch (DirectoryNotEmptyException x) {
+//            System.err.format("%s not empty%n", path);
+//        } catch (IOException x) {
+//            // File permission problems are caught here.
+//            System.err.println(x);
+//        }
+//        File readFile2=new File(pathToPosting+"\\noStem\\");
+//        if(readFile.isDirectory()) {
+//            for(String s : readFile.list()) {
+//                //process all files in the directory
+//                File currentFile = new File(readFile.getPath(),s);
+//                currentFile.delete();
+//            }
+//        } else {
+//            //process single file
+//            readFile.delete();
+//        }
+//        if(readFile2.isDirectory()) {
+//            for(String s : readFile2.list()) {
+//                //process all files in the directory
+//                File currentFile = new File(readFile2.getPath(),s);
+//                currentFile.delete();
+//            }
+//        } else {
+//            //process single file
+//            readFile.delete();
+//        }
         AlertBox.display("Reset","The dictionary and the posting file are deleted ");
 
     }

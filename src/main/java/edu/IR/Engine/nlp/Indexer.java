@@ -224,8 +224,14 @@ public class Indexer {
     }
 
 
-    public List<String> getDictionaryForView(){
-        return this.lastDictionaryToView;
+    public List<String> getDictionaryForView(String s) throws IOException {
+        List<String> dic=new ArrayList<>();
+        BufferedReader br = new BufferedReader(new FileReader(s));
+        String st;
+        while ((st = br.readLine()) != null)
+            dic.add(st);
+
+        return dic;
     }
 
     public void deleteDictionary(){
@@ -263,6 +269,13 @@ public class Indexer {
         mergeLastFile(path1,postingFile);
 
     }
+    public  List<String> loadDictionary(){
+        List<String> s=new ArrayList<>();
+
+
+        return s;
+
+    }
 
 
     public void createDictionary() throws Exception {
@@ -275,7 +288,7 @@ public class Indexer {
         List<TermStats> dic = new ArrayList<>();
         String line; ;
 
-        SortedMap<Integer,String> sortedTerms = new TreeMap<>();
+//        SortedMap<Integer,String> sortedTerms = new TreeMap<>();
 
         while ( (line= firstFile.readLine() )!=null) {
             Integer index1 = line.indexOf(':');
@@ -286,44 +299,37 @@ public class Indexer {
             TermStats termStats = new TermStats(term1, value1);
             dic.add(termStats);
 
-            sortedTerms.put(termStats.tf, term1);
+//            sortedTerms.put(termStats.tf, term1);
 
            // ans.add(newTermMerge);
         }
 
         // FIND 10 MAX AND MIN
 
-        int i = 0;
-        Set set = sortedTerms.entrySet();
-        Iterator itr = set.iterator();
-        // Display elements
-        while(itr.hasNext()) {
-            if (i++ == 9) {
-                break;
-            }
-            Map.Entry me = (Map.Entry)itr.next();
-            System.out.print(me.getKey() + ": " + me.getValue());
-        }
-
+//        int i = 0;
+//        Set set = sortedTerms.entrySet();
+//        Iterator itr = set.iterator();
+//        // Display elements
+//        while(itr.hasNext()) {
+//            if (i++ == 9) {
+//                break;
+//            }
+//            Map.Entry me = (Map.Entry)itr.next();
+//            System.out.print(me.getKey() + ": " + me.getValue());
+//        }
 
         //ArrayList<String> low = sortedTerms.values();
-
-
         //sortedTerms.
-
-
-
+//
         StringBuilder stringBuilder = new StringBuilder();
         for (TermStats termStats : dic){
             stringBuilder.append(termStats).append(System.lineSeparator());
         }
-
         String path = getPath("dic");
         System.out.println(stringBuilder);
-
         writeToFile(stringBuilder.toString(),path);
-
     }
+
 
     void saveDocuments() throws Exception {
         StringBuilder stringBuilder = new StringBuilder();

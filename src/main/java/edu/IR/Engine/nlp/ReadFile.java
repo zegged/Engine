@@ -198,12 +198,10 @@ public class ReadFile {
         System.out.println("openFile " + path);
         InputStream is = new FileInputStream(path);
         BufferedReader buf = new BufferedReader(new InputStreamReader(is));
-
         String line = buf.readLine();
         StringBuilder sb = new StringBuilder();
         //sb.append("<script th:inline=\"javascript\">");
         sb.append("<FILE>\n");
-
         while(line != null){
             if (line.contains("<F P")) {
                 if (line.contains("</F>")){

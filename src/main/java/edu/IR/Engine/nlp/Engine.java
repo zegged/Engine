@@ -120,10 +120,10 @@ public class Engine {
         //read corpus
         ReadFile readFile = new ReadFile();
 //        String pathToCorpus = "d:\\documents\\users\\razyal\\Downloads\\corpus\\corpus"; //CORPUS folder
-        String pathToCorpus = "C:\\corpus\\corpus\\corpus"; //CORPUS folder
+        String pathToCorpus = "d:\\documents\\users\\razyal\\Downloads\\corpus"; //CORPUS folder
 
         //String postingFile = "C:\\Users\\Razi\\Desktop\\ehzor\\corpus\\FB396001\\FB396001";
-        String postingFilePath = "C:\\Posting\\";
+        String postingFilePath = "d:\\documents\\users\\razyal\\Downloads\\testmerge\\";
         //Map<String, List<TermData>> lastDictionaryToView =  new TreeMap<>();
         Indexer indexer = new Indexer(postingFilePath);
         List<String> files = readFile.getAllFiles(pathToCorpus);
@@ -156,9 +156,6 @@ public class Engine {
         long startTime=0;
         long endTime=0;
         startTime = System.currentTimeMillis()/1000;
-
-
-
         for (String filePath : files) {
 
             double percent = (0.0 +  ++fileCounter ) / courpus_size*100;
@@ -188,26 +185,28 @@ public class Engine {
                     }
                 }
             }
-
+////            System.out.println("indexing");
+////            for (ParseResult parseResult : parseResults){
+////
+////                DocumentData documentData = parseResult.documentData;
+////                DocumentTerms documentTerms = parseResult.documentTerms;
+////                documentTerms.sort();
+////                indexer.addTerms(documentTerms, documentData.docID);
+////                indexer.addDocument(documentData);
+////                if (indexer.isMemoryFull()) {
+////                   indexer.savePosting();
+////                }
+////
+////            }
+//
         }
-
         ///final dump
         indexer.savePosting();
-
-
         //merge sort - LIMITED to file size (logical,virtual,string,terms,lists)
-
-
         indexer.merge();
-
-
-
         indexer.createDictionary();
-
-
-
-
-        List<String>dict=indexer.getDictionaryForView();
+        indexer.saveDocuments();
+        //List<String>dict=indexer.getDictionaryForView();
         endTime=System.currentTimeMillis()/1000;
         long totlaTime=endTime - startTime;
         System.out.println("Run Time: "+totlaTime);
@@ -216,15 +215,24 @@ public class Engine {
 
 
 
+        //String fileToSave = "c:\\posting\\test3.txt";
+
+
+
+        // TEST FOR POINTERS - WORKS
+        /*
+        String term = "turn";
+        String fileNameTerm = Indexer.termsPointers.get(term).m_pointers.get(0).first;
+        Long plStart = Indexer.termsPointers.get(term).m_pointers.get(0).second;
+        Long plEnd = Indexer.termsPointers.get(term).m_pointers.get(0).third;
+        indexer.findTerm(fileNameTerm,plStart,plEnd);
+        */
 
 
 
         // print docs
         System.out.println("\\\\\\\\\\\\\\\\\\\\\\\\");
         System.out.println("Document Dictionary:");
-
-        indexer.saveDocuments();
-
         for (String doc : Indexer.docs){
             //System.out.println(doc);
         }
