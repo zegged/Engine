@@ -155,16 +155,28 @@ public class Indexer {
         //System.out.println(data);
         String fileName = path;
         //"c:\\posting\\test.txt";
-        RandomAccessFile stream = new RandomAccessFile(fileName, "rw");
-        FileChannel channel = stream.getChannel();
-        String value = data;
-        byte[] strBytes = value.getBytes();
-        ByteBuffer buffer = ByteBuffer.allocate(strBytes.length);
-        buffer.put(strBytes);
-        buffer.flip();
-        channel.write(buffer);
-        stream.close();
-        channel.close();
+//        RandomAccessFile stream = new RandomAccessFile(fileName, "rw");
+//        FileChannel channel = stream.getChannel();
+//        String value = data;
+//        byte[] strBytes = value.getBytes();
+//        ByteBuffer buffer = ByteBuffer.allocate(strBytes.length);
+//        buffer.put(strBytes);
+//        buffer.flip();
+//        channel.write(buffer);
+//        stream.close();
+//        channel.close();
+
+        String content = "This is the content to write into file\n";
+
+        // If the file doesn't exists, create and write to it
+        // If the file exists, truncate (remove all content) and write to it
+        try (FileWriter writer = new FileWriter(path);
+             BufferedWriter bw = new BufferedWriter(writer)) {
+            bw.write(data);
+
+        } catch (IOException e) {
+            System.err.format("IOException: %s%n", e);
+        }
 
     }
 
@@ -250,6 +262,11 @@ public class Indexer {
         if (arg == "doc"){
             return m_strPostingFolderPath + "documents.txt";
         }
+        if (arg == "final"){
+            return m_strPostingFolderPath + "post.txt";
+        }
+
+
 
         return "";
     }
@@ -268,6 +285,15 @@ public class Indexer {
         String postingFile = getPath(0,0);
         mergeLastFile(path1,postingFile);
 
+        String lastPost = getPath(0,0);
+
+        String myName = getPath("final");
+
+        File file1 = new File(lastPost);
+        File file2 = new File(myName);
+        file1.renameTo(file2);
+
+
     }
     public  List<String> loadDictionary(){
         List<String> s=new ArrayList<>();
@@ -282,7 +308,8 @@ public class Indexer {
 
         System.out.println("creating dictionary.");
 
-        String path1 = getPath(0,0);
+        String path1 = getPath("final");
+
         BufferedReader firstFile = new BufferedReader(new FileReader(path1));
 
         List<TermStats> dic = new ArrayList<>();
@@ -327,6 +354,7 @@ public class Indexer {
         }
         String path = getPath("dic");
         System.out.println(stringBuilder);
+        firstFile.close();
         writeToFile(stringBuilder.toString(),path);
     }
 

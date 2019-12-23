@@ -157,8 +157,8 @@ public class GUI extends Application {
         Button browseButton4 = new Button("browse");
         GridPane.setConstraints(browseButton4, 2, 9);
         browseButton4.setOnAction(e-> browserLoad());
-
-        //load the created files
+//
+//        //load the created files
         Button loadButton = new Button("LOAD");
         GridPane.setConstraints(loadButton, 4, 9);
         Label loadLabel = new Label("To load the Dictionary:");
@@ -173,6 +173,7 @@ public class GUI extends Application {
         grid.getChildren().addAll(corpusLabel, corpusInput, postingLabel, postingInput,browseButton, startButton
                 ,stemmerCheck,stemmLabel,resetButton,resetLabel,
                 loadButton,loadLabel,browseButton2,dictionaryDisplayButton,displayDictionaryLabel,browseButton4,loadInput,iv);
+
 
 
 
@@ -196,19 +197,19 @@ public class GUI extends Application {
             if (box1) {
                 doStemming = true;
                 //stemming
-                //fullPath=pathToPosting + "\\yesStem\\";
+                fullPath=pathToPosting + "\\yesStem\\";
             } else {
                 doStemming = false;
                 //no stemming
-                //fullPath=pathToPosting + "\\noStem\\";
+                fullPath=pathToPosting + "\\noStem\\";
             }
 
-//            File dir=new File(fullPath);
-//            if(!dir.exists()){
-//                dir.mkdir();
-//            }
+            File dir=new File(fullPath);
+            if(!dir.exists()){
+                dir.mkdir();
+            }
             Map<String, List<TermData>> lastDictionaryToView = null;
-            indexer = new Indexer(pathToPosting+"\\");
+            indexer = new Indexer(fullPath);
             ReadFile readFile = new ReadFile();
             List<String> files = readFile.getAllFiles(pathToCorpus);
             Integer courpus_size = files.size();
@@ -257,9 +258,9 @@ public class GUI extends Application {
             indexer.savePosting();
             // merge sort - LIMITED to file size (logical,virtual,string,terms,lists)
             indexer.merge();
-            //indexer.createDictionary();  here is the problem
+            indexer.createDictionary();
             indexer.saveDocuments();
-            //getDictionaryTermGui();
+            getDictionaryTermGui();
             int i = 0;
             long endTime = System.currentTimeMillis()/1000;
             totalTime = endTime - startTime;
@@ -389,11 +390,15 @@ public class GUI extends Application {
     public void deleteReset() throws IOException {
         dictionary = null;
         cache = null;
-        //pathToPosting=pathToPosting+"\\yesStem";
+        String noStem=pathToPosting+"\\noStem";
+        pathToPosting=pathToPosting+"\\yesStem";
         try {
             File file = new File(pathToPosting+"/dictionary.txt");
             File file2 = new File(pathToPosting+"/documents.txt");
-            File file3= new File(pathToPosting+"/post0-0.txt");
+            File file3= new File(pathToPosting+"/post.txt");
+            File file4 = new File(noStem+"/dictionary.txt");
+            File file5 = new File(noStem+"/documents.txt");
+            File file6= new File(noStem+"/post.txt");
 
             try {
                 if(file.exists())
@@ -405,19 +410,19 @@ public class GUI extends Application {
             } catch (Exception e) {
             }
             try {
-                //String directoryPath = pathToSave;
                 String directoryPath = pathToPosting;
                 for (int i = 1; i <= 8; i++) {
-                    File file5 = new File(directoryPath + "/" + i);
+                    File file7 = new File(directoryPath + "/" + i);
                     try {
                         //Deleting the directory recursively.
-                        deleteDirectory(file5.getAbsolutePath());
+                        deleteDirectory(file7.getAbsolutePath());
                         System.out.println("Directory has been deleted recursively !");
                     } catch (IOException e) {
                         System.out.println("Problem occurs when deleting the directory : " + directoryPath);
                         e.printStackTrace();
                     }
                 }
+
             } catch (Exception e) {
 
             }
