@@ -777,6 +777,8 @@ public class Parse {
     private static HashMap<String,String> m_StopWords;//the stop words from the file
     private boolean doSteming;
     private List<String> alldictionaryFor_Hokem=new ArrayList();
+    int numOFsentences;
+    int numofterms;
     String s="";
     static Map <String,String> Months=new HashMap<String, String>(){{
         put("january","01"); put("february","02"); put("march","03");put("april","04");put("may","05");
@@ -1241,6 +1243,7 @@ public class Parse {
 
 
         List<CoreSentence> sentences = breakSentences(doc.text);
+        //List<CoreSentence> sentences = breakSentences("sdklgjsdkgsdg8776 num razy al ner ner");
 //        //for prices
 //        List<String> allPricesUnderMillion=new ArrayList<String>();
 //        allPricesUnderMillion=checkPricesMoreThanMillion(doc.text);
@@ -1256,6 +1259,8 @@ public class Parse {
         //temp dictionary for parse
         DocumentTerms documentTerms = new DocumentTerms();
         int counter=0;
+        numOFsentences=0;
+        numofterms=0;
         for (CoreSentence sentence : sentences){
             List<CoreLabel> coreLabelList = sentence.tokens();
 
@@ -1430,6 +1435,7 @@ public class Parse {
                         }
                     }
 
+
                     //upper case
                     if(term.matches("[a-zA-Z]+")){
                         if (Character.isUpperCase(term.charAt(0))){
@@ -1442,25 +1448,34 @@ public class Parse {
                         }else{
                             documentTerms.add(upper_words);
                             upper_words="";
+                            numOFsentences++;
                         }
                     }
 
                     if(Flag==false){
-                        if(!(term.equals("%")||term.equals(",k")||term.equals("$")||term.equals("")||term.equals("-"))){
-                            if(term.charAt(0)=='.'||term.charAt(0)=='.'){
-                                documentTerms.add(term.split(""+term.charAt(0))[0]);
-                            }else{
-                                documentTerms.add(term);
+                        if(term.matches("^[a-zA-Z0-9]+$")){
+                            continue;
+                        }else{
+                            if(!(term.equals("%")||term.equals(",k")||term.equals("$")||term.equals("")||term.equals("-"))){
+                                if(term.charAt(0)=='.'||term.charAt(0)=='.'){
+                                    documentTerms.add(term.split(""+term.charAt(0))[0]);
+                                }else{
+                                    documentTerms.add(term);
+                                }
                             }
 
                         }
+
                     }
+
 
                     // STATISTICS
                     if (documentTerms.checkMostPopular()>mostPopular_tf){
                         mostPopular_tf=documentTerms.checkMostPopular();
                         mostPopularTerm=term;
                     }
+
+                    numofterms++;
 
                 }
             }
@@ -1469,7 +1484,20 @@ public class Parse {
         for(int i=0;i<this.alldictionaryFor_Hokem.size();i++){
             documentTerms.add(this.alldictionaryFor_Hokem.get(i));
         }
-        DocumentData documentData = new DocumentData(intID,mostPopularTerm,mostPopular_tf);
+
+        int numUnique = 0;
+
+
+Iterator it=documentTerms.dictionary.entrySet().iterator();
+while (it.hasNext()){
+    Map.Entry pair=(Map.Entry)it.next();
+    if((Integer)pair.getValue()==1){
+        numUnique++;
+    }
+}
+
+
+        DocumentData documentData = new DocumentData(intID,mostPopularTerm,mostPopular_tf,numOFsentences,numUnique);
         return new ParseResult(documentData,documentTerms);
     }
     private void inserttoDic(List<String> list){

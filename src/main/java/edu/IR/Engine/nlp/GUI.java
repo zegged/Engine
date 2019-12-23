@@ -53,6 +53,8 @@ public class GUI extends Application {
     boolean finish=false;
     static Map<String,String> stopword ;
     Map<String, List<TermData>> loadDictinary;
+    int numOfDocIndex;
+    int numOfUniqTerms;
     //Map<String,List<TermData>>dict;
     public static void main(String[] args) {
         launch(args);
@@ -188,6 +190,7 @@ public class GUI extends Application {
     public void StartButton (String s1, String s2, boolean box1) throws Exception
     {
         long startTime = System.currentTimeMillis()/1000;
+        numOfDocIndex=0;
         if(s1.length()>0&&s2.length()>0) {//the fields are filled
 
             pathToCorpus = s1;
@@ -227,8 +230,8 @@ public class GUI extends Application {
             while ((st = br.readLine()) != null){
                 stopword.put(st,"");
             }
-            boolean stamming=true;
-            Parse parser = new Parse(stopword,stamming);
+
+            Parse parser = new Parse(stopword,doStemming);
 
             for (String filePath : files) {
                 double percent = (0.0 +  ++fileCounter ) / courpus_size*100;
@@ -250,6 +253,7 @@ public class GUI extends Application {
                         if (indexer.isMemoryFull()) {
                             indexer.savePosting();
                         }
+                        numOfDocIndex++;
 
                     }
                 }
@@ -391,14 +395,25 @@ public class GUI extends Application {
         dictionary = null;
         cache = null;
         String noStem=pathToPosting+"\\noStem";
-        pathToPosting=pathToPosting+"\\yesStem";
+        String yesStem=pathToPosting+"\\yesStem";
         try {
-            File file = new File(pathToPosting+"/dictionary.txt");
-            File file2 = new File(pathToPosting+"/documents.txt");
-            File file3= new File(pathToPosting+"/post.txt");
-            File file4 = new File(noStem+"/dictionary.txt");
-            File file5 = new File(noStem+"/documents.txt");
-            File file6= new File(noStem+"/post.txt");
+            File file = new File(yesStem+"/dictionary.txt");
+            File file2 = new File(yesStem+"/documents.txt");
+            File file3= new File(yesStem+"/post.txt");
+            File fil = new File(noStem+"/dictionary.txt");
+            File fil2 = new File(noStem+"/documents.txt");
+            File fil3= new File(noStem+"/post.txt");
+
+            try {if(fil.exists())
+                fil.delete();
+                if(fil2.exists())
+                    fil2.delete();
+                if(fil3.exists())
+                    fil3.delete();
+
+            }catch (Exception e){
+
+            }
 
             try {
                 if(file.exists())
@@ -410,18 +425,7 @@ public class GUI extends Application {
             } catch (Exception e) {
             }
             try {
-                String directoryPath = pathToPosting;
-                for (int i = 1; i <= 8; i++) {
-                    File file7 = new File(directoryPath + "/" + i);
-                    try {
-                        //Deleting the directory recursively.
-                        deleteDirectory(file7.getAbsolutePath());
-                        System.out.println("Directory has been deleted recursively !");
-                    } catch (IOException e) {
-                        System.out.println("Problem occurs when deleting the directory : " + directoryPath);
-                        e.printStackTrace();
-                    }
-                }
+
 
             } catch (Exception e) {
 
@@ -433,43 +437,50 @@ public class GUI extends Application {
 
     }
 
-    private static void deleteDirectory(String filePath) throws IOException {
-        try {
-            File file  = new File(filePath);
-            if(file.isDirectory()){
-                String[] childFiles = file.list();
-                if(childFiles == null) {
-                    //Directory is empty. Proceed for deletion
-                    file.delete();
-                }
-                else {
-                    //Directory has other files.
-                    //Need to delete them first
-                    for (String childFilePath :  childFiles) {
-                        //recursive delete the files
-                        deleteDirectory(childFilePath);
-                    }
-                }
+//    private static void deleteDirectory(String filePath) throws IOException {
+//        try {
+//            File file  = new File(filePath);
+//            if(file.isDirectory()){
+//                String[] childFiles = file.list();
+//                if(childFiles == null) {
+//                    //Directory is empty. Proceed for deletion
+//                    file.delete();
+//                }
+//                else {
+//                    //Directory has other files.
+//                    //Need to delete them first
+//                    for (String childFilePath :  childFiles) {
+//                        //recursive delete the files
+//                        deleteDirectory(childFilePath);
+//                    }
+//                }
+//
+//            }
+//            else {
+//                //it is a simple file. Proceed for deletion
+//                file.delete();
+//            }
+//        }
+//
+//        catch (Exception e)
+//        {
+//
+//        }
+//    }
 
-            }
-            else {
-                //it is a simple file. Proceed for deletion
-                file.delete();
-            }
-        }
-
-        catch (Exception e)
-        {
-
-        }
+    public long dicNumTerms(){
+        long n=0;
+        indexer.getDicNumTerms();
+        return n;
     }
 
     public void finishData()
     {//present all of the Data that is needed aout the program
         AlertBox.display("Program Information",
                 "time of running:"+totalTime+"\n"+
-                        "number of files indexed: "+"\n"+
-                        "number of unique terms");
+                        "number of files indexed: "+numOfDocIndex+"\n"+
+                        "number of unique terms: "+indexer.getDicNumTerms()+"\n"+
+                "number of all terms in corpus: "+indexer.dicNumTerms);
 
     }
 

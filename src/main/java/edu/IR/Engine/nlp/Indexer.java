@@ -20,6 +20,8 @@ public class Indexer {
     //terms:
     public static Map<String, List<TermData>> terms = new TreeMap<>();
     List<String> lastDictionaryToView ;
+    long dicNumTerms;
+    long numUniq;
 
     //docs:
     public static List<String> docs = new ArrayList<>();
@@ -172,7 +174,7 @@ public class Indexer {
         // If the file exists, truncate (remove all content) and write to it
         try (FileWriter writer = new FileWriter(path);
              BufferedWriter bw = new BufferedWriter(writer)) {
-            bw.write(data);
+             bw.write(data);
 
         } catch (IOException e) {
             System.err.format("IOException: %s%n", e);
@@ -246,11 +248,8 @@ public class Indexer {
         return dic;
     }
 
-    public void deleteDictionary(){
-        this.lastDictionaryToView.clear();
-    }
 
-    private String getPath(Integer prefix , Integer num) {
+       private String getPath(Integer prefix , Integer num) {
         String path = m_strPostingFolderPath + "post" + prefix + "-" + num + ".txt";
         return path;
     }
@@ -303,6 +302,10 @@ public class Indexer {
 
     }
 
+    public long getDicNumTerms(){
+        return numUniq;
+    }
+
 
     public void createDictionary() throws Exception {
 
@@ -315,39 +318,20 @@ public class Indexer {
         List<TermStats> dic = new ArrayList<>();
         String line;
 
-//        SortedMap<Integer,String> sortedTerms = new TreeMap<>();
-
+        dicNumTerms=0;
+        numUniq=0;
         while ( (line= firstFile.readLine() )!=null) {
             Integer index1 = line.indexOf(':');
             String term1 = line.substring(0, index1);
             String value1 = line.substring(index1 + 1);
-
-
             TermStats termStats = new TermStats(term1, value1);
             dic.add(termStats);
+            dicNumTerms++;
+            if (termStats.tf==1){
+                numUniq++;
+            }
 
-//            sortedTerms.put(termStats.tf, term1);
-
-           // ans.add(newTermMerge);
         }
-
-        // FIND 10 MAX AND MIN
-
-//        int i = 0;
-//        Set set = sortedTerms.entrySet();
-//        Iterator itr = set.iterator();
-//        // Display elements
-//        while(itr.hasNext()) {
-//            if (i++ == 9) {
-//                break;
-//            }
-//            Map.Entry me = (Map.Entry)itr.next();
-//            System.out.print(me.getKey() + ": " + me.getValue());
-//        }
-
-        //ArrayList<String> low = sortedTerms.values();
-        //sortedTerms.
-//
         StringBuilder stringBuilder = new StringBuilder();
         for (TermStats termStats : dic){
             stringBuilder.append(termStats).append(System.lineSeparator());
