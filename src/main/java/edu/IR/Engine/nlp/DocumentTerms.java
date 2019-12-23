@@ -5,13 +5,15 @@ import java.util.*;
 public class DocumentTerms {
     HashMap<String, Integer> dictionary;
     List<String> sortedTerms;
+    int term_frequency;
 
     public DocumentTerms(){
+
         dictionary = new LinkedHashMap<String, Integer>();
+        term_frequency=1;
     }
 
     public void add(String term) {
-        Integer term_frequency;
         if (dictionary.containsKey(term)){
             term_frequency = dictionary.get(term) + 1;
             dictionary.put(term,term_frequency);
@@ -20,10 +22,11 @@ public class DocumentTerms {
             term_frequency=1;
             dictionary.put(term,1);
         }
-        checkMostPopular(term,term_frequency);
     }
 
-    private void checkMostPopular(String term, Integer term_frequency) {
+    public int checkMostPopular() {
+        // STATISTICS
+        return this.term_frequency;
 
     }
 

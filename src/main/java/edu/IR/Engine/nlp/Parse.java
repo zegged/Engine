@@ -1455,11 +1455,13 @@ public class Parse {
 
                         }
                     }
-////                    // STATISTICS
-////                    if (term_frequency>mostPopular_tf){
-////                        mostPopular_tf=term_frequency;
-////                        mostPopularTerm=term;
-////                    }
+
+                    // STATISTICS
+                    if (documentTerms.checkMostPopular()>mostPopular_tf){
+                        mostPopular_tf=documentTerms.checkMostPopular();
+                        mostPopularTerm=term;
+                    }
+
                 }
             }
         }
