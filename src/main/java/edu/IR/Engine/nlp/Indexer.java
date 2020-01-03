@@ -470,17 +470,6 @@ public class Indexer {
         }
     }
 
-//    public void mergeTwoFiles(String path1, String path2, String mergeFile) throws IOException {
-//        BufferedReader firstFile = new BufferedReader(new FileReader(path1));
-//        BufferedReader secondFile = new BufferedReader(new FileReader(path2));
-//        String st;
-//        while ((st = firstFile.readLine()) != null)
-//            System.out.println(st);
-//    }
-
-
-//////////////
-
 
     public void mergeTwoFiles(String path1, String path2, String mergeFile) throws IOException {
         System.out.println("merging: " + path1 + " w/ " + path2);

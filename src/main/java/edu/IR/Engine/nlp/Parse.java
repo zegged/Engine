@@ -1263,35 +1263,7 @@ public class Parse {
         numofterms=0;
         for (CoreSentence sentence : sentences){
             List<CoreLabel> coreLabelList = sentence.tokens();
-
-
-                counter++;
-                if(counter<=1){
-////
-
-//                s=s.replaceAll("[\\.$|\\(|;|'|:|\\^|\\)|\\]|\\[|\\#|\\]|\\+|\\*|\\@]", "");
-//                //for dates
-//                List<String> allDates=new ArrayList<String>();
-//                allDates=checkDate(s);
-//                inserttoDic(allDates);
-////                //for NUMBER %
-//////                List<String> allPercentage=new ArrayList<String>();
-//////                allPercentage=checkPercentage(s);
-//////                inserttoDic(allPercentage);
-////
-                    //for prices
-//                    List<String> allPricesUnderMillion=new ArrayList<String>();
-//                    allPricesUnderMillion=checkPricesMoreThanMillion(s);
-//                    inserttoDic(allPricesUnderMillion);
-//////                List<String> allPricesUnderMillion2=new ArrayList<String>();
-//////                allPricesUnderMillion2=checkPricesUnderMillion2(s);
-//////                inserttoDic(allPricesUnderMillion2);
-////                //for numbers $,$$$, thousand , million , billion
-////                List<String> allNumbers=new ArrayList<String>();
-////                allNumbers=checkNumber(s);
-////                inserttoDic(allNumbers);
-////
-            }
+            counter++;
             String token="";
             String upper_words="";
             for (CoreLabel coreLabel : coreLabelList){
@@ -1426,7 +1398,6 @@ public class Parse {
                                 }
                             }
                         }
-
                     }
                     if(term.length()>1&&term.charAt(0)=='$'){
                         if(check_if_string_isNumber(term.substring(1,term.length()-1))){
@@ -1452,8 +1423,8 @@ public class Parse {
                         }
                     }
 
-                    if(Flag==false){
-                        if(term.matches("^[a-zA-Z0-9]+$")){
+                    if (Flag==false){
+                        if(term.matches("[A-Za-z].*[0-9]|[0-9].*[A-Za-z]")) {
                             continue;
                         }else{
                             if(!(term.equals("%")||term.equals(",k")||term.equals("$")||term.equals("")||term.equals("-"))){
@@ -1463,11 +1434,8 @@ public class Parse {
                                     documentTerms.add(term);
                                 }
                             }
-
                         }
-
                     }
-
 
                     // STATISTICS
                     if (documentTerms.checkMostPopular()>mostPopular_tf){
@@ -1486,16 +1454,16 @@ public class Parse {
         }
 
         int numUnique = 0;
+//check
 
-
-Iterator it=documentTerms.dictionary.entrySet().iterator();
-while (it.hasNext()){
-    Map.Entry pair=(Map.Entry)it.next();
-    if((Integer)pair.getValue()==1){
-        numUnique++;
-    }
-}
-
+        Iterator it=documentTerms.dictionary.entrySet().iterator();
+        while (it.hasNext()){
+        Map.Entry pair=(Map.Entry)it.next();
+        if((Integer)pair.getValue()==1){
+            numUnique++;
+        }
+        }
+//---------------------
 
         DocumentData documentData = new DocumentData(intID,mostPopularTerm,mostPopular_tf,numOFsentences,numUnique);
         return new ParseResult(documentData,documentTerms);
