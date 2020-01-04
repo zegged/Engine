@@ -118,10 +118,10 @@ public class Engine {
         //read corpus
         ReadFile readFile = new ReadFile();
 //        String pathToCorpus = "d:\\documents\\users\\razyal\\Downloads\\corpus\\corpus"; //CORPUS folder
-        String pathToCorpus = "C:\\Users\\Razi\\Desktop\\ehzor\\corpus2"; //CORPUS folder
+        String pathToCorpus = "C:\\corpus\\corpus\\"; //CORPUS folder
 
         //String postingFile = "C:\\Users\\Razi\\Desktop\\ehzor\\corpus\\FB396001\\FB396001";
-        String postingFilePath = "C:\\Users\\Razi\\Desktop\\ehzor\\posting";
+        String postingFilePath = "C:\\posting\\";
         //Map<String, List<TermData>> lastDictionaryToView =  new TreeMap<>();
         Indexer indexer = new Indexer(postingFilePath);
         List<String> files = readFile.getAllFiles(pathToCorpus);
@@ -183,21 +183,9 @@ public class Engine {
                     }
                 }
             }
-////            System.out.println("indexing");
-////            for (ParseResult parseResult : parseResults){
-////
-////                DocumentData documentData = parseResult.documentData;
-////                DocumentTerms documentTerms = parseResult.documentTerms;
-////                documentTerms.sort();
-////                indexer.addTerms(documentTerms, documentData.docID);
-////                indexer.addDocument(documentData);
-////                if (indexer.isMemoryFull()) {
-////                   indexer.savePosting();
-////                }
-////
-////            }
-//
+
         }
+
         ///final dump
         indexer.savePosting();
         //merge sort - LIMITED to file size (logical,virtual,string,terms,lists)

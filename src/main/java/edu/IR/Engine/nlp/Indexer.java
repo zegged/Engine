@@ -114,11 +114,11 @@ public class Indexer {
     private boolean OpenFileToWrite(String filename, Map<String, List<TermData>> terms){
 
         File file = new File(filename);
-        if (!file.exists()) {
+//        if (!file.exists()) {
             // Create a new file if not exists.
             try {
-                file.createNewFile();
-                FileWriter writer = new FileWriter(file);
+                //file.createNewFile();
+                FileWriter writer = new FileWriter(file, true);
                 //RandomAccessFile raf = new RandomAccessFile(file, "rw");
                 dumpPosting(filename,writer, terms);
                 // Closing the resources.
@@ -126,11 +126,11 @@ public class Indexer {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        else{
-            System.out.println("file already exists");
-            return false;
-        }
+//        }
+//        else{
+//            System.out.println("file already exists");
+//            return false;
+//        }
 
         return true;
     }
@@ -213,8 +213,8 @@ public class Indexer {
     }
 
     public boolean isMemoryFull() {
-        if (Indexer.docs.size() % 10000==0){
-            System.out.println("Dumping 10K Documents.");
+        if (Indexer.docs.size() % 50000==0){
+            System.out.println("Dumping 50K Documents.");
             return true;
         }
         return false;
@@ -445,12 +445,12 @@ public class Indexer {
 
         String strPostingShardPath = getPath(Iteration+1,0);
         String path3=getPath(Iteration,i+2);
-        if(checkFilesExists(path3)==false){
-            merge_two_last_files(path1,path2,strPostingShardPath);
-            deleteFile(path1);
-            deleteFile(path2);
-        }
-        else {
+//        if(checkFilesExists(path3)==false){
+//            merge_two_last_files(path1,path2,strPostingShardPath);
+//            deleteFile(path1);
+//            deleteFile(path2);
+//        }
+//        else {
             while (checkFilesExists(path1)){
                 if ( checkFilesExists(path2) ){
                     mergeTwoFiles(path1,path2,strPostingShardPath);
@@ -466,7 +466,7 @@ public class Indexer {
                 path1 = getPath(Iteration,i+0);
                 path2 = getPath(Iteration,i+1);
                 strPostingShardPath = getPath(Iteration+1,mergeIdx);
-            }
+//            }
         }
     }
 
@@ -493,6 +493,12 @@ public class Indexer {
         readLeft= false;
         readRight = false;
         while (line1!=null  && line2!=null  ) {
+
+            if (ans.size()>50000){
+                dumpMerge(mergeFile, ans);
+                ans.clear();
+            }
+
             String term1, term2, value1, value2;
             Integer index1, index2;
             index1 = line1.indexOf(':');
@@ -537,6 +543,10 @@ public class Indexer {
         }
         String line1T = firstFile.readLine();
         while (line1T!=null) {
+            if (ans.size()>50000){
+                dumpMerge(mergeFile, ans);
+                ans.clear();
+            }
             Integer index1 = line1T.indexOf(':');
             String term1 = line1T.substring(0, index1);
             String value1 = line1T.substring(index1 + 1);
@@ -549,6 +559,10 @@ public class Indexer {
 
         String line2T = secondFile.readLine();
         while (secondFile.readLine()!=null  ) {
+            if (ans.size()>50000){
+                dumpMerge(mergeFile, ans);
+                ans.clear();
+            }
             Integer index2 = line2T.indexOf(':');
             String term2 = line2T.substring(0, index2);
             String value2 = line2T.substring(index2 + 1);
@@ -573,6 +587,19 @@ public class Indexer {
 
         //TODO: retuen or save ans
         saveMerge(mergeFile,stringListMap);
+    }
+
+
+    public void dumpMerge(String filePath, List<TermMerge> terms){
+        Map<String, List<TermData>> stringListMap = new LinkedHashMap<>();
+        System.out.println("dump reformat");
+
+        for (TermMerge termMerge : terms){
+            termMerge.concatenateLists();
+            stringListMap.put(termMerge.m_term,termMerge.m_termData);
+        }
+
+        saveMerge(filePath,stringListMap);
     }
 
 
