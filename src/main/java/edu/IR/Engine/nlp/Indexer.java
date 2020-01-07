@@ -37,6 +37,8 @@ public class Indexer {
         m_strPostingFolderPath = path;
         lastDictionaryToView=new ArrayList<>();
         System.out.println("Indexer init");
+        String appendix = "docID:+mostPopularTerm:mostPopulatFrequency:numOFsentences:numofterms";
+        docs.add(appendix.concat(System.lineSeparator()));
     }
 
 

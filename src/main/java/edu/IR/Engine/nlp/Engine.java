@@ -154,44 +154,49 @@ public class Engine {
         long startTime=0;
         long endTime=0;
         startTime = System.currentTimeMillis()/1000;
-        for (String filePath : files) {
+//        for (String filePath : files) {
+//
+//            double percent = (0.0 +  ++fileCounter ) / courpus_size*100;
+//            System.out.println(String.format("%.2f", percent)  + "% File: " + fileCounter + " " + filePath);
+//
+//            text = readFile.openFile(filePath);
+//
+//            //xml to documents
+//            IRDocument[] fileDocs = readFile.parseXML(text);
+//            //parse documents
+//            int cnt=0;
+//
+//            List<ParseResult> parseResults = new ArrayList<>();
+//            System.out.println("parsing");
+//            if (true) {
+//                for (IRDocument doc : fileDocs) {
+//                    cnt++;
+//                    ParseResult parseResult = parser.parseDocument(doc);
+//                    parseResults.add(parseResult);
+//                    DocumentData documentData = parseResult.documentData;
+//                    DocumentTerms documentTerms = parseResult.documentTerms;
+//                    documentTerms.sort();
+//                    indexer.addTerms(documentTerms, documentData.docID);
+//                    indexer.addDocument(documentData);
+//                    if (indexer.isMemoryFull()) {
+//                        indexer.savePosting();
+//                    }
+//                }
+//            }
+//
+//        }
 
-            double percent = (0.0 +  ++fileCounter ) / courpus_size*100;
-            System.out.println(String.format("%.2f", percent)  + "% File: " + fileCounter + " " + filePath);
+        //////////////////final dump//////////
+//        indexer.savePosting();
+      //////////////////////////////////////
 
-            text = readFile.openFile(filePath);
+        /////Merge sort
+//        indexer.merge();
 
-            //xml to documents
-            IRDocument[] fileDocs = readFile.parseXML(text);
-            //parse documents
-            int cnt=0;
+//        indexer.saveDocuments();
 
-            List<ParseResult> parseResults = new ArrayList<>();
-            System.out.println("parsing");
-            if (true) {
-                for (IRDocument doc : fileDocs) {
-                    cnt++;
-                    ParseResult parseResult = parser.parseDocument(doc);
-                    parseResults.add(parseResult);
-                    DocumentData documentData = parseResult.documentData;
-                    DocumentTerms documentTerms = parseResult.documentTerms;
-                    documentTerms.sort();
-                    indexer.addTerms(documentTerms, documentData.docID);
-                    indexer.addDocument(documentData);
-                    if (indexer.isMemoryFull()) {
-                        indexer.savePosting();
-                    }
-                }
-            }
+//        indexer.createDictionary();
 
-        }
-
-        ///final dump
-        indexer.savePosting();
-        //merge sort - LIMITED to file size (logical,virtual,string,terms,lists)
-        indexer.merge();
-        indexer.createDictionary();
-        indexer.saveDocuments();
         //List<String>dict=indexer.getDictionaryForView();
         endTime=System.currentTimeMillis()/1000;
         long totlaTime=endTime - startTime;
@@ -199,6 +204,25 @@ public class Engine {
         System.out.println("Term Dictionary:");
 
 
+        Searcher searcher = new Searcher();
+
+        String term = "hello";
+        searcher.runQuery(term);
+//        TermSearch s = searcher.searchTerm(term);
+//
+//        if (!s.term.equals("")){
+//            System.out.println("found term " + term);
+//            System.out.println(s);
+//
+//            int id = 8678;
+//            DocumentSearch documentSearch = new DocumentSearch(id);
+//
+//
+//
+//        }
+//        else{
+//            System.out.println("Term not found");
+//        }
 
 
         //String fileToSave = "c:\\posting\\test3.txt";
@@ -218,11 +242,11 @@ public class Engine {
 
         // print docs
         System.out.println("\\\\\\\\\\\\\\\\\\\\\\\\");
-        System.out.println("Document Dictionary:");
-        for (String doc : Indexer.docs){
-            //System.out.println(doc);
-        }
-
+       // System.out.println("Document Dictionary:");
+//        for (String doc : Indexer.docs){
+//            //System.out.println(doc);
+//        }
+//
 
 
 
@@ -244,7 +268,7 @@ public class Engine {
 
         System.out.println("done");
 
-        System.out.println("a".compareTo("b"));
+        //System.out.println("a".compareTo("b"));
 
     }
 

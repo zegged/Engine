@@ -6,28 +6,29 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TermStats {
+public class TermSearch {
 
     String term;
     Integer tf;
     Integer df;
 
+    List<TermData> termData;
 
-    public TermStats(String term, String value){
+
+
+    public TermSearch(String term, String value){
         this.term=term;
         this.df=0;
         this.tf=0;
         String[] ans = value.split("^(\\[)||$(\\])||( \\d[->]\\d )");
-        List<TermData> termData = parse(value);
+        this.termData = parse(value);
         for (TermData t : termData){
-           // System.out.println(t.frequency + " > " + t.document);
+            // System.out.println(t.frequency + " > " + t.document);
             df +=1;
             tf += t.frequency;
         }
         //System.out.println(term + " tf=" + tf + " df=" + df);
     }
-
-
 
     private List<TermData> parse(String unParsedPostingList) {
         List<TermData> posting = new ArrayList<TermData>();
@@ -61,7 +62,3 @@ public class TermStats {
         return term + "|tf:"+tf+"|df:"+df;
     }
 }
-
-
-
-

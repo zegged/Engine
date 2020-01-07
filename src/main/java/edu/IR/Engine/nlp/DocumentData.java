@@ -17,8 +17,8 @@ public class DocumentData {
     }
 
     public String toString() {
-
-        return docID + "> |mostPopular:"+mostPopularTerm + " |freq:"+mostPopulatFrequency + " |numOfS:"+numOFsentences+ " |numOfterms:"+numofterms;
+        //return docID + "> |mostPopular:"+mostPopularTerm + " |freq:"+mostPopulatFrequency + " |numOfS:"+numOFsentences+ " |numOfterms:"+numofterms;
+        return docID+":"+mostPopularTerm+":"+mostPopulatFrequency+":"+numOFsentences+":"+numofterms;
     }
 
 
