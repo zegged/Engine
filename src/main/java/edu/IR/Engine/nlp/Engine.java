@@ -118,10 +118,10 @@ public class Engine {
         //read corpus
         ReadFile readFile = new ReadFile();
 //        String pathToCorpus = "d:\\documents\\users\\razyal\\Downloads\\corpus\\corpus"; //CORPUS folder
-        String pathToCorpus = "C:\\corpus\\corpus\\"; //CORPUS folder
+        String pathToCorpus = "C:\\Users\\Razi\\Desktop\\ehzor\\corpus2"; //CORPUS folder
 
         //String postingFile = "C:\\Users\\Razi\\Desktop\\ehzor\\corpus\\FB396001\\FB396001";
-        String postingFilePath = "C:\\posting\\";
+        String postingFilePath = "C:\\Users\\Razi\\Desktop\\ehzor\\posting";
         //Map<String, List<TermData>> lastDictionaryToView =  new TreeMap<>();
         Indexer indexer = new Indexer(postingFilePath);
         List<String> files = readFile.getAllFiles(pathToCorpus);
@@ -154,49 +154,44 @@ public class Engine {
         long startTime=0;
         long endTime=0;
         startTime = System.currentTimeMillis()/1000;
-//        for (String filePath : files) {
-//
-//            double percent = (0.0 +  ++fileCounter ) / courpus_size*100;
-//            System.out.println(String.format("%.2f", percent)  + "% File: " + fileCounter + " " + filePath);
-//
-//            text = readFile.openFile(filePath);
-//
-//            //xml to documents
-//            IRDocument[] fileDocs = readFile.parseXML(text);
-//            //parse documents
-//            int cnt=0;
-//
-//            List<ParseResult> parseResults = new ArrayList<>();
-//            System.out.println("parsing");
-//            if (true) {
-//                for (IRDocument doc : fileDocs) {
-//                    cnt++;
-//                    ParseResult parseResult = parser.parseDocument(doc);
-//                    parseResults.add(parseResult);
-//                    DocumentData documentData = parseResult.documentData;
-//                    DocumentTerms documentTerms = parseResult.documentTerms;
-//                    documentTerms.sort();
-//                    indexer.addTerms(documentTerms, documentData.docID);
-//                    indexer.addDocument(documentData);
-//                    if (indexer.isMemoryFull()) {
-//                        indexer.savePosting();
-//                    }
-//                }
-//            }
-//
-//        }
+        for (String filePath : files) {
 
-        //////////////////final dump//////////
-//        indexer.savePosting();
-      //////////////////////////////////////
+            double percent = (0.0 +  ++fileCounter ) / courpus_size*100;
+            System.out.println(String.format("%.2f", percent)  + "% File: " + fileCounter + " " + filePath);
 
-        /////Merge sort
-//        indexer.merge();
+            text = readFile.openFile(filePath);
 
-//        indexer.saveDocuments();
+            //xml to documents
+            IRDocument[] fileDocs = readFile.parseXML(text);
+            //parse documents
+            int cnt=0;
 
-//        indexer.createDictionary();
+            List<ParseResult> parseResults = new ArrayList<>();
+            System.out.println("parsing");
+            if (true) {
+                for (IRDocument doc : fileDocs) {
+                    cnt++;
+                    ParseResult parseResult = parser.parseDocument(doc);
+                    parseResults.add(parseResult);
+                    DocumentData documentData = parseResult.documentData;
+                    DocumentTerms documentTerms = parseResult.documentTerms;
+                    documentTerms.sort();
+                    indexer.addTerms(documentTerms, documentData.docID);
+                    indexer.addDocument(documentData);
+                    if (indexer.isMemoryFull()) {
+                        indexer.savePosting();
+                    }
+                }
+            }
 
+        }
+
+        ///final dump
+        indexer.savePosting();
+        //merge sort - LIMITED to file size (logical,virtual,string,terms,lists)
+        indexer.merge();
+        indexer.createDictionary();
+        indexer.saveDocuments();
         //List<String>dict=indexer.getDictionaryForView();
         endTime=System.currentTimeMillis()/1000;
         long totlaTime=endTime - startTime;
@@ -242,11 +237,11 @@ public class Engine {
 
         // print docs
         System.out.println("\\\\\\\\\\\\\\\\\\\\\\\\");
-       // System.out.println("Document Dictionary:");
-//        for (String doc : Indexer.docs){
-//            //System.out.println(doc);
-//        }
-//
+        System.out.println("Document Dictionary:");
+        for (String doc : Indexer.docs){
+            //System.out.println(doc);
+        }
+
 
 
 
@@ -268,7 +263,7 @@ public class Engine {
 
         System.out.println("done");
 
-        //System.out.println("a".compareTo("b"));
+        System.out.println("a".compareTo("b"));
 
     }
 

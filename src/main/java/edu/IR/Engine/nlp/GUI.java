@@ -32,14 +32,18 @@ import static java.nio.file.Files.deleteIfExists;
 public class GUI extends Application {
 
     Stage window;
+    Scene scene,scene2;
     //Scene dictionaryScene, cacheScene;
     ListView<String> dictionary;
     ListView <String>cache;
     private boolean doStemming=true;
     TextField postingInput;
     TextField loadInput;
+    TextField loadInput2;
+    TextField loadInput3;
     TextField saveInput;
     TextField corpusInput;
+    TextField file_query_input;
     String pathToSave="";
     String pathToLoad="";
     String s="";
@@ -49,6 +53,8 @@ public class GUI extends Application {
     ReadFile r;
     Parse P;
     Indexer indexer;
+    TextField queryInput;
+    TextField queryFileInput;
     long totalTime;
     boolean finish=false;
     static Map<String,String> stopword ;
@@ -70,7 +76,7 @@ public class GUI extends Application {
         grid.setHgap(10);
 
         ImageView iv=new ImageView();
-        Image image = new Image("file:just-google-it.jpg");
+        Image image = new Image("file:search-engine-189880.jpg");
         iv.setImage(image);
         iv.setFitWidth(510);
         iv.setFitHeight(200);
@@ -171,16 +177,91 @@ public class GUI extends Application {
         GridPane.setConstraints(loadInput, 1, 9);
 
 
+        Button changeScene=new Button("Go to search !");
+        changeScene.setStyle("-fx-background-color: #DC143C");
+        changeScene.setOnAction(event -> window.setScene(scene2));
+        GridPane.setConstraints(changeScene, 1, 10);
+
+
+        GridPane grid2 = new GridPane();
+        grid2.setPadding(new Insets( 10, 20, 10, 20));
+        grid2.setVgap(10);
+        grid2.setHgap(10);
+
+        //1
+        ImageView iv2=new ImageView();
+        Image image2 = new Image("file:search-engine-189880.jpg");
+        iv2.setImage(image2);
+        iv2.setFitWidth(510);
+        iv2.setFitHeight(200);
+        iv2.setImage(image2);
+        GridPane.setConstraints(iv2, 1, 0);
+
+        //2
+        Label labelStart = new Label("Start Searching");
+        GridPane.setConstraints(labelStart, 0, 1);
+        //check box for semantic
+        CheckBox semantic=new CheckBox("with semantic?");
+        GridPane.setConstraints(semantic, 1, 1);
+
+        //3
+        Label enter_query = new Label("Enter query:");
+        GridPane.setConstraints(enter_query, 0, 2);
+        loadInput2 = new TextField();
+        loadInput2.setPromptText("search");
+        GridPane.setConstraints(loadInput2, 1, 2);
+        Button runQuery = new Button("Run");
+        GridPane.setConstraints(runQuery, 2, 2);
+
+        //4
+        Label enter_query2 = new Label("get file query:");
+        GridPane.setConstraints(enter_query2, 0, 3);
+        file_query_input = new TextField();
+        file_query_input.setPromptText("file query input");
+        GridPane.setConstraints(file_query_input, 1, 3);
+        Button browseButton5 = new Button("browse");
+        GridPane.setConstraints(browseButton5, 2, 3);
+        browseButton5.setOnAction(e-> browser());
+        Button runQuery2 = new Button("Run");
+        GridPane.setConstraints(runQuery2, 3, 3);
+
+        //5
+        Label get5label = new Label("get 5 queries if you want");
+        GridPane.setConstraints(get5label, 1, 4);
+        Button get5=new Button("GET 5");
+        GridPane.setConstraints(get5, 2, 4);
+
+        //6
+        Label enter_save_file = new Label("Enter path to save file: ");
+        GridPane.setConstraints(enter_save_file, 0, 5);
+        loadInput3 = new TextField();
+        loadInput3.setPromptText("file");
+        GridPane.setConstraints(loadInput3, 1, 5);
+        Button browseButton6 = new Button("browse");
+        GridPane.setConstraints(browseButton6, 2, 5);
+        browseButton6.setOnAction(e-> browser());
+        Button saveQuery = new Button("Save");
+        GridPane.setConstraints(saveQuery, 3, 5);
+
+        Button go_back_Scene=new Button("Go back !");
+        go_back_Scene.setStyle("-fx-background-color: #DC143C");
+        go_back_Scene.setOnAction(event -> window.setScene(scene));
+        GridPane.setConstraints(go_back_Scene, 1, 6);
+
+
+        grid2.getChildren().addAll(go_back_Scene,iv2,labelStart,semantic,enter_query,loadInput2,runQuery,
+                enter_query2,file_query_input,browseButton5,runQuery2,get5,enter_save_file,loadInput3,browseButton6,get5label,saveQuery);
+
         //Add everything to grid
         grid.getChildren().addAll(corpusLabel, corpusInput, postingLabel, postingInput,browseButton, startButton
                 ,stemmerCheck,stemmLabel,resetButton,resetLabel,
-                loadButton,loadLabel,browseButton2,dictionaryDisplayButton,displayDictionaryLabel,browseButton4,loadInput,iv);
+                loadButton,loadLabel,browseButton2,dictionaryDisplayButton,displayDictionaryLabel,browseButton4,loadInput,iv,changeScene);
 
 
-
-
-//        final Scene scene = new Scene(grid, 820, 550,Color.CHOCOLATE);
-        Scene scene=new Scene(grid,850,500,Color.CHOCOLATE);
+        grid.setStyle("-fx-background-color: #5F9EA0;");
+        grid2.setStyle("-fx-background-color: #5F9EA0;");
+        scene=new Scene(grid,850,550);
+        scene2=new Scene(grid2,850,550,Color.CHOCOLATE);
         window.setScene(scene);
         window.show();
     }

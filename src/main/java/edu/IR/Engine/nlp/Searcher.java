@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Searcher {
 
-    public Searcher(){
+    public Searcher() {
         System.out.println("init searcher");
     }
 
@@ -17,41 +17,35 @@ public class Searcher {
     //
 
 
-public void runQuery(String str) throws Exception {
+    public void runQuery(String str) throws Exception {
         TermSearch termSearch = searchTerm(str);
-        List<DocumentData> documentData =  getDocStats(termSearch);
+        List<DocumentData> documentData = getDocStats(termSearch);
 
-}
+    }
 
-public void rank(List<DocumentData> documentData){
+    public void rank(List<DocumentData> documentData) {
         //Ranker ranker = new Ranker()
-
-        for (DocumentData documentData1 : documentData){
+        for (DocumentData documentData1 : documentData) {
             bm25(documentData1);
         }
-
-}
-
-public double bm25(DocumentData documentData){
-
-        Integer D =  documentData.numofterms; // length of the document D in words
-
-
-
-        return 0.0;
-}
-
-
-public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
-    //TODO: make separate func
-    List<DocumentData> documentDataList = new ArrayList<>();
-    for (TermData termData: termSearch.termData){
-        int docID = termData.document;
-        DocumentData documentData =  searchDocument(docID);
-        documentDataList.add(documentData);
     }
-    return documentDataList;
-}
+
+    public double bm25(DocumentData documentData) {
+        Integer D = documentData.numofterms; // length of the document D in words
+        return 0.0;
+    }
+
+
+    public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
+        //TODO: make separate func
+        List<DocumentData> documentDataList = new ArrayList<>();
+        for (TermData termData : termSearch.termData) {
+            int docID = termData.document;
+            DocumentData documentData = searchDocument(docID);
+            documentDataList.add(documentData);
+        }
+        return documentDataList;
+    }
 
 
     public TermSearch searchTerm(String term) throws Exception {
@@ -64,13 +58,13 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
 
         BufferedReader firstFile = new BufferedReader(new FileReader(path1));
 
-       // List<TermStats> dic = new ArrayList<>();
+        // List<TermStats> dic = new ArrayList<>();
 
         String line;
 
         //dicNumTerms=0;
         //numUniq=0;
-        while ( (line= firstFile.readLine() )!=null) {
+        while ((line = firstFile.readLine()) != null) {
             Integer index1 = line.indexOf(':');
             String term1 = line.substring(0, index1);
             if (term1.equals(term)) {
@@ -78,10 +72,6 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
 
                 ///TODO: return termSearch
                 TermSearch termSearch = new TermSearch(term1, value1);
-
-
-
-
 
 
                 return termSearch;
@@ -102,9 +92,6 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
 //        System.out.println(stringBuilder);
 //        firstFile.close();
 //        writeToFile(stringBuilder.toString(),path);
-
-
-
 
 
         ////////////TERM-NOT-FOUND///////////////////
@@ -131,10 +118,10 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
 
         //skip 2?
         //todo: fix to 1
-        line= firstFile.readLine();
-        line= firstFile.readLine();
+        line = firstFile.readLine();
+        line = firstFile.readLine();
 
-        while ( (line= firstFile.readLine() )!=null) {
+        while ((line = firstFile.readLine()) != null) {
             Integer index1 = line.indexOf(':');
             String doc1 = line.substring(0, index1);
             if (doc1.equals(String.valueOf(doc))) {
@@ -150,11 +137,10 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
                 Integer numOFsentences = Integer.valueOf(stats[2]);
                 Integer numofterms = Integer.valueOf(stats[3]);
 
-                DocumentData documentData = new DocumentData(doc,mostPopularTerm, mostPopular_tf, numOFsentences, numofterms);
+                DocumentData documentData = new DocumentData(doc, mostPopularTerm, mostPopular_tf, numOFsentences, numofterms);
                 return documentData;
 
                 //TermSearch termSearch = new TermSearch(term1, value1);
-
 
 
                 //return termSearch;
@@ -177,15 +163,11 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
 //        writeToFile(stringBuilder.toString(),path);
 
 
-
-
-
         ////////////TERM-NOT-FOUND///////////////////
-      //  return new TermSearch("TERM-NOT-FOUND", "");
+        //  return new TermSearch("TERM-NOT-FOUND", "");
         //Integer intID, String mostPopularTerm, int mostPopular_tf,int numOFsentences,int numofterms
-        return new DocumentData(0,"",0,0,0);
+        return new DocumentData(0, "", 0, 0, 0);
     }
-
 
 
 }
