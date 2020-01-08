@@ -86,40 +86,50 @@ public class GUI extends Application {
 
         //corpus Label - constrains use (child, column, row)
         Label corpusLabel = new Label("corpus:");
+        corpusLabel.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(corpusLabel, 0, 1);
 
         //corpos path Input
         corpusInput = new TextField();
         corpusInput.setPromptText("corpus path here");
+        corpusInput.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(corpusInput, 1, 1);
         //browse button
         Button browseButton2 = new Button("browse");
+        browseButton2.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(browseButton2, 2, 1);
         browseButton2.setOnAction(e->browser());
 
         //posting Label
         Label postingLabel = new Label("posting files:");
+        postingLabel.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(postingLabel, 0, 2);
 
         //posting path Input
         postingInput = new TextField();
         postingInput.setPromptText("posting path here");
+        postingInput.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(postingInput, 1, 2);
 
         //browse button
         Button browseButton = new Button("browse");
+        browseButton.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(browseButton, 2, 2);
         browseButton.setOnAction(e-> browserPosting());
 
         //Stemming
         Label stemmLabel = new Label("Do you want to preform Stemming?");
+        stemmLabel.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(stemmLabel, 1, 3);
         //ToggleGroup stemming = new ToggleGroup();
         CheckBox stemmerCheck=new CheckBox("Stemming?");
+        stemmerCheck.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(stemmerCheck, 2, 3);
 
         //Start
         Button startButton = new Button("START");
+        startButton.setStyle("-fx-font-weight: bold");
+        startButton.setStyle("-fx-background-color: #90EE90");
         GridPane.setConstraints(startButton, 1, 4);
         startButton.setOnAction(e -> {
             try {
@@ -135,9 +145,11 @@ public class GUI extends Application {
 
         //RESET
         Button resetButton = new Button("RESET");
+        resetButton.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(resetButton, 2, 5);
         //reset Label
         Label resetLabel = new Label("To reset the posting and dictionary:");
+        resetLabel.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(resetLabel, 1, 5);
         resetButton.setOnAction(e-> {
             try {
@@ -150,8 +162,10 @@ public class GUI extends Application {
 
         //Display dictionary
         Button dictionaryDisplayButton = new Button("Dictionary");
+        dictionaryDisplayButton.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(dictionaryDisplayButton, 2, 7);
         Label displayDictionaryLabel = new Label("View Dictionary:");
+        displayDictionaryLabel.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(displayDictionaryLabel, 1, 7);
         dictionaryDisplayButton.setOnAction(e->{
             try {
@@ -163,22 +177,27 @@ public class GUI extends Application {
 
         //load
         Button browseButton4 = new Button("browse");
+        browseButton4.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(browseButton4, 2, 9);
         browseButton4.setOnAction(e-> browserLoad());
 //
 //        //load the created files
         Button loadButton = new Button("LOAD");
+        loadButton.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(loadButton, 4, 9);
-        Label loadLabel = new Label("To load the Dictionary:");
+        Label loadLabel = new Label("load the Dictionary :");
+        loadLabel.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(loadLabel, 0, 9);
         loadButton.setOnAction(e -> {loadFiles();});
         loadInput = new TextField();
         loadInput.setPromptText("load path here");
+        loadInput.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(loadInput, 1, 9);
 
 
         Button changeScene=new Button("Go to search !");
-        changeScene.setStyle("-fx-background-color: #DC143C");
+        changeScene.setStyle("-fx-background-color: #DC143C ");
+//        changeScene.setStyle("-fx-font-weight: bold");
         changeScene.setOnAction(event -> window.setScene(scene2));
         GridPane.setConstraints(changeScene, 1, 10);
 
@@ -199,48 +218,63 @@ public class GUI extends Application {
 
         //2
         Label labelStart = new Label("Start Searching");
+        labelStart.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(labelStart, 0, 1);
         //check box for semantic
         CheckBox semantic=new CheckBox("with semantic?");
+        semantic.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(semantic, 1, 1);
 
         //3
         Label enter_query = new Label("Enter query:");
+        enter_query.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(enter_query, 0, 2);
         loadInput2 = new TextField();
         loadInput2.setPromptText("search");
+        loadInput2.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(loadInput2, 1, 2);
         Button runQuery = new Button("Run");
+        runQuery.setStyle("-fx-background-color: #4169E1");
         GridPane.setConstraints(runQuery, 2, 2);
 
         //4
         Label enter_query2 = new Label("get file query:");
+        enter_query2.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(enter_query2, 0, 3);
         file_query_input = new TextField();
         file_query_input.setPromptText("file query input");
+        file_query_input.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(file_query_input, 1, 3);
         Button browseButton5 = new Button("browse");
+        browseButton5.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(browseButton5, 2, 3);
         browseButton5.setOnAction(e-> browser());
         Button runQuery2 = new Button("Run");
+        runQuery2.setStyle("-fx-background-color: #4169E1");
         GridPane.setConstraints(runQuery2, 3, 3);
 
         //5
         Label get5label = new Label("get 5 queries if you want");
+        get5label.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(get5label, 1, 4);
         Button get5=new Button("GET 5");
+        get5.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(get5, 2, 4);
 
         //6
-        Label enter_save_file = new Label("Enter path to save file: ");
+        Label enter_save_file = new Label("The path to save file");
+        enter_save_file.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(enter_save_file, 0, 5);
         loadInput3 = new TextField();
         loadInput3.setPromptText("file");
+        loadInput3.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(loadInput3, 1, 5);
         Button browseButton6 = new Button("browse");
+        browseButton6.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(browseButton6, 2, 5);
         browseButton6.setOnAction(e-> browser());
         Button saveQuery = new Button("Save");
+        saveQuery.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(saveQuery, 3, 5);
 
         Button go_back_Scene=new Button("Go back !");
