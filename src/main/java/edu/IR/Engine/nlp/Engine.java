@@ -202,6 +202,16 @@ public class Engine {
         Searcher searcher = new Searcher();
 
         String term = "hello";
+
+
+        DatamuseQuery datamuseQuery = new DatamuseQuery();
+        String similar =  datamuseQuery.findSimilar(term);
+
+        System.out.println(similar);
+
+
+
+
         searcher.runQuery(term);
 //        TermSearch s = searcher.searchTerm(term);
 //
