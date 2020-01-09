@@ -118,10 +118,10 @@ public class Engine {
         //read corpus
         ReadFile readFile = new ReadFile();
 //        String pathToCorpus = "d:\\documents\\users\\razyal\\Downloads\\corpus\\corpus"; //CORPUS folder
-        String pathToCorpus = "C:\\Users\\Razi\\Desktop\\ehzor\\corpus2"; //CORPUS folder
+        String pathToCorpus = "C:\\corpus\\corpus2\\"; //CORPUS folder
 
         //String postingFile = "C:\\Users\\Razi\\Desktop\\ehzor\\corpus\\FB396001\\FB396001";
-        String postingFilePath = "C:\\Users\\Razi\\Desktop\\ehzor\\posting";
+        String postingFilePath = "C:\\posting\\";
         //Map<String, List<TermData>> lastDictionaryToView =  new TreeMap<>();
         Indexer indexer = new Indexer(postingFilePath);
         List<String> files = readFile.getAllFiles(pathToCorpus);
@@ -204,10 +204,10 @@ public class Engine {
         String term = "hello";
 
 
-        DatamuseQuery datamuseQuery = new DatamuseQuery();
-        String similar =  datamuseQuery.findSimilar(term);
+        //DatamuseQuery datamuseQuery = new DatamuseQuery();
+        //String similar =  datamuseQuery.findSimilar(term);
 
-        System.out.println(similar);
+        //System.out.println(similar);
 
 
 

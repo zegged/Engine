@@ -1,9 +1,12 @@
 package edu.IR.Engine.nlp;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Searcher {
 
@@ -38,7 +41,28 @@ public void runQuery(String str) throws Exception {
         List<DocumentData> documentData =  getDocStats(termSearch);
 
 
-        //Ranker ranker = new Ranker(termSearch,documentData);
+        Ranker ranker = new Ranker(termSearch,documentData);
+
+        Map<Double, Integer> map = ranker.get_all_ranked_document();
+
+
+    FileWriter fw = new FileWriter("C:\\posting\\Qresults.txt");
+    BufferedWriter bw = null;
+    bw = new BufferedWriter(fw);
+
+
+        for (Map.Entry<Double,Integer> entry: map.entrySet()){
+            Double score = entry.getKey();
+            Integer docID = entry.getValue();
+            //bw.write("0 0 FBIS3-"+docID, );
+
+
+
+        }
+bw.close();
+//        for (int i = 0; i < map.size(); i++){
+//            double score =  map.get();
+//        }
 
         //rank(documentData);
 }
@@ -137,7 +161,7 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
 
     public DocumentData searchDocument(int doc) throws Exception {
 
-        System.out.println("searching for doc " + doc);
+        //System.out.println("searching for doc " + doc);
 
         //String path1 = getPath("final");
 
@@ -162,8 +186,8 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
             String doc1 = line.substring(0, index1);
             if (doc1.equals(String.valueOf(doc))) {
                 String value1 = line.substring(index1 + 1);
-                System.out.println("doc found");
-                System.out.println(line);
+                //System.out.println("doc found");
+                //System.out.println(line);
 
                 //Integer intID, String mostPopularTerm, int mostPopular_tf,int numOFsentences,int numofterms
                 String[] stats = value1.split(":");
@@ -172,8 +196,9 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
                 Integer mostPopular_tf = Integer.valueOf(stats[1]);
                 Integer numOFsentences = Integer.valueOf(stats[2]);
                 Integer numofterms = Integer.valueOf(stats[3]);
+                String strID = stats[4];
 
-                DocumentData documentData = new DocumentData(doc,mostPopularTerm, mostPopular_tf, numOFsentences, numofterms);
+                DocumentData documentData = new DocumentData(doc,mostPopularTerm, mostPopular_tf, numOFsentences, numofterms,strID);
                 return documentData;
 
                 //TermSearch termSearch = new TermSearch(term1, value1);
@@ -206,7 +231,7 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
         ////////////TERM-NOT-FOUND///////////////////
       //  return new TermSearch("TERM-NOT-FOUND", "");
         //Integer intID, String mostPopularTerm, int mostPopular_tf,int numOFsentences,int numofterms
-        return new DocumentData(0,"",0,0,0);
+        return new DocumentData(0,"",0,0,0, "");
     }
 
 

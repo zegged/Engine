@@ -1360,7 +1360,7 @@ public class Parse {
                 mostPopularTerm= (String) pair.getKey();
             }
         }
-        DocumentData documentData = new DocumentData(intID,mostPopularTerm,mostPopular_tf,numOFsentences,numUnique);
+        DocumentData documentData = new DocumentData(intID,mostPopularTerm,mostPopular_tf,numOFsentences,numUnique, doc.id);
         return new ParseResult(documentData,documentTerms);
     }
     private void inserttoDic(List<String> list){
