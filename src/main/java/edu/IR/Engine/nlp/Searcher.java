@@ -43,7 +43,7 @@ public void runQuery(String str) throws Exception {
 
         Ranker ranker = new Ranker(termSearch,documentData);
 
-        Map<Double, Integer> map = ranker.get_all_ranked_document();
+        Map<Double, String> map = ranker.get_all_ranked_document();
 
 
     FileWriter fw = new FileWriter("C:\\posting\\Qresults.txt");
@@ -51,10 +51,10 @@ public void runQuery(String str) throws Exception {
     bw = new BufferedWriter(fw);
 
 
-        for (Map.Entry<Double,Integer> entry: map.entrySet()){
+        for (Map.Entry<Double,String> entry: map.entrySet()){
             Double score = entry.getKey();
-            Integer docID = entry.getValue();
-            //bw.write("0 0 FBIS3-"+docID, );
+            String docID = entry.getValue();
+            bw.write("351 0 "+docID + " " + score + " 0.0 mt \n");
 
 
 

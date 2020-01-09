@@ -13,7 +13,7 @@ public class Ranker {
     public static int avgDoc = 200; //Average length of document in corpus.???????
     double avgdl; //average document length
     TermSearch term;
-    SortedMap<Double, Integer> all_doc_returns;
+    SortedMap<Double, String> all_doc_returns;
     List<DocumentData> list_of_all_relevant_doc;
     double tf=0;
     double numberOfDocuments=0;
@@ -28,7 +28,7 @@ public class Ranker {
         this.avgdl = avgdl;
         this.term= term;
         this.list_of_all_relevant_doc=list_of_all_relevant_doc;
-        this.all_doc_returns=new TreeMap<Double, Integer>();
+        this.all_doc_returns=new TreeMap<Double, String>();
     }
 
     public Map get_all_ranked_document (){
@@ -39,7 +39,7 @@ public class Ranker {
             this.averageDocumentLength=200;
             this.documentFrequency=list_of_all_relevant_doc.size();
             double score=score(tf,numberOfDocuments,docLength,averageDocumentLength,0,documentFrequency);
-            all_doc_returns.put(score,list_of_all_relevant_doc.get(i).docID);
+            all_doc_returns.put(score,list_of_all_relevant_doc.get(i).strID);
         }
         //sort the map
         Map ascSortedMap = new TreeMap();
