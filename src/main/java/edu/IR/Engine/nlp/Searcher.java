@@ -16,11 +16,26 @@ public class Searcher {
     //pointer to each term
     //
 
+public void buildSVD(){
+
+        //TODO: get all terms from post
+
+}
+
+
+
 
 public void runQuery(String str) throws Exception {
+
+
+        //term - posting line (all docs and tf)
         TermSearch termSearch = searchTerm(str);
+
+
+        //for every doc - get df.
         List<DocumentData> documentData =  getDocStats(termSearch);
 
+        rank(documentData);
 }
 
 public void rank(List<DocumentData> documentData){
