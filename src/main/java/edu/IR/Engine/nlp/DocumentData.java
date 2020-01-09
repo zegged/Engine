@@ -1,7 +1,9 @@
 package edu.IR.Engine.nlp;
 
 public class DocumentData {
+
     Integer docID;
+    int docTF;
     String mostPopularTerm;
     Integer mostPopulatFrequency;
     int numOFsentences;

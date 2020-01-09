@@ -32,17 +32,23 @@ public void runQuery(String str) throws Exception {
         TermSearch termSearch = searchTerm(str);
 
 
+
+
         //for every doc - get df.
         List<DocumentData> documentData =  getDocStats(termSearch);
 
-        rank(documentData);
+
+        //Ranker ranker = new Ranker(termSearch,documentData);
+
+        //rank(documentData);
 }
 
 public void rank(List<DocumentData> documentData){
         //Ranker ranker = new Ranker()
 
         for (DocumentData documentData1 : documentData){
-            bm25(documentData1);
+           double documentScore =  bm25(documentData1);
+
         }
 
 }
@@ -62,7 +68,9 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
     List<DocumentData> documentDataList = new ArrayList<>();
     for (TermData termData: termSearch.termData){
         int docID = termData.document;
+        int docTF = termData.frequency;
         DocumentData documentData =  searchDocument(docID);
+        documentData.docTF=docTF;
         documentDataList.add(documentData);
     }
     return documentDataList;

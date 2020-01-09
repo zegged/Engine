@@ -30,6 +30,8 @@ public class TermSearch {
         //System.out.println(term + " tf=" + tf + " df=" + df);
     }
 
+
+
     private List<TermData> parse(String unParsedPostingList) {
         List<TermData> posting = new ArrayList<TermData>();
 
