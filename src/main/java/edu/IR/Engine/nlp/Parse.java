@@ -1175,7 +1175,7 @@ public class Parse {
                 // PARSE DONE
                 // SAVE TERM IN TEMP DICTIONARY
                 int term_frequency = 1;
-                if((m_StopWords.containsKey(term)||term.equals(",")||term.equals("."))){
+                if((m_StopWords.containsKey(term.toLowerCase())||term.equals(",")||term.equals("."))){
                     continue;
                 }else {
                     //Porter's stemmer

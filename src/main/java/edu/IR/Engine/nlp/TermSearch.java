@@ -14,8 +14,6 @@ public class TermSearch {
 
     List<TermData> termData;
 
-
-
     public TermSearch(String term, String value){
         this.term=term;
         this.df=0;

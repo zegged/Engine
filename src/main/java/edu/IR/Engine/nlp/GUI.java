@@ -301,7 +301,6 @@ public class GUI extends Application {
     }
     //When button is clicked, handle() gets called
     //Button click is an ActionEvent (also MouseEvents, TouchEvents, etc...)
-
     public void StartButton (String s1, String s2, boolean box1) throws Exception
     {
         long startTime = System.currentTimeMillis()/1000;

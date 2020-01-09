@@ -1,7 +1,6 @@
 package edu.IR.Engine.nlp;
 
 import java.util.*;
-
 public class DocumentTerms {
     HashMap<String, Integer> dictionary;
     List<String> sortedTerms;
