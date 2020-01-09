@@ -13,7 +13,7 @@ public class Ranker {
     public static int avgDoc = 200; //Average length of document in corpus.???????
     double avgdl; //average document length
     TermSearch term;
-    SortedMap<Double, DocumentData> all_doc_returns;
+    SortedMap<Double, Integer> all_doc_returns;
     List<DocumentData> list_of_all_relevant_doc;
     double tf=0;
     double numberOfDocuments=0;
@@ -28,14 +28,23 @@ public class Ranker {
         this.avgdl = avgdl;
         this.term= term;
         this.list_of_all_relevant_doc=list_of_all_relevant_doc;
-        this.all_doc_returns=new TreeMap<Double, DocumentData>();
+        this.all_doc_returns=new TreeMap<Double, Integer>();
     }
 
     public Map get_all_ranked_document (){
-
         for(int i=0;i<list_of_all_relevant_doc.size();i++ ){
-            this.tf=term.termData.get(i).frequency;
+            this.tf=list_of_all_relevant_doc.get(i).docTF;
+            this.numberOfDocuments=N;
+            this.docLength=list_of_all_relevant_doc.get(i).numofterms;
+            this.averageDocumentLength=200;
+            this.documentFrequency=list_of_all_relevant_doc.size();
+            double score=score(tf,numberOfDocuments,docLength,averageDocumentLength,0,documentFrequency);
+            all_doc_returns.put(score,list_of_all_relevant_doc.get(i).docID);
         }
+        //sort the map
+        Map ascSortedMap = new TreeMap();
+        ascSortedMap.putAll(all_doc_returns);
+        return ascSortedMap;
 
 //        for(int j=0;j<list_all_terms_in_query.size();j++){
 //            tf=list_all_terms_in_query.get(j).tf;
@@ -48,10 +57,7 @@ public class Ranker {
 //                all_doc_returns.put(score,list_of_all_relevant_doc.get(i));
 //            }
 //        }
-        //sort the map
-        Map ascSortedMap = new TreeMap();
-        ascSortedMap.putAll(all_doc_returns);
-        return ascSortedMap;
+
     }
     /**
      * Uses BM25 to compute a weight for a term in a document.
@@ -87,7 +93,6 @@ public class Ranker {
         double idf =Math.log( numberOfDocuments / documentFrequency);
         double rank = first * idf;
         return rank;
-
     }
 
 }
