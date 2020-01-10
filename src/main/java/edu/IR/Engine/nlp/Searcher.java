@@ -1,17 +1,24 @@
 package edu.IR.Engine.nlp;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.pipeline.CoreDocument;
+import edu.stanford.nlp.pipeline.CoreSentence;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Searcher {
 
+    StanfordCoreNLP stanfordCoreNLP;
+    Map<String,String> map;
+
     public Searcher(){
         System.out.println("init searcher");
+        map = new HashMap<>();
+        stanfordCoreNLP = Pipeline.getPipeline();
     }
 
 
@@ -25,25 +32,74 @@ public void buildSVD(){
 
 }
 
+public Map<Double, String> runSingleQuery(String str) throws Exception {
+    TermSearch termSearch = getTerm(str);
+    List<DocumentData> documentData =  getDocStats(termSearch);
+    Ranker ranker = new Ranker(termSearch,documentData);
+    Map<Double, String> map = ranker.get_all_ranked_document();
+return map;
+}
+
+    private List<CoreSentence> breakSentences(String text){
+        CoreDocument coreDocument = new CoreDocument(text);
+        stanfordCoreNLP.annotate(coreDocument);
+        List<CoreSentence> sentences = coreDocument.sentences();
+        return sentences;
+    }
+
+public void runQuery(String query) throws Exception {
 
 
 
-public void runQuery(String str) throws Exception {
+
+    Map<String, Double> fullMap = new HashMap<>();
+
+    //parse query in NLP
+    CoreDocument coreDocument = new CoreDocument(query);
+    List<CoreSentence> sentences = breakSentences(query);
+
+        List<CoreLabel> coreLabelList = sentences.get(0).tokens();
+        Integer querySize =  coreLabelList.size();
 
 
-        //term - posting line (all docs and tf)
-        TermSearch termSearch = searchTerm(str);
+
+        for (CoreLabel coreLabel : coreLabelList) {
+            String token = coreLabel.originalText();
+            //String pos = coreLabel.get(CoreAnnotations.PartOfSpeechAnnotation.class);
+            //String ner = coreLabel.get(CoreAnnotations.NamedEntityTagAnnotation.class);
+
+            Map<Double, String> map =  runSingleQuery(token);
+
+            //invert map to merge by String
+            Map<String, Double> invMap = map.entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+
+            invMap.forEach((k, v) -> fullMap.merge(k, v, (v1, v2) -> v1 + v2));
+
+            //fullMap.putAll(map);
+
+        }
+
+
+        //invert map to sort by Double
+
+        //before sort
+        Map<Double, String> sigmaMap = fullMap.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+
+
+    Map<Double,String> ascSortedMap = new TreeMap();
+    ascSortedMap.putAll(sigmaMap);
 
 
 
 
-        //for every doc - get df.
-        List<DocumentData> documentData =  getDocStats(termSearch);
 
 
-        Ranker ranker = new Ranker(termSearch,documentData);
 
-        Map<Double, String> map = ranker.get_all_ranked_document();
+       // Map<Double, String> map = runSingleQuery(query);
 
 
     FileWriter fw = new FileWriter("C:\\posting\\Qresults.txt");
@@ -51,7 +107,7 @@ public void runQuery(String str) throws Exception {
     bw = new BufferedWriter(fw);
 
 
-        for (Map.Entry<Double,String> entry: map.entrySet()){
+        for (Map.Entry<Double,String> entry: ascSortedMap.entrySet()){
             Double score = entry.getKey();
             String docID = entry.getValue();
             bw.write("351 0 "+docID + " " + score + " 0.0 mt \n");
@@ -100,6 +156,16 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
     return documentDataList;
 }
 
+
+
+    public TermSearch getTerm(String term){
+
+        if (map.containsKey(term)){
+            return new TermSearch(term,map.get(term));
+        }
+
+        return new TermSearch("TERM-NOT-FOUND", "");
+    }
 
     public TermSearch searchTerm(String term) throws Exception {
 
@@ -235,5 +301,26 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
     }
 
 
+    public void loadDictionary() throws IOException {
+
+        //String path1 = getPath("final");
+        String path1 = "c:\\posting\\post.txt";
+
+        FileReader fileReader = new FileReader(path1);
+        BufferedReader firstFile = new BufferedReader(fileReader);
+
+        String line;
+        while ((line = firstFile.readLine()) != null) {
+            Integer index1 = line.indexOf(':');
+            String term1 = line.substring(0, index1);
+            String value1 = line.substring(index1 + 1);
+
+            map.put(term1,value1);
+
+
+        }
+        firstFile.close();
+        fileReader.close();
+    }
 
 }
