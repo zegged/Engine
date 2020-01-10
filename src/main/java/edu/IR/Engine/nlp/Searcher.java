@@ -1,6 +1,5 @@
 package edu.IR.Engine.nlp;
 
-import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.CoreDocument;
 import edu.stanford.nlp.pipeline.CoreSentence;
@@ -13,11 +12,13 @@ import java.util.stream.Collectors;
 public class Searcher {
 
     StanfordCoreNLP stanfordCoreNLP;
-    Map<String,String> map;
+    Map<String,String> mapTerms;
+    Map<Integer,String> mapDocs;
 
     public Searcher(){
         System.out.println("init searcher");
-        map = new HashMap<>();
+        mapTerms = new HashMap<>();
+        mapDocs = new HashMap<>();
         stanfordCoreNLP = Pipeline.getPipeline();
     }
 
@@ -149,7 +150,8 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
     for (TermData termData: termSearch.termData){
         int docID = termData.document;
         int docTF = termData.frequency;
-        DocumentData documentData =  searchDocument(docID);
+        //DocumentData documentData =  searchDocument(docID);
+        DocumentData documentData =  getDoc(docID);
         documentData.docTF=docTF;
         documentDataList.add(documentData);
     }
@@ -157,17 +159,39 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
 }
 
 
+    public DocumentData getDoc(Integer doc){
+
+//        if (mapTerms.containsKey(doc)){
+//            return new TermSearch(doc, mapDocs.get(doc));
+//        }
+        String value1 = mapDocs.get(doc);
+        //System.out.println("doc found");
+        //System.out.println(line);
+
+        //Integer intID, String mostPopularTerm, int mostPopular_tf,int numOFsentences,int numofterms
+        String[] stats = value1.split(":");
+
+        String mostPopularTerm = stats[0];
+        Integer mostPopular_tf = Integer.valueOf(stats[1]);
+        Integer numOFsentences = Integer.valueOf(stats[2]);
+        Integer numofterms = Integer.valueOf(stats[3]);
+        String strID = stats[4];
+
+        DocumentData documentData = new DocumentData(doc,mostPopularTerm, mostPopular_tf, numOFsentences, numofterms,strID);
+        return documentData;
+    }
+
 
     public TermSearch getTerm(String term){
 
-        if (map.containsKey(term)){
-            return new TermSearch(term,map.get(term));
+        if (mapTerms.containsKey(term)){
+            return new TermSearch(term, mapTerms.get(term));
         }
 
         return new TermSearch("TERM-NOT-FOUND", "");
     }
 
-    public TermSearch searchTerm(String term) throws Exception {
+    public TermSearch searchTerm(String term) throws Exception { //DELETE?
 
         System.out.println("searching for term " + term);
 
@@ -315,7 +339,7 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
             String term1 = line.substring(0, index1);
             String value1 = line.substring(index1 + 1);
 
-            map.put(term1,value1);
+            mapTerms.put(term1,value1);
 
 
         }
@@ -323,4 +347,31 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
         fileReader.close();
     }
 
+    public void loadDocuments() throws IOException {
+        //String path1 = getPath("final");
+        String path1 = "c:\\posting\\documents.txt";
+
+        FileReader fileReader = new FileReader(path1);
+        BufferedReader firstFile = new BufferedReader(fileReader);
+
+        String line;
+        //todo: fix this
+        line = firstFile.readLine();
+        line = firstFile.readLine();
+
+
+
+        while ((line = firstFile.readLine()) != null) {
+            Integer index1 = line.indexOf(':');
+            String term1 = line.substring(0, index1);
+            String value1 = line.substring(index1 + 1);
+
+            mapDocs.put(Integer.valueOf(term1),value1);
+
+
+        }
+        firstFile.close();
+        fileReader.close();
+
+    }
 }
