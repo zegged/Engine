@@ -96,7 +96,7 @@ public class Searcher {
 
     public void writeQueryResult(Map<String, Double> scores, Integer queryID) throws IOException {
         boolean append = true;
-        FileWriter fw = new FileWriter("C:\\posting\\Qresults.txt", append);
+        FileWriter fw = new FileWriter("d:\\documents\\users\\razyal\\Documents\\posting\\yesStem\\Qresults.txt", append);
         BufferedWriter bw = null;
         bw = new BufferedWriter(fw);
 
@@ -305,7 +305,7 @@ public class Searcher {
     public void loadDictionary() throws IOException {
 
         //String path1 = getPath("final");
-        String path1 = "c:\\posting\\post.txt";
+        String path1 = "d:\\documents\\users\\razyal\\Documents\\posting\\yesStem\\post.txt";
 
         FileReader fileReader = new FileReader(path1);
         BufferedReader firstFile = new BufferedReader(fileReader);
@@ -326,7 +326,7 @@ public class Searcher {
 
     public void loadDocuments() throws IOException {
         //String path1 = getPath("final");
-        String path1 = "c:\\posting\\documents.txt";
+        String path1 = "d:\\documents\\users\\razyal\\Documents\\posting\\yesStem\\documents.txt";
 
         FileReader fileReader = new FileReader(path1);
         BufferedReader firstFile = new BufferedReader(fileReader);
@@ -351,8 +351,8 @@ public class Searcher {
 
     }
 
-    public void runFileQueries() throws Exception {
-        String path1 = "c:\\posting\\queries.txt";
+    public void runFileQueries(String path1) throws Exception {
+//        String path1 = "d:\\documents\\users\\razyal\\Documents\\posting\\yesStem\\queries.txt";
 
         ReadFile readFile = new ReadFile();
         String text = readFile.openQueryFile(path1);

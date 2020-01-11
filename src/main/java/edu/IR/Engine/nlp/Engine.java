@@ -228,7 +228,7 @@ public class Engine {
 
 
 
-           searcher.runFileQueries();
+//           searcher.runFileQueries();
 
 
 //        TermSearch s = searcher.searchTerm(term);

@@ -783,6 +783,7 @@ public class Parse {
     int numOFsentences;
     int numofterms;
     String s = "";
+    String docParsing="";
     static Map<String, String> Months = new HashMap<String, String>() {{
         put("january", "01");
         put("february", "02");
@@ -1031,86 +1032,57 @@ public class Parse {
     }
 
     public List<String> checkPricesMoreThanMillion(String str) {
-        List<String> saved_Number = new ArrayList<String>();
 
+        List<String> saved_Number = new ArrayList<String>();
         if (str.toLowerCase().contains("dollar") || str.contains("$")) {
-//            //$price million/billion
-//            Pattern p3 = Pattern.compile("\\d*.\\d+ billion U.S. dollars|\\d*.\\d+ million U.S. dollars|\\d*.\\d+ trillion U.S. dollars|\\$\\d*.\\d+ million|\\$\\d*.\\d+ billion");
-//            Matcher m3 = p3.matcher(str);
-//            while (m3.find()) {
-//                if (m3.group().contains("billion")) {
-//                    Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
-//                    Matcher m = p.matcher(m3.group());
-//                    while (m.find()) {
-//                        String s = m.group().replaceAll(",", "");
-//                        int result = Integer.parseInt(s);
-//                        saved_Number.add("" + result * 1000 + " M Dollars");
-//                    }
-//                } else if (m3.group().contains("million")) {
-//                    Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
-//                    Matcher m = p.matcher(m3.group());
-//                    while (m.find()) {
-//                        String s = m.group().replaceAll(",", "");
-//                        int result = Integer.parseInt(s);
-//                        saved_Number.add("" + result + " M Dollars");
-//                    }
-//                }else{
-//                    if (m3.group().contains("trillion")) {
-//                        Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
-//                        Matcher m = p.matcher(m3.group());
-//                        while (m.find()) {
-//                            String s = m.group().replaceAll(",", "");
-//                            int result = Integer.parseInt(s);
-//                            saved_Number.add("" + result * 1000000 + " M Dollars");
-//                        }
-//                    }
-//                }
-//            }
+            //$price million/billion
+            Pattern p3 = Pattern.compile("\\d*.\\d+ billion U.S. dollars|\\d*.\\d+ million U.S. dollars|\\d*.\\d+ trillion U.S. dollars|\\$\\d*.\\d+ million|\\$\\d*.\\d+ billion");
+            Matcher m3 = p3.matcher(str);
+            while (m3.find()) {
+                if (m3.group().contains("billion")) {
+                    Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
+                    Matcher m = p.matcher(m3.group());
+                    while (m.find()) {
+                        String s = m.group().replaceAll(",", "");
+                        int result = Integer.parseInt(s);
+                        saved_Number.add("" + result * 1000 + " M Dollars");
+                    }
+                } else if (m3.group().contains("million")) {
+                    Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
+                    Matcher m = p.matcher(m3.group());
+                    while (m.find()) {
+                        String s = m.group().replaceAll(",", "");
+                        int result = Integer.parseInt(s);
+                        saved_Number.add("" + result + " M Dollars");
+                    }
+                }else{
+                    if (m3.group().contains("trillion")) {
+                        Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
+                        Matcher m = p.matcher(m3.group());
+                        while (m.find()) {
+                            String s = m.group().replaceAll(",", "");
+                            int result = Integer.parseInt(s);
+                            saved_Number.add("" + result * 1000000 + " M Dollars");
+                        }
+                    }
+                }
+                docParsing=docParsing.replaceFirst(m3.group(),"");
+            }
             //price m Dollars
             Pattern p5 = Pattern.compile("\\d+,\\d+ m Dollars|\\d+ m Dollars");
             Matcher m5 = p5.matcher(str);
             while (m5.find()) {
                 saved_Number.add(m5.group().replaceAll("m", "M"));
+                docParsing=docParsing.replaceFirst(m5.group(),"");
             }
             //price bn Dollars
             Pattern p6 = Pattern.compile("\\d+,\\d+ bn Dollars|\\d+ bn Dollars");
             Matcher m6 = p6.matcher(str);
             while (m6.find()) {
                 saved_Number.add(m6.group().replaceAll("bn", "M"));
+                docParsing=docParsing.replaceFirst(m6.group(),"");
             }
 
-//            //price billion/million/trillion U.S. dollars
-//            Pattern p7 = Pattern.compile("\\d*.\\d+ billion U.S. dollars|\\d*.\\d+ million U.S. dollars|\\d*.\\d+ trillion U.S. dollars");
-//            Matcher m7 = p7.matcher(str);
-//            while (m7.find()) {
-//                if (m7.group().contains("billion")) {
-//                    Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
-//                    Matcher m = p.matcher(m7.group());
-//                    while (m.find()) {
-//                        String s = m.group().replaceAll(",", "");
-//                        int result = Integer.parseInt(s);
-//                        saved_Number.add("" + result * 1000 + " M Dollars");
-//                    }
-//                }
-//                if (m7.group().contains("million")) {
-//                    Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
-//                    Matcher m = p.matcher(m7.group());
-//                    while (m.find()) {
-//                        String s = m.group().replaceAll(",", "");
-//                        int result = Integer.parseInt(s);
-//                        saved_Number.add("" + result + " M Dollars");
-//                    }
-//                }
-//                if (m7.group().contains("trillion")) {
-//                    Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
-//                    Matcher m = p.matcher(m7.group());
-//                    while (m.find()) {
-//                        String s = m.group().replaceAll(",", "");
-//                        int result = Integer.parseInt(s);
-//                        saved_Number.add("" + result * 1000000 + " M Dollars");
-//                    }
-//                }
-//            }
         }
         return saved_Number;
     }
@@ -1175,17 +1147,17 @@ public class Parse {
         // STANFORD NLP PARSE
         doc.text = doc.text.replaceAll("[\\(|;|'|:|\\^|\\)|\\]|\\[|\\#|\\]|\\+|\\*|\\@|!|?]", "");
         doc.text = doc.text.replaceAll("-{2,}", "");
-
-
-        List<CoreSentence> sentences = breakSentences(doc.text);
+        docParsing=doc.text;
+        List<CoreSentence> sentences = breakSentences(docParsing);
         DocumentTerms documentTerms = new DocumentTerms();
         String str = sentences.toString();
         List<String> pricesMoreThanMillion = new ArrayList<>();
-        pricesMoreThanMillion = checkPricesMoreThanMillion(doc.text);
+        pricesMoreThanMillion = checkPricesMoreThanMillion(docParsing);
         inserttoDic(pricesMoreThanMillion);
         int counter = 0;
         numOFsentences = 0;
         numofterms = 0;
+        int counter_terms=0;
         for (CoreSentence sentence : sentences) {
             List<CoreLabel> coreLabelList = sentence.tokens();
             counter++;
@@ -1337,10 +1309,12 @@ public class Parse {
                             if (upper_words.equals("")) {
                                 upper_words = term;
                             } else {
-                                upper_words = upper_words + " " + term;
-                                documentTerms.add(upper_words);
+                                if(counter_terms<2){
+                                    upper_words = upper_words + " " + term;
+                                    documentTerms.add(upper_words);
+                                    counter_terms++;
+                                }
                             }
-
                         } else {
                             if (upper_words.equals("")) {
                                 continue;
@@ -1361,11 +1335,6 @@ public class Parse {
                             }
                         }
                     }
-                    // STATISTICS
-//                    if (documentTerms.checkMostPopular()>mostPopular_tf){
-//                        mostPopular_tf=documentTerms.checkMostPopular();
-//                        mostPopularTerm=term;
-//                    }
                     numofterms++;
                 }
             }
@@ -1390,6 +1359,7 @@ public class Parse {
         }
         DocumentData documentData = new DocumentData(intID, mostPopularTerm, mostPopular_tf, numOFsentences, numUnique, doc.id);
         return new ParseResult(documentData, documentTerms);
+
     }
 
     private void inserttoDic(List<String> list) {

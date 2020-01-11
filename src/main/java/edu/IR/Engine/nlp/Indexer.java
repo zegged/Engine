@@ -215,8 +215,8 @@ public class Indexer {
     }
 
     public boolean isMemoryFull() {
-        if (Indexer.docs.size() % 50000==0){
-            System.out.println("Dumping 50K Documents.");
+        if (Indexer.docs.size() % 10000==0){
+            System.out.println("Dumping 10K Documents.");
             return true;
         }
         return false;
@@ -339,23 +339,15 @@ public class Indexer {
             Integer index1 = line.indexOf(':');
             String term1 = line.substring(0, index1);
             String value1 = line.substring(index1 + 1);
-
-
-
-
             //value1.concat(":").concat(String.valueOf(ptr));
-
             TermStats termStats = new TermStats(term1, value1);
-
             //update pointer for next term
             //ptr = raf.getFilePointer();
-
             dic.add(termStats);
             dicNumTerms++;
             if (termStats.tf==1){
                 numUniq++;
             }
-
         }
         StringBuilder stringBuilder = new StringBuilder();
         for (TermStats termStats : dic){
