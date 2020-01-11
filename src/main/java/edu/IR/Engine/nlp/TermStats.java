@@ -13,10 +13,13 @@ public class TermStats {
     Integer df;
 
 
+
+
     public TermStats(String term, String value){
         this.term=term;
         this.df=0;
         this.tf=0;
+
         String[] ans = value.split("^(\\[)||$(\\])||( \\d[->]\\d )");
         List<TermData> termData = parse(value);
         for (TermData t : termData){

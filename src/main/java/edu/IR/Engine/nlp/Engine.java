@@ -118,7 +118,7 @@ public class Engine {
         //read corpus
         ReadFile readFile = new ReadFile();
 //        String pathToCorpus = "d:\\documents\\users\\razyal\\Downloads\\corpus\\corpus"; //CORPUS folder
-        String pathToCorpus = "C:\\corpus\\corpus2\\"; //CORPUS folder
+        String pathToCorpus = "C:\\corpus\\corpus\\"; //CORPUS folder
 
         //String postingFile = "C:\\Users\\Razi\\Desktop\\ehzor\\corpus\\FB396001\\FB396001";
         String postingFilePath = "C:\\posting\\";
@@ -154,44 +154,44 @@ public class Engine {
         long startTime=0;
         long endTime=0;
         startTime = System.currentTimeMillis()/1000;
-        for (String filePath : files) {
-
-            double percent = (0.0 +  ++fileCounter ) / courpus_size*100;
-            System.out.println(String.format("%.2f", percent)  + "% File: " + fileCounter + " " + filePath);
-
-            text = readFile.openFile(filePath);
-
-            //xml to documents
-            IRDocument[] fileDocs = readFile.parseXML(text);
-            //parse documents
-            int cnt=0;
-
-            List<ParseResult> parseResults = new ArrayList<>();
-            System.out.println("parsing");
-            if (true) {
-                for (IRDocument doc : fileDocs) {
-                    cnt++;
-                    ParseResult parseResult = parser.parseDocument(doc);
-                    parseResults.add(parseResult);
-                    DocumentData documentData = parseResult.documentData;
-                    DocumentTerms documentTerms = parseResult.documentTerms;
-                    documentTerms.sort();
-                    indexer.addTerms(documentTerms, documentData.docID);
-                    indexer.addDocument(documentData);
-                    if (indexer.isMemoryFull()) {
-                        indexer.savePosting();
-                    }
-                }
-            }
-
-        }
+//        for (String filePath : files) {
+//
+//            double percent = (0.0 +  ++fileCounter ) / courpus_size*100;
+//            System.out.println(String.format("%.2f", percent)  + "% File: " + fileCounter + " " + filePath);
+//
+//            text = readFile.openFile(filePath);
+//
+//            //xml to documents
+//            IRDocument[] fileDocs = readFile.parseXML(text);
+//            //parse documents
+//            int cnt=0;
+//
+//            List<ParseResult> parseResults = new ArrayList<>();
+//            System.out.println("parsing");
+//            if (true) {
+//                for (IRDocument doc : fileDocs) {
+//                    cnt++;
+//                    ParseResult parseResult = parser.parseDocument(doc);
+//                    parseResults.add(parseResult);
+//                    DocumentData documentData = parseResult.documentData;
+//                    DocumentTerms documentTerms = parseResult.documentTerms;
+//                    documentTerms.sort();
+//                    indexer.addTerms(documentTerms, documentData.docID);
+//                    indexer.addDocument(documentData);
+//                    if (indexer.isMemoryFull()) {
+//                        indexer.savePosting();
+//                    }
+//                }
+//            }
+//
+//        }
 
         ///final dump
-        indexer.savePosting();
+//        indexer.savePosting();
         //merge sort - LIMITED to file size (logical,virtual,string,terms,lists)
-        indexer.merge();
-        indexer.createDictionary();
-        indexer.saveDocuments();
+//        indexer.merge();
+//        indexer.createDictionary();
+//        indexer.saveDocuments();
         //List<String>dict=indexer.getDictionaryForView();
         endTime=System.currentTimeMillis()/1000;
         long totlaTime=endTime - startTime;
@@ -201,7 +201,12 @@ public class Engine {
 
         Searcher searcher = new Searcher();
 
-        String term = "hello";
+        searcher.loadDictionary();
+
+        searcher.loadDocuments();
+
+        //pistol-pack:[1->11936, 1->15621, 1->115]
+        String term = "pistol pack";
 
 
         //DatamuseQuery datamuseQuery = new DatamuseQuery();
@@ -212,7 +217,10 @@ public class Engine {
 
 
 
-        searcher.runQuery(term);
+        Map<Double, String> scores =  searcher.runQuery(term);
+
+           searcher.writeQueryResult(scores);
+
 //        TermSearch s = searcher.searchTerm(term);
 //
 //        if (!s.term.equals("")){

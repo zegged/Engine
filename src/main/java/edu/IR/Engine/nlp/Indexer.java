@@ -315,18 +315,41 @@ public class Indexer {
 
         String path1 = getPath("final");
 
-        BufferedReader firstFile = new BufferedReader(new FileReader(path1));
+        FileReader fileReader = new FileReader(path1);
+        BufferedReader firstFile = new BufferedReader(fileReader);
+        //File file = new File(path1);
+        //RandomAccessFile raf = new RandomAccessFile(file, "w");
+        //raf.seek(start);
+        //String line = raf.readLine();
+        //Long plStart = raf.getFilePointer();
+        //raf.writeBytes(lineToAdd);
+        //raf.close();
+
+
+
 
         List<TermStats> dic = new ArrayList<>();
         String line;
 
         dicNumTerms=0;
         numUniq=0;
+        //Long ptr = raf.getFilePointer();
+        //Long ptr = fileReader
         while ( (line= firstFile.readLine() )!=null) {
             Integer index1 = line.indexOf(':');
             String term1 = line.substring(0, index1);
             String value1 = line.substring(index1 + 1);
+
+
+
+
+            //value1.concat(":").concat(String.valueOf(ptr));
+
             TermStats termStats = new TermStats(term1, value1);
+
+            //update pointer for next term
+            //ptr = raf.getFilePointer();
+
             dic.add(termStats);
             dicNumTerms++;
             if (termStats.tf==1){
@@ -336,7 +359,8 @@ public class Indexer {
         }
         StringBuilder stringBuilder = new StringBuilder();
         for (TermStats termStats : dic){
-            stringBuilder.append(termStats).append(System.lineSeparator());
+            stringBuilder.append(termStats)
+                    .append(System.lineSeparator());
         }
         String path = getPath("dic");
         System.out.println(stringBuilder);
