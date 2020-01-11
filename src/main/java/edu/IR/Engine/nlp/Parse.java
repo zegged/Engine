@@ -765,91 +765,112 @@ import edu.stanford.nlp.pipeline.CoreSentence;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 
 import java.util.*;
+
 import org.tartarus.snowball.ext.PorterStemmer;
+
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.Map.Entry.comparingByValue;
 import static java.util.stream.Collectors.toMap;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Parse {
     StanfordCoreNLP stanfordCoreNLP;
-    private static HashMap<String,String> m_StopWords;//the stop words from the file
+    private static HashMap<String, String> m_StopWords;//the stop words from the file
     private boolean doSteming;
-    private List<String> alldictionaryFor_Hokem=new ArrayList();
+    private List<String> alldictionaryFor_Hokem = new ArrayList();
     int numOFsentences;
     int numofterms;
-    String s="";
-    static Map <String,String> Months=new HashMap<String, String>(){{
-        put("january","01"); put("february","02"); put("march","03");put("april","04");put("may","05");
-        put("june","06");put("july","07");put("august","08");put("september","09");put("october","10");
-        put("november","11");put("december","12");put("jan", "01");put("feb","02");put("mar","03");
-        put("apr","04");put("may","05");put("jun","06");put("jul","07");put("aug","08");put("sep","09");
-        put("oct","10");put("nov","11");put("dec","12");}};
+    String s = "";
+    static Map<String, String> Months = new HashMap<String, String>() {{
+        put("january", "01");
+        put("february", "02");
+        put("march", "03");
+        put("april", "04");
+        put("may", "05");
+        put("june", "06");
+        put("july", "07");
+        put("august", "08");
+        put("september", "09");
+        put("october", "10");
+        put("november", "11");
+        put("december", "12");
+        put("jan", "01");
+        put("feb", "02");
+        put("mar", "03");
+        put("apr", "04");
+        put("may", "05");
+        put("jun", "06");
+        put("jul", "07");
+        put("aug", "08");
+        put("sep", "09");
+        put("oct", "10");
+        put("nov", "11");
+        put("dec", "12");
+    }};
 
 
-    public Parse(Map<String,String> m_StopWords ,boolean doStemming){
+    public Parse(Map<String, String> m_StopWords, boolean doStemming) {
         System.out.println("Parse init");
         stanfordCoreNLP = Pipeline.getPipeline();
-        if(this.m_StopWords==null)
+        if (this.m_StopWords == null)
             this.m_StopWords = new HashMap<>(m_StopWords);//added new need tot check time to run
-        this.doSteming=doStemming;
+        this.doSteming = doStemming;
     }
 
     //handle with dates
-    public static List< String > getKeyByValue(String value){
-        List< String > keys = new ArrayList< String>();
-        for ( String key : Months.keySet() )
-        {
-            if ( Months.get( key ).equals( value ) )
-            {
-                keys.add( key );
+    public static List<String> getKeyByValue(String value) {
+        List<String> keys = new ArrayList<String>();
+        for (String key : Months.keySet()) {
+            if (Months.get(key).equals(value)) {
+                keys.add(key);
             }
         }
-        if(value.equals("05")){
+        if (value.equals("05")) {
             keys.add("blabla");
         }
         return keys;
     }
-    public List<String> checkDate(String sentence){
+
+    public List<String> checkDate(String sentence) {
         sentence = sentence.replaceAll("[\\.]$", "");
-        sentence=sentence.toLowerCase();
-        List<String> saved_Date= new ArrayList<String>() ;
-        for(int i=1;i<=12;i++){
-            List< String > keys = new ArrayList< String>();
-            if(i<10){
-                keys=getKeyByValue("0"+i);
+        sentence = sentence.toLowerCase();
+        List<String> saved_Date = new ArrayList<String>();
+        for (int i = 1; i <= 12; i++) {
+            List<String> keys = new ArrayList<String>();
+            if (i < 10) {
+                keys = getKeyByValue("0" + i);
+            } else {
+                keys = getKeyByValue("" + i);
             }
-            else {
-                keys=getKeyByValue(""+i);
-            }
-            Pattern p3 = Pattern.compile("\\d+-\\d+ "+keys.get(0)+"|"+"\\d*-\\d* "+keys.get(1)
-            +"|"+"\\d+ "+keys.get(0)+"|"+"\\d* "+keys.get(1));
+            Pattern p3 = Pattern.compile("\\d+-\\d+ " + keys.get(0) + "|" + "\\d*-\\d* " + keys.get(1)
+                    + "|" + "\\d+ " + keys.get(0) + "|" + "\\d* " + keys.get(1));
             Matcher m3 = p3.matcher(sentence);
-            while(m3.find()) {
-                List<String> newDate=new ArrayList<>();
-                newDate=DateListToSave(m3.group(),keys.get(0));
-                if(newDate==null){
+            while (m3.find()) {
+                List<String> newDate = new ArrayList<>();
+                newDate = DateListToSave(m3.group(), keys.get(0));
+                if (newDate == null) {
                     break;
                 }
-                for(int k=0;k<newDate.size();k++){
+                for (int k = 0; k < newDate.size(); k++) {
                     saved_Date.add(newDate.get(k));
-                    this.s=this.s.replaceFirst(m3.group(),"");
+                    this.s = this.s.replaceFirst(m3.group(), "");
                 }
             }
-            Pattern p5 = Pattern.compile(keys.get(0)+" \\d+-\\d+"+"|"+keys.get(1)+" \\d+-\\d+"
-            +"|"+keys.get(0)+" \\d+"+"|"+keys.get(1)+" \\d+");
+            Pattern p5 = Pattern.compile(keys.get(0) + " \\d+-\\d+" + "|" + keys.get(1) + " \\d+-\\d+"
+                    + "|" + keys.get(0) + " \\d+" + "|" + keys.get(1) + " \\d+");
 
             Matcher m5 = p5.matcher(sentence);
-            while(m5.find()) {
-                List<String> newDate=new ArrayList<>();
-                newDate=DateListToSave(m5.group(),keys.get(0));
-                if(newDate==null){
+            while (m5.find()) {
+                List<String> newDate = new ArrayList<>();
+                newDate = DateListToSave(m5.group(), keys.get(0));
+                if (newDate == null) {
                     break;
                 }
-                for(int k=0;k<newDate.size();k++){
+                for (int k = 0; k < newDate.size(); k++) {
                     saved_Date.add(newDate.get(k));
-                    this.s=this.s.replaceFirst(m5.group(),"");
+                    this.s = this.s.replaceFirst(m5.group(), "");
                 }
             }
         }
@@ -857,284 +878,291 @@ public class Parse {
         return saved_Date;
     }
 
-    public static List<String> DateListToSave(String date,String month){
+    public static List<String> DateListToSave(String date, String month) {
         Pattern p = Pattern.compile("\\d+-\\d+|\\d+");
         Matcher m = p.matcher(date);
-        String num="";
-        String num2="";
-        while(m.find()) {
-            if(m.group().contains("-")){
-                String[] s=m.group().split("-");
-                num=s[0];
-                num2=s[1];
+        String num = "";
+        String num2 = "";
+        while (m.find()) {
+            if (m.group().contains("-")) {
+                String[] s = m.group().split("-");
+                num = s[0];
+                num2 = s[1];
 
-            }else{
-                num=m.group();
+            } else {
+                num = m.group();
             }
 
         }
-        List<String> newDate=new ArrayList<>();
-        String value="";
-        if (Months.containsKey(month.toLowerCase())){ value=Months.get(month.toLowerCase());}
-        if(num==""){
+        List<String> newDate = new ArrayList<>();
+        String value = "";
+        if (Months.containsKey(month.toLowerCase())) {
+            value = Months.get(month.toLowerCase());
+        }
+        if (num == "") {
             return null;
         }
         int result = Integer.parseInt(num);
-        if(result>31){
-            if(num2!=""){
-                newDate.add(num+"-"+value);
-                newDate.add(num2+"-"+value);
-            }else{
-                newDate.add(num+"-"+value);
+        if (result > 31) {
+            if (num2 != "") {
+                newDate.add(num + "-" + value);
+                newDate.add(num2 + "-" + value);
+            } else {
+                newDate.add(num + "-" + value);
             }
 
-        }
-        else{
-            if(num2!=""){
-                newDate.add(value+"-"+num);
-                newDate.add(value+"-"+num2);
-            }else{
-                newDate.add(value+"-"+num);
+        } else {
+            if (num2 != "") {
+                newDate.add(value + "-" + num);
+                newDate.add(value + "-" + num2);
+            } else {
+                newDate.add(value + "-" + num);
             }
 
         }
         return newDate;
     }
 
-        // handle numbers like this $,$$$ \d*\.\d
-    public List<String> checkNumber(String sentence){
+    // handle numbers like this $,$$$ \d*\.\d
+    public List<String> checkNumber(String sentence) {
         sentence = sentence.replaceAll("[\\.]$", "");
-        List<String> saved_Number= new ArrayList<String>();
-        List<String> saved_Number2= new ArrayList<String>();
-        List<String> saved_Number3= new ArrayList<String>();
-        List<String> saved_Number4= new ArrayList<String>();
-        sentence=sentence.toLowerCase();
+        List<String> saved_Number = new ArrayList<String>();
+        List<String> saved_Number2 = new ArrayList<String>();
+        List<String> saved_Number3 = new ArrayList<String>();
+        List<String> saved_Number4 = new ArrayList<String>();
+        sentence = sentence.toLowerCase();
         Pattern p = Pattern.compile("\\d{1,}?,\\d{3},\\d{3},\\d{3}|\\d{1,}?,\\d{3},\\d{3}|\\d{1,}?,\\d{3}");
-        Pattern p2=Pattern.compile("\\d{1,}? thousand|\\d{1,}? million|\\d{1,}? billion");
-        Pattern p3=Pattern.compile("\\d*\\.\\d*");
+        Pattern p2 = Pattern.compile("\\d{1,}? thousand|\\d{1,}? million|\\d{1,}? billion");
+        Pattern p3 = Pattern.compile("\\d*\\.\\d*");
         Matcher m = p.matcher(sentence);
         Matcher m2 = p2.matcher(sentence);
         Matcher m3 = p3.matcher(sentence);
-        while(m.find()) {
+        while (m.find()) {
             saved_Number.add(m.group());
-            sentence=sentence.replaceAll(m.group(),"");
+            sentence = sentence.replaceAll(m.group(), "");
         }
-        while(m2.find()) {
+        while (m2.find()) {
             saved_Number3.add(m2.group());
-            sentence=sentence.replaceAll(m2.group(),"");
+            sentence = sentence.replaceAll(m2.group(), "");
         }
-        while(m3.find()) {
+        while (m3.find()) {
             saved_Number4.add(m3.group());
-            sentence=sentence.replaceAll(m3.group(),"");
+            sentence = sentence.replaceAll(m3.group(), "");
         }
-        for(String num:saved_Number3){
+        for (String num : saved_Number3) {
             saved_Number2.add(Name_NumberHandle(num));
         }
-        for(String billions:saved_Number){
-            saved_Number2.add(regular_NumberHandle(billions,""));
+        for (String billions : saved_Number) {
+            saved_Number2.add(regular_NumberHandle(billions, ""));
         }
-        for(String s:saved_Number4){
+        for (String s : saved_Number4) {
             saved_Number2.add(splitNumberWithPoint(s));
         }
-        this.s=sentence;
+        this.s = sentence;
         return saved_Number2;
     }
+
     //recive number like x,xxx and change it to k/m/b
-    public String regular_NumberHandle(String term,String prev){
-        String number_to_save="";
-        if(term.contains(".")){
+    public String regular_NumberHandle(String term, String prev) {
+        String number_to_save = "";
+        if (term.contains(".")) {
             return term;
         }
-            if(term.length()!=0) {
-                number_to_save = term.split(",")[0] + "." + term.split(",")[1];
-                if ((isNumeric(term) && term.length() <= 7)) {
-                    number_to_save = number_to_save + "K";
-                } else if ((isNumeric(term) && term.length() > 11)) {
-                    number_to_save = number_to_save + "B";
-                } else {
-                    number_to_save = number_to_save + "M";
-                }
-                char lastchar = number_to_save.charAt(number_to_save.length() - 2);
-                char lastchar2 = number_to_save.charAt(number_to_save.length() - 3);
-                if (lastchar == '0' && lastchar2 != '0') {
-                    number_to_save = number_to_save.substring(0, number_to_save.length() - 2) +
-                            number_to_save.substring(number_to_save.length() - 1);
-                }
-                if (lastchar == '0' && lastchar2 == '0') {
-                    number_to_save = number_to_save.substring(0, number_to_save.length() - 3) +
-                            number_to_save.substring(number_to_save.length() - 1);
-                }
-                if (term.split(",")[1].equals("000")) {
-                    number_to_save = term.split(",")[0] + number_to_save.substring(number_to_save.length() - 1);
-                }
-
+        if (term.length() != 0) {
+            number_to_save = term.split(",")[0] + "." + term.split(",")[1];
+            if ((isNumeric(term) && term.length() <= 7)) {
+                number_to_save = number_to_save + "K";
+            } else if ((isNumeric(term) && term.length() > 11)) {
+                number_to_save = number_to_save + "B";
+            } else {
+                number_to_save = number_to_save + "M";
             }
+            char lastchar = number_to_save.charAt(number_to_save.length() - 2);
+            char lastchar2 = number_to_save.charAt(number_to_save.length() - 3);
+            if (lastchar == '0' && lastchar2 != '0') {
+                number_to_save = number_to_save.substring(0, number_to_save.length() - 2) +
+                        number_to_save.substring(number_to_save.length() - 1);
+            }
+            if (lastchar == '0' && lastchar2 == '0') {
+                number_to_save = number_to_save.substring(0, number_to_save.length() - 3) +
+                        number_to_save.substring(number_to_save.length() - 1);
+            }
+            if (term.split(",")[1].equals("000")) {
+                number_to_save = term.split(",")[0] + number_to_save.substring(number_to_save.length() - 1);
+            }
+
+        }
         return number_to_save;
     }
 
     //thousand=K million=M billion=B
-    public String Name_NumberHandle(String num){
-        String term=num.split(" ")[1];
-        String prev=num.split(" ")[0];
-        String number_to_save="";
-        if(term.toLowerCase().equals("thousand")){
-            number_to_save=prev+"K";
-        }
-        else if(term.toLowerCase().equals("billion")){
-            number_to_save=prev+"B";
-        }
-        else{
-            number_to_save=prev+"M";
+    public String Name_NumberHandle(String num) {
+        String term = num.split(" ")[1];
+        String prev = num.split(" ")[0];
+        String number_to_save = "";
+        if (term.toLowerCase().equals("thousand")) {
+            number_to_save = prev + "K";
+        } else if (term.toLowerCase().equals("billion")) {
+            number_to_save = prev + "B";
+        } else {
+            number_to_save = prev + "M";
         }
         return number_to_save;
 
     }
 
 
-    public List<String> checkPercentage(String sentence){
-        List<String> saved_Number= new ArrayList<String>();
+    public List<String> checkPercentage(String sentence) {
+        List<String> saved_Number = new ArrayList<String>();
         sentence = sentence.replaceAll("[\\.]$", "");
         Pattern p = Pattern.compile("\\d*.\\d*%");
         Matcher m = p.matcher(sentence);
         Pattern p2 = Pattern.compile("\\d*.\\d* percent|\\d* percentage");
         Matcher m2 = p2.matcher(sentence);
-        while(m.find()) {
+        while (m.find()) {
             saved_Number.add(m.group());
-            this.s=this.s.replaceFirst(m.group(),"");
+            this.s = this.s.replaceFirst(m.group(), "");
         }
-        while(m2.find()) {
-            saved_Number.add(m2.group().split(" ")[0]+"%");
-            this.s=this.s.replaceFirst(m2.group(),"");
+        while (m2.find()) {
+            saved_Number.add(m2.group().split(" ")[0] + "%");
+            this.s = this.s.replaceFirst(m2.group(), "");
         }
         return saved_Number;
     }
 
-    public List<String> checkPricesMoreThanMillion(String str){
-        List<String> saved_Number= new ArrayList<String>();
+    public List<String> checkPricesMoreThanMillion(String str) {
+        List<String> saved_Number = new ArrayList<String>();
 
-        //$price million/billion
-//        Pattern p3=Pattern.compile("\\$\\d*.\\d+ million|\\$\\d*.\\d+ billion");
-//        Matcher m3 = p3.matcher(str);
-//        while(m3.find()) {
-//            String s=m3.group().replaceAll("\\s","");
-//            if(s.contains("m")){
-//                int i=s.indexOf('m');
-//                String num=s.substring(1,i);
-//                saved_Number.add(num+" M Dollars");
-//            }
-//            else{
-//                int i=s.indexOf('b');
-//                String num=s.substring(1,i);
-//                if(num.contains(",")){
-//                    num=num.replaceAll(",","");
-//                }
-//                try {
-//                    Double dNum=Double.parseDouble(num);
-//                    dNum=dNum*1000;
-//                    saved_Number.add(dNum+" M Dollars");
-//                }catch (Exception e){
-//
-//                }
-//            }
-//        }
-        //price m Dollars
-        Pattern p5=Pattern.compile("\\d*.\\d+ m Dollars");
-        Matcher m5 = p5.matcher(str);
-        while (m5.find()){
-            saved_Number.add(m5.group().replaceAll("m","M"));
-        }
-        //price bn Dollars
-        Pattern p6=Pattern.compile("\\d*.\\d+ bn Dollars");
-        Matcher m6 = p6.matcher(str);
-        while (m6.find()){
-            saved_Number.add(m6.group().replaceAll("bn","M"));
-        }
+        if (str.toLowerCase().contains("dollar") || str.contains("$")) {
+            //$price million/billion
+            Pattern p3 = Pattern.compile("\\d*.\\d+ billion U.S. dollars|\\d*.\\d+ million U.S. dollars|\\d*.\\d+ trillion U.S. dollars|\\$\\d*.\\d+ million|\\$\\d*.\\d+ billion");
+            Matcher m3 = p3.matcher(str);
+            while (m3.find()) {
+                if (m3.group().contains("billion")) {
+                    Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
+                    Matcher m = p.matcher(m3.group());
+                    while (m.find()) {
+                        String s = m.group().replaceAll(",", "");
+                        int result = Integer.parseInt(s);
+                        saved_Number.add("" + result * 1000 + " M Dollars");
+                    }
+                } else if (m3.group().contains("million")) {
+                    Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
+                    Matcher m = p.matcher(m3.group());
+                    while (m.find()) {
+                        String s = m.group().replaceAll(",", "");
+                        int result = Integer.parseInt(s);
+                        saved_Number.add("" + result + " M Dollars");
+                    }
+                }else{
+                    if (m3.group().contains("trillion")) {
+                        Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
+                        Matcher m = p.matcher(m3.group());
+                        while (m.find()) {
+                            String s = m.group().replaceAll(",", "");
+                            int result = Integer.parseInt(s);
+                            saved_Number.add("" + result * 1000000 + " M Dollars");
+                        }
+                    }
+                }
+            }
+            //price m Dollars
+            Pattern p5 = Pattern.compile("\\d+,\\d+ m Dollars|\\d+ m Dollars");
+            Matcher m5 = p5.matcher(str);
+            while (m5.find()) {
+                saved_Number.add(m5.group().replaceAll("m", "M"));
+            }
+            //price bn Dollars
+            Pattern p6 = Pattern.compile("\\d+,\\d+ bn Dollars|\\d+ bn Dollars");
+            Matcher m6 = p6.matcher(str);
+            while (m6.find()) {
+                saved_Number.add(m6.group().replaceAll("bn", "M"));
+            }
 
-        //price billion/million/trillion U.S. dollars
-//        Pattern p7=Pattern.compile("\\d*.\\d+ billion U.S. dollars|\\d*.\\d+ million U.S. dollars|\\d*.\\d+ trillion U.S. dollars");
-//        Matcher m7 = p7.matcher(str);
-//        while (m7.find()){
-//            String s=m7.group().replaceAll("^\\s+","");
-//            s=s.replaceAll(",","");
-//            int i=s.indexOf(' ');
-//            String num=s.substring(0,i);
-//            if(s.contains("m")){
-//                saved_Number.add(num+" M Dollars");
+//            //price billion/million/trillion U.S. dollars
+//            Pattern p7 = Pattern.compile("\\d*.\\d+ billion U.S. dollars|\\d*.\\d+ million U.S. dollars|\\d*.\\d+ trillion U.S. dollars");
+//            Matcher m7 = p7.matcher(str);
+//            while (m7.find()) {
+//                if (m7.group().contains("billion")) {
+//                    Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
+//                    Matcher m = p.matcher(m7.group());
+//                    while (m.find()) {
+//                        String s = m.group().replaceAll(",", "");
+//                        int result = Integer.parseInt(s);
+//                        saved_Number.add("" + result * 1000 + " M Dollars");
+//                    }
+//                }
+//                if (m7.group().contains("million")) {
+//                    Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
+//                    Matcher m = p.matcher(m7.group());
+//                    while (m.find()) {
+//                        String s = m.group().replaceAll(",", "");
+//                        int result = Integer.parseInt(s);
+//                        saved_Number.add("" + result + " M Dollars");
+//                    }
+//                }
+//                if (m7.group().contains("trillion")) {
+//                    Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
+//                    Matcher m = p.matcher(m7.group());
+//                    while (m.find()) {
+//                        String s = m.group().replaceAll(",", "");
+//                        int result = Integer.parseInt(s);
+//                        saved_Number.add("" + result * 1000000 + " M Dollars");
+//                    }
+//                }
 //            }
-//            else if(s.contains("b")){
-//
-//                if(num.contains(",")){
-//                    num=num.replaceAll(",","");
-//                }
-//                try {
-//                    Double dNum=Double.parseDouble(num);
-//                    dNum=dNum*1000;
-//                    saved_Number.add(dNum+" M Dollars");
-//                }catch (Exception e){
-//                }
-//            }else{
-//                if(num.contains(",")){
-//                    num=num.replaceAll(",","");
-//                }
-//                try {
-//                    Double dNum=Double.parseDouble(num);
-//                    dNum=dNum*1000000;
-//                    saved_Number.add(dNum+" M Dollars");
-//                }catch (Exception e){
-//                }
-//            }
-//        }
+        }
         return saved_Number;
     }
 
     public static boolean isNumeric(String str) {
-        if(str.contains(",")){
+        if (str.contains(",")) {
             return isNumeric(str.split(",")[0]);
         }
         try {
             Double.parseDouble(str);
             return true;
-        } catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             return false;
         }
     }
 
-    public String splitNumberWithPoint(String s){
-        String[] arr=String.valueOf(s).split("\\.");
-        String result="";
-            if(arr.length!=0) {
-                if(arr.length==1){
-                    return arr[0];
-                }
-                if (arr[0].length() < 3) {
-                    return arr[0] + "." + arr[1];
-                }
-                if (arr[0].length() < 7) {
-                    result = arr[0].substring(0, arr[0].length() - 3) + "," + arr[0].substring(arr[0].length() - 3, arr[0].length());
-                } else if (arr[0].length() > 6 && arr[0].length() < 10) {
-                    result = arr[0].substring(0, arr[0].length() - 6) + "," + arr[0].substring(arr[0].length() - 6, arr[0].length() - 3) + "," + arr[0].substring(arr[0].length() - 3, arr[0].length());
-                } else
-                    result = arr[0].substring(0, arr[0].length() - 9) + "," + arr[0].substring(arr[0].length() - 9, arr[0].length() - 6) + "," + arr[0].substring(arr[0].length() - 6, arr[0].length() - 3) + "," + arr[0].substring(arr[0].length() - 3, arr[0].length());
+    public String splitNumberWithPoint(String s) {
+        String[] arr = String.valueOf(s).split("\\.");
+        String result = "";
+        if (arr.length != 0) {
+            if (arr.length == 1) {
+                return arr[0];
             }
+            if (arr[0].length() < 3) {
+                return arr[0] + "." + arr[1];
+            }
+            if (arr[0].length() < 7) {
+                result = arr[0].substring(0, arr[0].length() - 3) + "," + arr[0].substring(arr[0].length() - 3, arr[0].length());
+            } else if (arr[0].length() > 6 && arr[0].length() < 10) {
+                result = arr[0].substring(0, arr[0].length() - 6) + "," + arr[0].substring(arr[0].length() - 6, arr[0].length() - 3) + "," + arr[0].substring(arr[0].length() - 3, arr[0].length());
+            } else
+                result = arr[0].substring(0, arr[0].length() - 9) + "," + arr[0].substring(arr[0].length() - 9, arr[0].length() - 6) + "," + arr[0].substring(arr[0].length() - 6, arr[0].length() - 3) + "," + arr[0].substring(arr[0].length() - 3, arr[0].length());
+        }
 
-        return regular_NumberHandle(result,"");
+        return regular_NumberHandle(result, "");
     }
 
-    public List<String> betweenFunc(String s){
-        List<String> result=new ArrayList<>();
-        s=s.toLowerCase();
-        Pattern p=Pattern.compile("between \\d+ and \\d+");
+    public List<String> betweenFunc(String s) {
+        List<String> result = new ArrayList<>();
+        s = s.toLowerCase();
+        Pattern p = Pattern.compile("between \\d+ and \\d+");
         Matcher m = p.matcher(s);
-        while (m.find()){
+        while (m.find()) {
             result.add(m.group());
         }
         return result;
     }
 
-    public ParseResult parseDocument(IRDocument doc){
+    public ParseResult parseDocument(IRDocument doc) {
 
         // parse docID
-        String stringID = doc.id.split("-",2)[1].trim();
+        String stringID = doc.id.split("-", 2)[1].trim();
         Integer intID = Integer.valueOf(stringID);
         //System.out.println( "doc: " + intID);
 
@@ -1145,190 +1173,190 @@ public class Parse {
         int uniqueTermsInDocument; //amount of unique terms
 
         // STANFORD NLP PARSE
-        doc.text=doc.text.replaceAll("[\\(|;|'|:|\\^|\\)|\\]|\\[|\\#|\\]|\\+|\\*|\\@|!|?]", "");
-        doc.text=doc.text.replaceAll("-{2,}","");
+        doc.text = doc.text.replaceAll("[\\(|;|'|:|\\^|\\)|\\]|\\[|\\#|\\]|\\+|\\*|\\@|!|?]", "");
+        doc.text = doc.text.replaceAll("-{2,}", "");
 
 
-        List<CoreSentence> sentences = breakSentences(doc.text);
+        List<CoreSentence> sentences = breakSentences("This is Well Be Wevds Rfsdf Rcsf Rsdsd Qsfd");
         DocumentTerms documentTerms = new DocumentTerms();
-        String str=sentences.toString();
-        List<String> pricesMoreThanMillion=new ArrayList<>();
-        pricesMoreThanMillion=  checkPricesMoreThanMillion(doc.text);
-//        System.out.println(pricesMoreThanMillion);
+        String str = sentences.toString();
+        List<String> pricesMoreThanMillion = new ArrayList<>();
+        //pricesMoreThanMillion = checkPricesMoreThanMillion(doc.text);
         inserttoDic(pricesMoreThanMillion);
-        int counter=0;
-        numOFsentences=0;
-        numofterms=0;
-        for (CoreSentence sentence : sentences){
+        int counter = 0;
+        numOFsentences = 0;
+        numofterms = 0;
+        for (CoreSentence sentence : sentences) {
             List<CoreLabel> coreLabelList = sentence.tokens();
             counter++;
-            String token="";
-            String upper_words="";
-            String prev_token="";
-            for (CoreLabel coreLabel : coreLabelList){
+            String token = "";
+            String upper_words = "";
+            String prev_token = "";
+            for (CoreLabel coreLabel : coreLabelList) {
                 // PARSE HERE
-                boolean Flag=false;
-                String prev_prev_token= prev_token;
-                prev_token=token;
+                boolean Flag = false;
+                String prev_prev_token = prev_token;
+                prev_token = token;
                 token = coreLabel.originalText();
                 String term = token.trim();
                 // PARSE DONE
                 // SAVE TERM IN TEMP DICTIONARY
                 int term_frequency = 1;
-                if((m_StopWords.containsKey(term.toLowerCase())||term.equals(",")||term.equals("."))){
+                if ((m_StopWords.containsKey(term.toLowerCase()) || term.equals(",") || term.equals("."))) {
                     continue;
-                }else {
+                } else {
                     //Porter's stemmer
-                    if(this.doSteming==true&&!(term.toLowerCase().equals("percent")||term.toLowerCase().equals("percentage"))
-                            &&!(term.toLowerCase().equals("dollars")||term.toLowerCase().equals("million"))
-                            &&!(term.toLowerCase().equals("thousand")||term.toLowerCase().equals("billion"))){
-                            PorterStemmer stemmer=new PorterStemmer();
-                            stemmer.setCurrent(term); //set string you need to stem
-                            stemmer.stem();  //stem the word
-                            term=stemmer.getCurrent();//get the stemmed word
+                    if (this.doSteming == true && !(term.toLowerCase().equals("percent") || term.toLowerCase().equals("percentage"))
+                            && !(term.toLowerCase().equals("dollars") || term.toLowerCase().equals("million"))
+                            && !(term.toLowerCase().equals("thousand") || term.toLowerCase().equals("billion"))) {
+                        PorterStemmer stemmer = new PorterStemmer();
+                        stemmer.setCurrent(term); //set string you need to stem
+                        stemmer.stem();  //stem the word
+                        term = stemmer.getCurrent();//get the stemmed word
                     }
                     // SAVE TERM IN TEMP DICTIONARY
-                    term=term.replaceAll("^\\.","");
-                    term=term.replaceAll("^\\,","");
+                    term = term.replaceAll("^\\.", "");
+                    term = term.replaceAll("^\\,", "");
                     //if term begins with '|,
 
                     //percent
-                    if(term.equals("%")||term.equals("percent")||term.equals("percentage")){
-                        if(check_if_string_isNumber(prev_token)){
+                    if (term.equals("%") || term.equals("percent") || term.equals("percentage")) {
+                        if (check_if_string_isNumber(prev_token)) {
                             documentTerms.deleteLastTerm(prev_token);
-                            documentTerms.add(prev_token+"%");
-                            Flag=true;
+                            documentTerms.add(prev_token + "%");
+                            Flag = true;
                         }
                     }
 
                     //dates
-                    if(isDate(prev_token,term)){
-                        List<String> date_to_save=new ArrayList<>();
-                        if(Months.containsKey(term.toLowerCase())){
-                            date_to_save=DateListToSave(prev_token,term);
-                        }else{date_to_save=DateListToSave(term,prev_token);}
-                        String a="";
-                        if(date_to_save!=null){
-                            for(int i=0;i<date_to_save.size();i++){
+                    if (isDate(prev_token, term)) {
+                        List<String> date_to_save = new ArrayList<>();
+                        if (Months.containsKey(term.toLowerCase())) {
+                            date_to_save = DateListToSave(prev_token, term);
+                        } else {
+                            date_to_save = DateListToSave(term, prev_token);
+                        }
+                        String a = "";
+                        if (date_to_save != null) {
+                            for (int i = 0; i < date_to_save.size(); i++) {
                                 documentTerms.add(date_to_save.get(i));
-                                Flag=true;
+                                Flag = true;
                             }
                         }
                     }
 
                     //numbers
-                    if(term.contains(",") && !(prev_token.equals("$"))){
-                        List<String> n=new ArrayList<>();
-                        String s_n="";
-                        for(int i=0;i<term.split(",").length;i++){
-                            if(isNumeric(term.split(",")[i])){
-                                if(i==term.split(",").length-1){
-                                    s_n=s_n+term.split(",")[i];
-                                }else{
-                                    s_n=s_n+term.split(",")[i]+",";
+                    if (term.contains(",") && !(prev_token.equals("$"))) {
+                        List<String> n = new ArrayList<>();
+                        String s_n = "";
+                        for (int i = 0; i < term.split(",").length; i++) {
+                            if (isNumeric(term.split(",")[i])) {
+                                if (i == term.split(",").length - 1) {
+                                    s_n = s_n + term.split(",")[i];
+                                } else {
+                                    s_n = s_n + term.split(",")[i] + ",";
                                 }
-                            }
-                            else{
-                                s_n=term;
+                            } else {
+                                s_n = term;
                                 break;
                             }
                         }
-                        if(term==s_n){
+                        if (term == s_n) {
                             continue;
-                        }else{
-                            term=s_n;
-                            term=term.replace(",$","");
-                            documentTerms.add(regular_NumberHandle(term,prev_token));
-                            Flag=true;
+                        } else {
+                            term = s_n;
+                            term = term.replace(",$", "");
+                            documentTerms.add(regular_NumberHandle(term, prev_token));
+                            Flag = true;
                         }
                     }
-                    if(term.contains(".")&& !(prev_token.equals("$"))){
-                        List<String> n=new ArrayList<>();
-                        String s_n="";
-                        if(isNumeric(term)){
-                            String leftPoint=term.split("\\.")[0];
-                            if(leftPoint.length()>3){//that means more than thousand
+                    if (term.contains(".") && !(prev_token.equals("$"))) {
+                        List<String> n = new ArrayList<>();
+                        String s_n = "";
+                        if (isNumeric(term)) {
+                            String leftPoint = term.split("\\.")[0];
+                            if (leftPoint.length() > 3) {//that means more than thousand
                                 documentTerms.add(splitNumberWithPoint(term));
-                                Flag=true;
+                                Flag = true;
                             }
                         }
 
                     }
-                    if(term.toLowerCase().equals("million")&&(handleNumbers(prev_token)||isNumeric(prev_token))){
-                        documentTerms.add(prev_token+"M");
-                        Flag=true;
+                    if (term.toLowerCase().equals("million") && (handleNumbers(prev_token) || isNumeric(prev_token))) {
+                        documentTerms.add(prev_token + "M");
+                        Flag = true;
                     }
-                    if(term.toLowerCase().equals("thousand")&&(handleNumbers(prev_token)||isNumeric(prev_token))){
-                        documentTerms.add(prev_token+"K");
-                        Flag=true;
+                    if (term.toLowerCase().equals("thousand") && (handleNumbers(prev_token) || isNumeric(prev_token))) {
+                        documentTerms.add(prev_token + "K");
+                        Flag = true;
                     }
-                    if(term.toLowerCase().equals("billion")&&(handleNumbers(prev_token)||isNumeric(prev_token))){
-                        documentTerms.add(prev_token+"B");
-                        Flag=true;
+                    if (term.toLowerCase().equals("billion") && (handleNumbers(prev_token) || isNumeric(prev_token))) {
+                        documentTerms.add(prev_token + "B");
+                        Flag = true;
                     }
 
                     //Prices price Dollar
-                    if(token.toLowerCase().equals("dollars")){
-                        if(check_if_string_isNumber(prev_token)){
-                            String num=prev_token.replaceAll(",","");
-                            if(num.length()>=7){
-                                String price=regular_NumberHandle(prev_token,term);
-                                if(price.contains("B")){
-                                    price=price.substring(0,price.length()-1);
-                                    Double d=Double.parseDouble(price);
-                                    documentTerms.add(d*1000+" M Dollars");
-                                }else{
-                                    price=price.substring(0,price.length()-1)+" M Dollars";
+                    if (token.toLowerCase().equals("dollars")) {
+                        if (check_if_string_isNumber(prev_token)) {
+                            String num = prev_token.replaceAll(",", "");
+                            if (num.length() >= 7) {
+                                String price = regular_NumberHandle(prev_token, term);
+                                if (price.contains("B")) {
+                                    price = price.substring(0, price.length() - 1);
+                                    Double d = Double.parseDouble(price);
+                                    documentTerms.add(d * 1000 + " M Dollars");
+                                } else {
+                                    price = price.substring(0, price.length() - 1) + " M Dollars";
                                     documentTerms.add(price);
                                 }
-                            }else {
+                            } else {
                                 //prices under million
-                                documentTerms.add(prev_token+" Dollars");
+                                documentTerms.add(prev_token + " Dollars");
                             }
-                            Flag=true;
+                            Flag = true;
                         }
                     }
-
                     //$Price
-                    if(term.length()>1&&prev_token.equals("$")){
-                        if(check_if_string_isNumber(term)){
-                            String num=term.replaceAll(",","");
-                            if(num.length()>=7){
-                                String price=regular_NumberHandle(term,prev_token);
-                                price=price.substring(0,price.length()-1)+" M Dollars";
-                            }else {
+                    if (term.length() > 1 && prev_token.equals("$")) {
+                        if (check_if_string_isNumber(term)) {
+                            String num = term.replaceAll(",", "");
+                            if (num.length() >= 7) {
+                                String price = regular_NumberHandle(term, prev_token);
+                                price = price.substring(0, price.length() - 1) + " M Dollars";
+                            } else {
                                 //prices under million
-                                documentTerms.add(term+" Dollars");
+                                documentTerms.add(term + " Dollars");
                             }
-                            Flag=true;
+                            Flag = true;
                         }
                     }
 
                     //upper case
-                    if(term.matches("[a-zA-Z]+")){
-                        if (Character.isUpperCase(term.charAt(0))&&!(Months.containsKey(term.toLowerCase()))){
-                            if(upper_words.equals("")){
-                                upper_words=term;
-                            }else{
-                                upper_words=upper_words+" "+term;
+                    if (term.matches("[a-zA-Z]+")) {
+                        if (Character.isUpperCase(term.charAt(0)) && !(Months.containsKey(term.toLowerCase()))) {
+                            if (upper_words.equals("")) {
+                                upper_words = term;
+                            } else {
+                                upper_words = upper_words + " " + term;
+                                documentTerms.add(upper_words);
                             }
 
-                        }else{
-                            if(upper_words.equals("")){
+                        } else {
+                            if (upper_words.equals("")) {
                                 continue;
-                            }else{
+                            } else {
                                 documentTerms.add(upper_words);
-                                upper_words="";
+                                upper_words = "";
                                 numOFsentences++;
                             }
                         }
                     }
-                    if (Flag==false){
-                        if(term.matches("[A-Za-z].*[0-9]|[0-9].*[A-Za-z]")) {
+                    if (Flag == false) {
+                        if (term.matches("[A-Za-z].*[0-9]|[0-9].*[A-Za-z]")) {
                             continue;
-                        }else{
-                            if(!(term.equals("%")||term.equals(",k")||term.equals("$")||term.equals("")||term.equals("-"))){
-                                    documentTerms.add(term);
+                        } else {
+                            if (!(term.equals("%") || term.equals(",k") || term.equals("$") || term.equals("") || term.equals("-"))) {
+                                documentTerms.add(term);
 
                             }
                         }
@@ -1342,34 +1370,35 @@ public class Parse {
                 }
             }
         }
-         //RETURN DOC DATA AND TERMS
-        for(int i=0;i<this.alldictionaryFor_Hokem.size();i++){
+        //RETURN DOC DATA AND TERMS
+        for (int i = 0; i < this.alldictionaryFor_Hokem.size(); i++) {
             documentTerms.add(this.alldictionaryFor_Hokem.get(i));
         }
         // STATISTICS
         int numUnique = 0;
         mostPopular_tf = 0;
-        Iterator it=documentTerms.dictionary.entrySet().iterator();
-        while (it.hasNext()){
-            Map.Entry pair=(Map.Entry)it.next();
-            if((Integer)pair.getValue()==1){
+        Iterator it = documentTerms.dictionary.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            if ((Integer) pair.getValue() == 1) {
                 numUnique++;
             }
-            if((Integer)pair.getValue()>mostPopular_tf){
-                mostPopular_tf=(Integer)pair.getValue();
-                mostPopularTerm= (String) pair.getKey();
+            if ((Integer) pair.getValue() > mostPopular_tf) {
+                mostPopular_tf = (Integer) pair.getValue();
+                mostPopularTerm = (String) pair.getKey();
             }
         }
-        DocumentData documentData = new DocumentData(intID,mostPopularTerm,mostPopular_tf,numOFsentences,numUnique, doc.id);
-        return new ParseResult(documentData,documentTerms);
+        DocumentData documentData = new DocumentData(intID, mostPopularTerm, mostPopular_tf, numOFsentences, numUnique, doc.id);
+        return new ParseResult(documentData, documentTerms);
     }
-    private void inserttoDic(List<String> list){
-        for(int i=0;i<list.size();i++){
+
+    private void inserttoDic(List<String> list) {
+        for (int i = 0; i < list.size(); i++) {
             this.alldictionaryFor_Hokem.add(list.get(i));
         }
     }
 
-    private List<CoreSentence> breakSentences(String text){
+    private List<CoreSentence> breakSentences(String text) {
         CoreDocument coreDocument = new CoreDocument(text);
         stanfordCoreNLP.annotate(coreDocument);
         List<CoreSentence> sentences = coreDocument.sentences();
@@ -1377,12 +1406,12 @@ public class Parse {
         return sentences;
     }
 
-    private boolean check_if_string_isNumber(String term){
+    private boolean check_if_string_isNumber(String term) {
         if (term == null) {
             return false;
         }
         try {
-            term=term.replaceAll(",","");
+            term = term.replaceAll(",", "");
             double d = Double.parseDouble(term);
         } catch (NumberFormatException nfe) {
             return false;
@@ -1390,73 +1419,70 @@ public class Parse {
         return true;
     }
 
-    private boolean isDate(String s1,String s2){
-        if(Months.containsKey(s1.toLowerCase())||Months.containsKey(s2.toLowerCase())){
+    private boolean isDate(String s1, String s2) {
+        if (Months.containsKey(s1.toLowerCase()) || Months.containsKey(s2.toLowerCase())) {
             return true;
         }
         return false;
     }
 
-    private boolean handleNumbers(String term){
-        if(term.contains(",")){
-            List<String> n=new ArrayList<>();
-            String s_n="";
-            for(int i=0;i<term.split(",").length;i++){
-                if(isNumeric(term.split(",")[i])){
-                    if(i==term.split(",").length-1){
-                        s_n=s_n+term.split(",")[i];
-                    }else{
-                        s_n=s_n+term.split(",")[i]+",";
+    private boolean handleNumbers(String term) {
+        if (term.contains(",")) {
+            List<String> n = new ArrayList<>();
+            String s_n = "";
+            for (int i = 0; i < term.split(",").length; i++) {
+                if (isNumeric(term.split(",")[i])) {
+                    if (i == term.split(",").length - 1) {
+                        s_n = s_n + term.split(",")[i];
+                    } else {
+                        s_n = s_n + term.split(",")[i] + ",";
                     }
 
-                }
-                else{
-                    s_n=term;
+                } else {
+                    s_n = term;
                     break;
                 }
             }
-            if(term==s_n){
+            if (term == s_n) {
                 return false;
-            }
-            else{
-                term=s_n;
-                term=term.replace(",$","");
+            } else {
+                term = s_n;
+                term = term.replace(",$", "");
                 return true;
             }
         }
-        if(term.contains(".")){
-            List<String> n=new ArrayList<>();
-            String s_n="";
-            for(int i=0;i<term.split("\\.").length;i++){
-                if(isNumeric(term.split("\\.")[i])&&term.split("\\.").length<2){
-                    if(i==term.split("\\.").length-1){
-                        s_n=s_n+term.split("\\.")[i];
-                    }else{
-                        s_n=s_n+term.split("\\,")[i]+".";
+        if (term.contains(".")) {
+            List<String> n = new ArrayList<>();
+            String s_n = "";
+            for (int i = 0; i < term.split("\\.").length; i++) {
+                if (isNumeric(term.split("\\.")[i]) && term.split("\\.").length < 2) {
+                    if (i == term.split("\\.").length - 1) {
+                        s_n = s_n + term.split("\\.")[i];
+                    } else {
+                        s_n = s_n + term.split("\\,")[i] + ".";
                     }
-                }
-                else{
-                    s_n=term;
+                } else {
+                    s_n = term;
                     break;
                 }
             }
-            if(term==s_n){
+            if (term == s_n) {
                 return false;
-            }else {
+            } else {
                 term = s_n;
                 return true;
             }
         }
-        if(term.contains("/")&&!(term.contains(" "))){
-            if(term.split("/").length<1){
+        if (term.contains("/") && !(term.contains(" "))) {
+            if (term.split("/").length < 1) {
                 return false;
             }
-            return (handleNumbers(term.split("/")[0])||check_if_string_isNumber(term.split("/")[0]))&&
-                    (handleNumbers(term.split("/")[1])||check_if_string_isNumber(term.split("/")[1]));
+            return (handleNumbers(term.split("/")[0]) || check_if_string_isNumber(term.split("/")[0])) &&
+                    (handleNumbers(term.split("/")[1]) || check_if_string_isNumber(term.split("/")[1]));
         }
-        if(term.contains(" ")){
-            return (handleNumbers(term.split(" ")[0])||check_if_string_isNumber(term.split(" ")[0]))&&
-                    (handleNumbers(term.split(" ")[1])||check_if_string_isNumber(term.split(" ")[1]));
+        if (term.contains(" ")) {
+            return (handleNumbers(term.split(" ")[0]) || check_if_string_isNumber(term.split(" ")[0])) &&
+                    (handleNumbers(term.split(" ")[1]) || check_if_string_isNumber(term.split(" ")[1]));
 
         }
         return false;

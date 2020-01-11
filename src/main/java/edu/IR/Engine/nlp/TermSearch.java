@@ -48,7 +48,6 @@ public class TermSearch {
             Integer frequency =  Integer.valueOf(result.group(1));
             Integer document = Integer.valueOf(result.group(2));
 
-
             TermData termData = new TermData(document,frequency);
             posting.add(termData);
         }

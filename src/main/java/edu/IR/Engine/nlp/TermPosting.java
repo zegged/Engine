@@ -32,7 +32,7 @@ public class TermPosting {
 
             //  String res = result.group(0);
             Integer frequency =  Integer.valueOf(result.group(1));
-            Integer document = Integer.valueOf(result.group(2));
+           Integer document = Integer.valueOf(result.group(2));
 
 
             TermData termData = new TermData(document,frequency);
