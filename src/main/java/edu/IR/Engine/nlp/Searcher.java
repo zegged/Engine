@@ -373,14 +373,9 @@ public class Searcher {
 
         for (IRQuery irQuery : fileDocs){
             Map<String, Double> scores =  runQuery(irQuery.title);
-
             //add id
             //save to stringFile
-
             writeQueryResult(scores, irQuery.id);
-
         }
-
-
     }
 }

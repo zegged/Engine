@@ -626,7 +626,6 @@ public class GUI extends Application {
             searcher.loadDictionary();
             searcher.loadDocuments();
             String term = s1;
-
             Map<String, Double> scores = searcher.runQuery(term);
             searcher.writeQueryResult(scores,0);
             AlertBox.display("Query", "finsh searching!");
