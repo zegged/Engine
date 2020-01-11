@@ -134,8 +134,8 @@ public class Searcher {
             int docID = termData.document;
             int docTF = termData.frequency;
 
-            DocumentData documentData = searchDocument(docID);
-            DocumentData documentData2 = getDoc(docID);
+           // DocumentData documentData = searchDocument(docID);
+            DocumentData documentData = getDoc(docID);
             documentData.docTF = docTF;
             documentDataList.add(documentData);
         }
