@@ -1034,38 +1034,38 @@ public class Parse {
         List<String> saved_Number = new ArrayList<String>();
 
         if (str.toLowerCase().contains("dollar") || str.contains("$")) {
-            //$price million/billion
-            Pattern p3 = Pattern.compile("\\d*.\\d+ billion U.S. dollars|\\d*.\\d+ million U.S. dollars|\\d*.\\d+ trillion U.S. dollars|\\$\\d*.\\d+ million|\\$\\d*.\\d+ billion");
-            Matcher m3 = p3.matcher(str);
-            while (m3.find()) {
-                if (m3.group().contains("billion")) {
-                    Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
-                    Matcher m = p.matcher(m3.group());
-                    while (m.find()) {
-                        String s = m.group().replaceAll(",", "");
-                        int result = Integer.parseInt(s);
-                        saved_Number.add("" + result * 1000 + " M Dollars");
-                    }
-                } else if (m3.group().contains("million")) {
-                    Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
-                    Matcher m = p.matcher(m3.group());
-                    while (m.find()) {
-                        String s = m.group().replaceAll(",", "");
-                        int result = Integer.parseInt(s);
-                        saved_Number.add("" + result + " M Dollars");
-                    }
-                }else{
-                    if (m3.group().contains("trillion")) {
-                        Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
-                        Matcher m = p.matcher(m3.group());
-                        while (m.find()) {
-                            String s = m.group().replaceAll(",", "");
-                            int result = Integer.parseInt(s);
-                            saved_Number.add("" + result * 1000000 + " M Dollars");
-                        }
-                    }
-                }
-            }
+//            //$price million/billion
+//            Pattern p3 = Pattern.compile("\\d*.\\d+ billion U.S. dollars|\\d*.\\d+ million U.S. dollars|\\d*.\\d+ trillion U.S. dollars|\\$\\d*.\\d+ million|\\$\\d*.\\d+ billion");
+//            Matcher m3 = p3.matcher(str);
+//            while (m3.find()) {
+//                if (m3.group().contains("billion")) {
+//                    Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
+//                    Matcher m = p.matcher(m3.group());
+//                    while (m.find()) {
+//                        String s = m.group().replaceAll(",", "");
+//                        int result = Integer.parseInt(s);
+//                        saved_Number.add("" + result * 1000 + " M Dollars");
+//                    }
+//                } else if (m3.group().contains("million")) {
+//                    Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
+//                    Matcher m = p.matcher(m3.group());
+//                    while (m.find()) {
+//                        String s = m.group().replaceAll(",", "");
+//                        int result = Integer.parseInt(s);
+//                        saved_Number.add("" + result + " M Dollars");
+//                    }
+//                }else{
+//                    if (m3.group().contains("trillion")) {
+//                        Pattern p = Pattern.compile("\\d+,\\d+|\\d+");
+//                        Matcher m = p.matcher(m3.group());
+//                        while (m.find()) {
+//                            String s = m.group().replaceAll(",", "");
+//                            int result = Integer.parseInt(s);
+//                            saved_Number.add("" + result * 1000000 + " M Dollars");
+//                        }
+//                    }
+//                }
+//            }
             //price m Dollars
             Pattern p5 = Pattern.compile("\\d+,\\d+ m Dollars|\\d+ m Dollars");
             Matcher m5 = p5.matcher(str);
@@ -1177,11 +1177,11 @@ public class Parse {
         doc.text = doc.text.replaceAll("-{2,}", "");
 
 
-        List<CoreSentence> sentences = breakSentences("This is Well Be Wevds Rfsdf Rcsf Rsdsd Qsfd");
+        List<CoreSentence> sentences = breakSentences(doc.text);
         DocumentTerms documentTerms = new DocumentTerms();
         String str = sentences.toString();
         List<String> pricesMoreThanMillion = new ArrayList<>();
-        //pricesMoreThanMillion = checkPricesMoreThanMillion(doc.text);
+        pricesMoreThanMillion = checkPricesMoreThanMillion(doc.text);
         inserttoDic(pricesMoreThanMillion);
         int counter = 0;
         numOFsentences = 0;

@@ -1,5 +1,10 @@
 package edu.IR.Engine.nlp;
 
+import com.medallia.word2vec.Searcher;
+import com.medallia.word2vec.Word2VecModel;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
@@ -15,50 +20,37 @@ public class Ranker {
     TermSearch term;
     SortedMap<Double, String> all_doc_returns;
     List<DocumentData> list_of_all_relevant_doc;
-    double tf=0;
-    double numberOfDocuments=0;
-    double docLength=0;
-    double averageDocumentLength=0 ;
-    double queryFrequency=0;
-    double documentFrequency=0;
+    double tf = 0;
+    double numberOfDocuments = 0;
+    double docLength = 0;
+    double averageDocumentLength = 0;
+    double queryFrequency = 0;
+    double documentFrequency = 0;
 
 
-
-    public Ranker( TermSearch term,List<DocumentData> list_of_all_relevant_doc) {
+    public Ranker(TermSearch term, List<DocumentData> list_of_all_relevant_doc) {
         this.avgdl = avgdl;
-        this.term= term;
-        this.list_of_all_relevant_doc=list_of_all_relevant_doc;
-        this.all_doc_returns=new TreeMap<Double, String>();
+        this.term = term;
+        this.list_of_all_relevant_doc = list_of_all_relevant_doc;
+        this.all_doc_returns = new TreeMap<Double, String>();
     }
 
-    public Map get_all_ranked_document (){
-        for(int i=0;i<list_of_all_relevant_doc.size();i++ ){
-            this.tf=list_of_all_relevant_doc.get(i).docTF;
-            this.numberOfDocuments=N;
-            this.docLength=list_of_all_relevant_doc.get(i).numofterms;
-            this.averageDocumentLength=200;
-            this.documentFrequency=list_of_all_relevant_doc.size();
-            double score=score(tf,numberOfDocuments,docLength,averageDocumentLength,0,documentFrequency);
-            all_doc_returns.put(score,list_of_all_relevant_doc.get(i).strID);
+    public Map get_all_ranked_document() {
+        for (int i = 0; i < list_of_all_relevant_doc.size(); i++) {
+            this.tf = list_of_all_relevant_doc.get(i).docTF;
+            this.numberOfDocuments = N;
+            this.docLength = list_of_all_relevant_doc.get(i).numofterms;
+            this.averageDocumentLength = 200;
+            this.documentFrequency = list_of_all_relevant_doc.size();
+            double score = score(tf, numberOfDocuments, docLength, averageDocumentLength, 0, documentFrequency);
+            all_doc_returns.put(score, list_of_all_relevant_doc.get(i).strID);
         }
         //sort the map
         Map ascSortedMap = new TreeMap();
         ascSortedMap.putAll(all_doc_returns);
         return ascSortedMap;
-
-//        for(int j=0;j<list_all_terms_in_query.size();j++){
-//            tf=list_all_terms_in_query.get(j).tf;
-//            documentFrequency=list_all_terms_in_query.get(j).df;//????????????????????????????????????????
-//            for (int i=0;i<list_of_all_relevant_doc.size();i++){
-//                numberOfDocuments=N;
-//                docLength=list_of_all_relevant_doc.get(i).numofterms;
-//                averageDocumentLength=200;//??????????????????????????????????????????
-//                double score=score(tf,numberOfDocuments,docLength,averageDocumentLength,queryFrequency,documentFrequency);
-//                all_doc_returns.put(score,list_of_all_relevant_doc.get(i));
-//            }
-//        }
-
     }
+
     /**
      * Uses BM25 to compute a weight for a term in a document.
      *
@@ -87,12 +79,35 @@ public class Ranker {
 //        // multiply the weight with idf
 //        double idf = weight * Math.log((numberOfDocuments - documentFrequency + 0.5d) / (documentFrequency + 0.5d));
 //        return idf;
-        numberOfDocuments=N;
+        numberOfDocuments = N;
         double K = k_1 * ((1 - b) + ((b * docLength) / averageDocumentLength));
         double first = (((k_1 + 1d) * tf) / (K + tf));    //first part
-        double idf =Math.log( numberOfDocuments / documentFrequency);
+        double idf = Math.log(numberOfDocuments / documentFrequency);
         double rank = first * idf;
         return rank;
     }
+
+    public static void semantic() {
+        try {
+            Word2VecModel model = Word2VecModel.fromTextFile(new File("word2vec.c.output.model.txt"));
+            com.medallia.word2vec.Searcher semanticSearcher = model.forSearch();
+            int results = 10;
+            List<com.medallia.word2vec.Searcher.Match> matches = semanticSearcher.getMatches("college", results);
+            for (com.medallia.word2vec.Searcher.Match match : matches) {
+                System.out.println(match.match()+"+"+match.distance());
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (com.medallia.word2vec.Searcher.UnknownWordException e) {
+            e.printStackTrace();
+
+        }
+    }
+
+    public static void main(String args[]) throws Exception {
+        semantic();
+    }
+
 
 }

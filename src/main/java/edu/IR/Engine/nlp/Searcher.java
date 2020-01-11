@@ -8,13 +8,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.pipeline.CoreDocument;
+import edu.stanford.nlp.pipeline.CoreSentence;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
+
 public class Searcher {
 
     StanfordCoreNLP stanfordCoreNLP;
-    Map<String,String> mapTerms;
-    Map<Integer,String> mapDocs;
+    Map<String, String> mapTerms;
+    Map<Integer, String> mapDocs;
 
-    public Searcher(){
+    public Searcher() {
         System.out.println("init searcher");
         mapTerms = new HashMap<>();
         mapDocs = new HashMap<>();
@@ -26,137 +35,115 @@ public class Searcher {
     //pointer to each term
     //
 
-public void buildSVD(){
+    public void buildSVD() {
 
         //TODO: get all terms from post
 
-}
+    }
 
-public Map<Double, String> runSingleQuery(String str) throws Exception {
-    TermSearch termSearch = getTerm(str);
-    List<DocumentData> documentData =  getDocStats(termSearch);
-    Ranker ranker = new Ranker(termSearch,documentData);
-    Map<Double, String> map = ranker.get_all_ranked_document();
-return map;
-}
+    public Map<Double, String> runSingleQuery(String str) throws Exception {
+        TermSearch termSearch = getTerm(str);
+        List<DocumentData> documentData = getDocStats(termSearch);
+        Ranker ranker = new Ranker(termSearch, documentData);
+        Map<Double, String> map = ranker.get_all_ranked_document();
+        return map;
+    }
 
-    private List<CoreSentence> breakSentences(String text){
+    private List<CoreSentence> breakSentences(String text) {
         CoreDocument coreDocument = new CoreDocument(text);
         stanfordCoreNLP.annotate(coreDocument);
         List<CoreSentence> sentences = coreDocument.sentences();
         return sentences;
     }
 
-public Map<Double, String> runQuery(String query) throws Exception {
+    public Map<Double, String> runQuery(String query) throws Exception {
 
 
-        Map<Double, Integer> map = ranker.get_all_ranked_document();
+        Map<String, Double> fullMap = new HashMap<>();
 
-
-    Map<String, Double> fullMap = new HashMap<>();
-
-    //parse query in NLP
-    CoreDocument coreDocument = new CoreDocument(query);
-    List<CoreSentence> sentences = breakSentences(query);
-
+        //parse query in NLP
+        CoreDocument coreDocument = new CoreDocument(query);
+        List<CoreSentence> sentences = breakSentences(query);
         List<CoreLabel> coreLabelList = sentences.get(0).tokens();
-        Integer querySize =  coreLabelList.size();
-
-
+        Integer querySize = coreLabelList.size();
 
         for (CoreLabel coreLabel : coreLabelList) {
             String token = coreLabel.originalText();
             //String pos = coreLabel.get(CoreAnnotations.PartOfSpeechAnnotation.class);
             //String ner = coreLabel.get(CoreAnnotations.NamedEntityTagAnnotation.class);
-
-            Map<Double, String> map =  runSingleQuery(token);
-
+            Map<Double, String> map = runSingleQuery(token);
             //invert map to merge by String
             Map<String, Double> invMap = map.entrySet()
                     .stream()
                     .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
             invMap.forEach((k, v) -> fullMap.merge(k, v, (v1, v2) -> v1 + v2));
-
             //fullMap.putAll(map);
-
         }
-
-
         //invert map to sort by Double
-
         //before sort
         Map<Double, String> sigmaMap = fullMap.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
+        Map<Double, String> ascSortedMap = new TreeMap();
+        ascSortedMap.putAll(sigmaMap);
 
-    Map<Double,String> ascSortedMap = new TreeMap();
-    ascSortedMap.putAll(sigmaMap);
-
-
-
-
-    //writeQueryResult(ascSortedMap);
-
-
-return ascSortedMap;
-}
-
-public void writeQueryResult(Map<Double, String> scores) throws IOException {
-    FileWriter fw = new FileWriter("C:\\posting\\Qresults.txt");
-    BufferedWriter bw = null;
-    bw = new BufferedWriter(fw);
-
-
-    for (Map.Entry<Double,String> entry: scores.entrySet()){
-        Double score = entry.getKey();
-        String docID = entry.getValue();
-        bw.write("351 0 "+docID + " " + score + " 0.0 mt \n");
-
-
-
+        return ascSortedMap;
     }
-    bw.close();
-}
 
-public void rank(List<DocumentData> documentData){
+    public void writeQueryResult(Map<Double, String> scores) throws IOException {
+        FileWriter fw = new FileWriter("C:\\posting\\Qresults.txt");
+        BufferedWriter bw = null;
+        bw = new BufferedWriter(fw);
+
+
+        for (Map.Entry<Double, String> entry : scores.entrySet()) {
+            Double score = entry.getKey();
+            String docID = entry.getValue();
+            bw.write("351 0 " + docID + " " + score + " 0.0 mt \n");
+
+
+        }
+        bw.close();
+    }
+
+    public void rank(List<DocumentData> documentData) {
         //Ranker ranker = new Ranker()
 
-        for (DocumentData documentData1 : documentData){
-           double documentScore =  bm25(documentData1);
+        for (DocumentData documentData1 : documentData) {
+            double documentScore = bm25(documentData1);
 
         }
 
-}
+    }
 
-public double bm25(DocumentData documentData){
+    public double bm25(DocumentData documentData) {
 
-        Integer D =  documentData.numofterms; // length of the document D in words
-
+        Integer D = documentData.numofterms; // length of the document D in words
 
 
         return 0.0;
-}
-
-
-public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
-    //TODO: make separate func
-    List<DocumentData> documentDataList = new ArrayList<>();
-    for (TermData termData: termSearch.termData){
-        int docID = termData.document;
-        int docTF = termData.frequency;
-
-        DocumentData documentData =  searchDocument(docID);
-        DocumentData documentData2 =  getDoc(docID);
-        documentData.docTF=docTF;
-        documentDataList.add(documentData);
     }
-    return documentDataList;
-}
 
 
-    public DocumentData getDoc(Integer doc){
+    public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
+        //TODO: make separate func
+        List<DocumentData> documentDataList = new ArrayList<>();
+        for (TermData termData : termSearch.termData) {
+            int docID = termData.document;
+            int docTF = termData.frequency;
+
+            DocumentData documentData = searchDocument(docID);
+            DocumentData documentData2 = getDoc(docID);
+            documentData.docTF = docTF;
+            documentDataList.add(documentData);
+        }
+        return documentDataList;
+    }
+
+
+    public DocumentData getDoc(Integer doc) {
 
 //        if (mapTerms.containsKey(doc)){
 //            return new TermSearch(doc, mapDocs.get(doc));
@@ -174,14 +161,14 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
         Integer numofterms = Integer.valueOf(stats[3]);
         String strID = stats[4];
 
-        DocumentData documentData = new DocumentData(doc,mostPopularTerm, mostPopular_tf, numOFsentences, numofterms,strID);
+        DocumentData documentData = new DocumentData(doc, mostPopularTerm, mostPopular_tf, numOFsentences, numofterms, strID);
         return documentData;
     }
 
 
-    public TermSearch getTerm(String term){
+    public TermSearch getTerm(String term) {
 
-        if (mapTerms.containsKey(term)){
+        if (mapTerms.containsKey(term)) {
             return new TermSearch(term, mapTerms.get(term));
         }
 
@@ -198,13 +185,13 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
 
         BufferedReader firstFile = new BufferedReader(new FileReader(path1));
 
-       // List<TermStats> dic = new ArrayList<>();
+        // List<TermStats> dic = new ArrayList<>();
 
         String line;
 
         //dicNumTerms=0;
         //numUniq=0;
-        while ( (line= firstFile.readLine() )!=null) {
+        while ((line = firstFile.readLine()) != null) {
             Integer index1 = line.indexOf(':');
             String term1 = line.substring(0, index1);
             if (term1.equals(term)) {
@@ -212,10 +199,6 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
 
                 ///TODO: return termSearch
                 TermSearch termSearch = new TermSearch(term1, value1);
-
-
-
-
 
 
                 return termSearch;
@@ -236,9 +219,6 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
 //        System.out.println(stringBuilder);
 //        firstFile.close();
 //        writeToFile(stringBuilder.toString(),path);
-
-
-
 
 
         ////////////TERM-NOT-FOUND///////////////////
@@ -291,7 +271,6 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
                 //TermSearch termSearch = new TermSearch(term1, value1);
 
 
-
                 //return termSearch;
             }
 //            TermStats termStats = new TermStats(term1, value1);
@@ -310,9 +289,6 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
 //        System.out.println(stringBuilder);
 //        firstFile.close();
 //        writeToFile(stringBuilder.toString(),path);
-
-
-
 
 
         ////////////TERM-NOT-FOUND///////////////////
@@ -336,7 +312,7 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
             String term1 = line.substring(0, index1);
             String value1 = line.substring(index1 + 1);
 
-            mapTerms.put(term1,value1);
+            mapTerms.put(term1, value1);
 
 
         }
@@ -357,13 +333,12 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
         line = firstFile.readLine();
 
 
-
         while ((line = firstFile.readLine()) != null) {
             Integer index1 = line.indexOf(':');
             String term1 = line.substring(0, index1);
             String value1 = line.substring(index1 + 1);
 
-            mapDocs.put(Integer.valueOf(term1),value1);
+            mapDocs.put(Integer.valueOf(term1), value1);
 
 
         }
