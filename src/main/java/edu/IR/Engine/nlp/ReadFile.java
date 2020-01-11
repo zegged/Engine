@@ -170,13 +170,14 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -192,6 +193,49 @@ public class ReadFile {
 
     public ReadFile(){
         System.out.println("init ReadFile");
+    }
+
+    public String openQueryFile(String path) throws IOException {
+        System.out.println("openFile " + path);
+        InputStream is = new FileInputStream(path);
+        BufferedReader buf = new BufferedReader(new InputStreamReader(is));
+        String line = buf.readLine();
+        StringBuilder sb = new StringBuilder();
+        //sb.append("<script th:inline=\"javascript\">");
+        sb.append("<FILE>\n");
+        while(line != null){
+
+            if (line.contains("<narr>")) {
+                String narrFix = "</desc>";
+                sb.append(narrFix).append("\n");
+            }
+
+            if (line.contains("<desc>")) {
+                String narrFix = "</title>";
+                sb.append(narrFix).append("\n");
+            }
+
+            if (line.contains("<title>")) {
+                String narrFix = "</num>";
+                sb.append(narrFix).append("\n");
+            }
+
+            if (line.contains("</top>")) {
+                String narrFix = "</narr>";
+                sb.append(narrFix).append("\n");
+            }
+
+
+            sb.append(line).append("\n");
+            line = buf.readLine();
+        }
+        sb.append("</FILE>\n");
+        //sb.append("</script>");
+
+        String fileAsString = sb.toString();
+        //System.out.println("Contents (before Java 7) : " + fileAsString);
+
+        return fileAsString;
     }
 
     public String openFile(String path) throws IOException {
@@ -260,6 +304,75 @@ public class ReadFile {
         return fileAsString;
     }
 
+    public IRQuery[] parseQueryFile(String singleFileXML) throws ParserConfigurationException, IOException, SAXException {
+        //Get Document Builder
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        //factory.setValidating(false);
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        //Build Document
+        Document document = builder.parse(new InputSource(new StringReader(singleFileXML)));
+
+        //Normalize the XML Structure; It's just too important !!
+        document.getDocumentElement().normalize();
+
+        //Here comes the root node
+        Element root = document.getDocumentElement();
+        //System.out.println(root.getNodeName());
+
+        //Get all docs in file
+        NodeList nList = document.getElementsByTagName("top");
+        //System.out.println("============================");
+        //System.out.println(((Document) nList).getDocumentElement().getNodeName());
+
+        IRQuery[] allDocs = new IRQuery[nList.getLength()];
+
+        for (int temp = 0; temp < nList.getLength(); temp++)
+        {
+            Node node = nList.item(temp);
+            //System.out.println("");    //Just a separator
+            if (node.getNodeType() == Node.ELEMENT_NODE)
+            {
+                //Print each employee's detail
+                Element eElement = (Element) node;
+                String title = eElement.getElementsByTagName("title").item(0).getTextContent();
+                String id = eElement.getElementsByTagName("num").item(0).getTextContent();
+                String desc = eElement.getElementsByTagName("desc").item(0).getTextContent();
+                String narr = eElement.getElementsByTagName("narr").item(0).getTextContent();
+                //String narr = "";
+
+                //System.out.println("Document id : "	+ id);
+
+//                NodeList nodeList =  eElement.getElementsByTagName("TEXT");
+//                String text;
+//                if (nodeList.getLength()>0) { // LA011290 - no <text>
+//                    text = eElement.getElementsByTagName("TEXT").item(0).getTextContent();
+//                }
+//                else{
+//                    text = "";
+//                }
+                //System.out.println("Text " + text);
+
+                //NodeList headerList = eElement.getElementsByTagName("HEADER");
+                //Element headerElement = (Element) headerList.item(0);
+                //String date = headerElement.getElementsByTagName("DATE1").item(0).getTextContent();
+                //System.out.println("Date : "	+ date);
+                //REMOVED DUE TO FILE: 70
+
+                //Element titleElement = (Element) headerElement.getElementsByTagName("H3").item(0);
+                //String title = titleElement.getElementsByTagName("TI").item(0).getTextContent();
+                //System.out.println("Title : "	+ title);
+                //REMOVED DUE TO FILE: 3
+
+                allDocs[temp] = new IRQuery(title,id,desc,narr);
+            }
+        }
+
+
+        System.out.println("loaded queries " + allDocs.length);
+
+        return allDocs;
+
+    }
 
     IRDocument[] parseXML(String singleFileXML) throws Exception {
 

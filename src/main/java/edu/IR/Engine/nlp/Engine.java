@@ -206,6 +206,9 @@ public class Engine {
         searcher.loadDocuments();
 
         //pistol-pack:[1->11936, 1->15621, 1->115]
+
+
+
         String term = "pistol pack";
 
 
@@ -217,9 +220,16 @@ public class Engine {
 
 
 
-        Map<Double, String> scores =  searcher.runQuery(term);
+        Map<String, Double> scores =  searcher.runQuery(term);
 
-           searcher.writeQueryResult(scores);
+           //searcher.writeQueryResult(scores, 351);
+
+
+
+
+
+           searcher.runFileQueries();
+
 
 //        TermSearch s = searcher.searchTerm(term);
 //

@@ -12,7 +12,9 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.CoreDocument;
 import edu.stanford.nlp.pipeline.CoreSentence;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,11 +43,11 @@ public class Searcher {
 
     }
 
-    public Map<Double, String> runSingleQuery(String str) throws Exception {
+    public Map<String, Double> runSingleQuery(String str) throws Exception {
         TermSearch termSearch = getTerm(str);
         List<DocumentData> documentData = getDocStats(termSearch);
         Ranker ranker = new Ranker(termSearch, documentData);
-        Map<Double, String> map = ranker.get_all_ranked_document();
+        Map<String, Double> map = ranker.get_all_ranked_document();
         return map;
     }
 
@@ -56,7 +58,7 @@ public class Searcher {
         return sentences;
     }
 
-    public Map<Double, String> runQuery(String query) throws Exception {
+    public Map<String, Double> runQuery(String query) throws Exception {
 
 
         Map<String, Double> fullMap = new HashMap<>();
@@ -71,37 +73,39 @@ public class Searcher {
             String token = coreLabel.originalText();
             //String pos = coreLabel.get(CoreAnnotations.PartOfSpeechAnnotation.class);
             //String ner = coreLabel.get(CoreAnnotations.NamedEntityTagAnnotation.class);
-            Map<Double, String> map = runSingleQuery(token);
+            Map<String, Double> map = runSingleQuery(token);
             //invert map to merge by String
-            Map<String, Double> invMap = map.entrySet()
-                    .stream()
-                    .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+//            Map<String, Double> invMap = map.entrySet()
+//                    .stream()
+//                    .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
-            invMap.forEach((k, v) -> fullMap.merge(k, v, (v1, v2) -> v1 + v2));
+            map.forEach((k, v) -> fullMap.merge(k, v, (v1, v2) -> v1 + v2));
             //fullMap.putAll(map);
         }
         //invert map to sort by Double
         //before sort
-        Map<Double, String> sigmaMap = fullMap.entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+//        Map<Double, String> sigmaMap = fullMap.entrySet()
+//                .stream()
+//                .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+//
+//        Map<Double, String> ascSortedMap = new TreeMap();
+//        ascSortedMap.putAll(sigmaMap);
 
-        Map<Double, String> ascSortedMap = new TreeMap();
-        ascSortedMap.putAll(sigmaMap);
-
-        return ascSortedMap;
+        return fullMap;
     }
 
-    public void writeQueryResult(Map<Double, String> scores) throws IOException {
-        FileWriter fw = new FileWriter("C:\\posting\\Qresults.txt");
+    public void writeQueryResult(Map<String, Double> scores, Integer queryID) throws IOException {
+        boolean append = true;
+        FileWriter fw = new FileWriter("C:\\posting\\Qresults.txt", append);
         BufferedWriter bw = null;
         bw = new BufferedWriter(fw);
 
 
-        for (Map.Entry<Double, String> entry : scores.entrySet()) {
-            Double score = entry.getKey();
-            String docID = entry.getValue();
-            bw.write("351 0 " + docID + " " + score + " 0.0 mt \n");
+
+        for (Map.Entry<String, Double> entry : scores.entrySet()) {
+            Double score = entry.getValue();
+            String docID = entry.getKey();
+            bw.write(queryID + " 0 " + docID + " " + score + " 0.0 mt \n");
 
 
         }
@@ -344,6 +348,39 @@ public class Searcher {
         }
         firstFile.close();
         fileReader.close();
+
+    }
+
+    public void runFileQueries() throws Exception {
+        String path1 = "c:\\posting\\queries.txt";
+
+        ReadFile readFile = new ReadFile();
+        String text = readFile.openQueryFile(path1);
+
+
+        //FileReader fileReader = new FileReader(path1);
+        //BufferedReader firstFile = new BufferedReader(fileReader);
+
+        String line;
+      //  line = firstFile.readLine();
+//        while ((line = firstFile.readLine()) != null) {
+//
+//        }
+
+
+        IRQuery[] fileDocs = readFile.parseQueryFile(text);
+
+
+        for (IRQuery irQuery : fileDocs){
+            Map<String, Double> scores =  runQuery(irQuery.title);
+
+            //add id
+            //save to stringFile
+
+            writeQueryResult(scores, irQuery.id);
+
+        }
+
 
     }
 }
