@@ -217,7 +217,10 @@ public class Engine {
 
 
 
-        searcher.runQuery(term);
+        Map<Double, String> scores =  searcher.runQuery(term);
+
+           searcher.writeQueryResult(scores);
+
 //        TermSearch s = searcher.searchTerm(term);
 //
 //        if (!s.term.equals("")){

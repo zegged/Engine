@@ -48,7 +48,7 @@ return map;
         return sentences;
     }
 
-public void runQuery(String query) throws Exception {
+public Map<Double, String> runQuery(String query) throws Exception {
 
 
 
@@ -97,31 +97,27 @@ public void runQuery(String query) throws Exception {
 
 
 
+    //writeQueryResult(ascSortedMap);
 
 
+return ascSortedMap;
+}
 
-       // Map<Double, String> map = runSingleQuery(query);
-
-
+public void writeQueryResult(Map<Double, String> scores) throws IOException {
     FileWriter fw = new FileWriter("C:\\posting\\Qresults.txt");
     BufferedWriter bw = null;
     bw = new BufferedWriter(fw);
 
 
-        for (Map.Entry<Double,String> entry: ascSortedMap.entrySet()){
-            Double score = entry.getKey();
-            String docID = entry.getValue();
-            bw.write("351 0 "+docID + " " + score + " 0.0 mt \n");
+    for (Map.Entry<Double,String> entry: scores.entrySet()){
+        Double score = entry.getKey();
+        String docID = entry.getValue();
+        bw.write("351 0 "+docID + " " + score + " 0.0 mt \n");
 
 
 
-        }
-bw.close();
-//        for (int i = 0; i < map.size(); i++){
-//            double score =  map.get();
-//        }
-
-        //rank(documentData);
+    }
+    bw.close();
 }
 
 public void rank(List<DocumentData> documentData){
@@ -150,8 +146,9 @@ public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
     for (TermData termData: termSearch.termData){
         int docID = termData.document;
         int docTF = termData.frequency;
-        //DocumentData documentData =  searchDocument(docID);
-        DocumentData documentData =  getDoc(docID);
+
+        DocumentData documentData =  searchDocument(docID);
+        DocumentData documentData2 =  getDoc(docID);
         documentData.docTF=docTF;
         documentDataList.add(documentData);
     }
