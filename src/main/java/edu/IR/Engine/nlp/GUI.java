@@ -36,6 +36,8 @@ public class GUI extends Application {
 
     Stage window;
     Scene scene, scene2;
+    Searcher searcher;
+    ChoiceBox<String> choiceBox;
     //Scene dictionaryScene, cacheScene;
     ListView<String> dictionary;
     ListView<String> cache;
@@ -87,7 +89,6 @@ public class GUI extends Application {
         iv.setImage(image);
         GridPane.setConstraints(iv, 1, 0);
 
-
         //corpus Label - constrains use (child, column, row)
         Label corpusLabel = new Label("corpus:");
         corpusLabel.setStyle("-fx-font-weight: bold");
@@ -103,24 +104,20 @@ public class GUI extends Application {
         browseButton2.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(browseButton2, 2, 1);
         browseButton2.setOnAction(e -> browser());
-
         //posting Label
         Label postingLabel = new Label("posting files:");
         postingLabel.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(postingLabel, 0, 2);
-
         //posting path Input
         postingInput = new TextField();
         postingInput.setPromptText("posting path here");
         postingInput.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(postingInput, 1, 2);
-
         //browse button
         Button browseButton = new Button("browse");
         browseButton.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(browseButton, 2, 2);
         browseButton.setOnAction(e -> browserPosting());
-
         //Stemming
         Label stemmLabel = new Label("Do you want to preform Stemming?");
         stemmLabel.setStyle("-fx-font-weight: bold");
@@ -129,7 +126,6 @@ public class GUI extends Application {
         CheckBox stemmerCheck = new CheckBox("Stemming?");
         stemmerCheck.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(stemmerCheck, 2, 3);
-
         //Start
         Button startButton = new Button("START");
         startButton.setStyle("-fx-font-weight: bold");
@@ -146,7 +142,6 @@ public class GUI extends Application {
         });
         startButton.disableProperty().bind(Bindings.createBooleanBinding(() -> !((postingInput.getText() != null && corpusInput.getText() != null)),
                 postingInput.textProperty(), corpusInput.textProperty()));
-
         //RESET
         Button resetButton = new Button("RESET");
         resetButton.setStyle("-fx-font-weight: bold");
@@ -162,7 +157,6 @@ public class GUI extends Application {
                 e1.printStackTrace();
             }
         });
-
 
         //Display dictionary
         Button dictionaryDisplayButton = new Button("Dictionary");
@@ -180,12 +174,14 @@ public class GUI extends Application {
         });
 
         //load
+        loadInput = new TextField();
+        loadInput.setPromptText("load path here");
+        loadInput.setStyle("-fx-font-weight: bold");
+        GridPane.setConstraints(loadInput, 1, 9);
         Button browseButton4 = new Button("browse");
         browseButton4.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(browseButton4, 2, 9);
         browseButton4.setOnAction(e -> browserLoad());
-//
-//        //load the created files
         Button loadButton = new Button("LOAD");
         loadButton.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(loadButton, 4, 9);
@@ -193,12 +189,12 @@ public class GUI extends Application {
         loadLabel.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(loadLabel, 0, 9);
         loadButton.setOnAction(e -> {
-            loadFiles();
+            try {
+                loadFiles(loadInput.getText(), stemmerCheck.isSelected());
+            } catch (IOException e1) {
+                e1.getStackTrace();
+            }
         });
-        loadInput = new TextField();
-        loadInput.setPromptText("load path here");
-        loadInput.setStyle("-fx-font-weight: bold");
-        GridPane.setConstraints(loadInput, 1, 9);
 
 
         Button changeScene = new Button("Go to search !");
@@ -278,10 +274,20 @@ public class GUI extends Application {
         //5
         Label get5label = new Label("get 5 queries if you want");
         get5label.setStyle("-fx-font-weight: bold");
-        GridPane.setConstraints(get5label, 1, 4);
+        GridPane.setConstraints(get5label, 0, 4);
+        choiceBox=new ChoiceBox<>();
+        GridPane.setConstraints(choiceBox, 1, 4);
+        choiceBox.setValue("5terms");//????
         Button get5 = new Button("GET 5");
         get5.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(get5, 2, 4);
+        get5.setOnAction(e -> {
+            try {
+                get5Function(choiceBox);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        });
 
         //6
         Label enter_save_file = new Label("The path to save file");
@@ -305,13 +311,13 @@ public class GUI extends Application {
         GridPane.setConstraints(go_back_Scene, 1, 6);
 
 
-        grid2.getChildren().addAll(go_back_Scene, iv2, labelStart, semantic, enter_query, loadInput2, runQuery,
+        grid2.getChildren().addAll(choiceBox,go_back_Scene, iv2, labelStart, semantic, enter_query, loadInput2, runQuery,
                 enter_query2, file_query_input, browseButton5, runQuery2, get5, enter_save_file, loadInput3, browseButton6, get5label, saveQuery);
 
         //Add everything to grid
         grid.getChildren().addAll(corpusLabel, corpusInput, postingLabel, postingInput, browseButton, startButton
                 , stemmerCheck, stemmLabel, resetButton, resetLabel,
-                loadButton, loadLabel, browseButton2, dictionaryDisplayButton, displayDictionaryLabel, browseButton4, loadInput, iv, changeScene);
+                loadButton, loadLabel, browseButton2, dictionaryDisplayButton, displayDictionaryLabel, browseButton4,loadInput, iv, changeScene);
 
 
         grid.setStyle("-fx-background-color: #5F9EA0;");
@@ -480,15 +486,28 @@ public class GUI extends Application {
     }
 
 
-    public void loadFiles() {
+    public void loadFiles(String pathToPosting, boolean selected) throws IOException {
+        if(!pathToPosting.equals("")){
+            searcher = new Searcher();
+            String path1 = "";
+            String path2="";
+            if (selected) {
+                path1 = pathToPosting + "\\yesStem\\post.txt";
+                path2 = pathToPosting + "\\yesStem\\documents.txt";
 
+            } else {
+                path1 = pathToPosting + "\\noStem\\post.txt";
+                path2 = pathToPosting + "\\yesStem\\documents.txt";
+            }
+            searcher.loadDictionary(path1);
+            searcher.loadDocuments(path2);
+        }else{
+            AlertBox.display("Load", "Enter path to load Dictionary ");
+        }
     }
 
     public void browserFile() {
         try {
-//            FileChooser fileChooser = new FileChooser();
-//            fileChooser.setTitle("C:\\");
-//            fileChooser.showOpenDialog(null);
             FileChooser dc = new FileChooser();
             dc.setInitialDirectory((new File("C:\\")));
             File selectedFile = dc.showOpenDialog(null);
@@ -529,6 +548,7 @@ public class GUI extends Application {
     }
 
     public void browserLoad() {
+
         DirectoryChooser dc = new DirectoryChooser();
         dc.setInitialDirectory((new File("C:\\")));
         File selectedFile = dc.showDialog(null);
@@ -538,108 +558,91 @@ public class GUI extends Application {
     }
 
     public void deleteReset() throws IOException {
-        dictionary = null;
-        cache = null;
-        String noStem = pathToPosting + "\\noStem";
-        String yesStem = pathToPosting + "\\yesStem";
-        try {
+
+        if (pathToPosting.equals("")) {
+            AlertBox.display("Reset", "Enter path to delete files ");
+        } else {
+            String noStem = pathToPosting + "\\noStem";
+            String yesStem = pathToPosting + "\\yesStem";
             File file = new File(yesStem + "/dictionary.txt");
             File file2 = new File(yesStem + "/documents.txt");
             File file3 = new File(yesStem + "/post.txt");
-            File fil = new File(noStem + "/dictionary.txt");
-            File fil2 = new File(noStem + "/documents.txt");
-            File fil3 = new File(noStem + "/post.txt");
+            File file_noStem = new File(noStem + "/dictionary.txt");
+            File file2_noStem = new File(noStem + "/documents.txt");
+            File file3_noStem = new File(noStem + "/post.txt");
 
-            try {
-                if (fil.exists())
-                    fil.delete();
-                if (fil2.exists())
-                    fil2.delete();
-                if (fil3.exists())
-                    fil3.delete();
+            if (file_noStem.exists())
+                file_noStem.delete();
+            if (file2_noStem.exists())
+                file2_noStem.delete();
+            if (file3_noStem.exists())
+                file3_noStem.delete();
 
-            } catch (Exception e) {
+            if (file.exists())
+                file.delete();
+            if (file2.exists())
+                file2.delete();
+            if (file3.exists())
+                file3.delete();
 
-            }
-
-            try {
-                if (file.exists())
-                    file.delete();
-                if (file2.exists())
-                    file2.delete();
-                if (file3.exists())
-                    file3.delete();
-            } catch (Exception e) {
-            }
-            try {
-
-
-            } catch (Exception e) {
-
-            }
-
-        } catch (Exception e) {
+            deleteDirectory(noStem);
+            deleteDirectory(yesStem);
+            AlertBox.display("Reset", "The dictionary and the posting file are deleted ");
         }
-        AlertBox.display("Reset", "The dictionary and the posting file are deleted ");
-
     }
 
-//    private static void deleteDirectory(String filePath) throws IOException {
-//        try {
-//            File file  = new File(filePath);
-//            if(file.isDirectory()){
-//                String[] childFiles = file.list();
-//                if(childFiles == null) {
-//                    //Directory is empty. Proceed for deletion
-//                    file.delete();
-//                }
-//                else {
-//                    //Directory has other files.
-//                    //Need to delete them first
-//                    for (String childFilePath :  childFiles) {
-//                        //recursive delete the files
-//                        deleteDirectory(childFilePath);
-//                    }
-//                }
-//
-//            }
-//            else {
-//                //it is a simple file. Proceed for deletion
-//                file.delete();
-//            }
-//        }
-//
-//        catch (Exception e)
-//        {
-//
-//        }
-//    }
+    private static void deleteDirectory(String filePath) {
+        File file = new File(filePath);
+        if (file.isDirectory()) {
+            file.delete();
+        }
+    }
 
     /**
      * @param s1: the qury we searching
      */
     public void RunButton(String s1) throws Exception {
         if (s1 != null) {
-            AlertBox.display("Program Information",
-                    "the query you are serching is : " + s1);
-            Searcher searcher = new Searcher();
-            searcher.loadDictionary();
-            searcher.loadDocuments();
+            AlertBox.display("Program Information", "the query you are serching is : " + s1);
+//            Searcher searcher = new Searcher();
+//            searcher.loadDictionary();
+//            searcher.loadDocuments();
             String term = s1;
             Map<String, Double> scores = searcher.runQuery(term);
-            searcher.writeQueryResult(scores,0);
-            AlertBox.display("Query", "finsh searching!");
+            searcher.writeQueryResult(scores, 0);
+            choiceBox.getItems().add("Doc1");
+            choiceBox.getItems().add("Doc2");
+            choiceBox.getItems().add("Doc3");
         } else {// the fields are missing
             //change scene to alert and back to the main window to let write again
             AlertBox.display("Missing Input", "Error: no query had been written!");
         }
     }
+
     public void RunButton2(String path) throws Exception {
-        Searcher searcher = new Searcher();
-        searcher.loadDictionary();
-        searcher.loadDocuments();
+//        Searcher searcher = new Searcher();
+//        searcher.loadDictionary();
+//        searcher.loadDocuments();
         searcher.runFileQueries(path);
+        choiceBox.getItems().add("Doc1");
+        choiceBox.getItems().add("Doc2");
+        choiceBox.getItems().add("Doc3");
     }
+
+    public void get5Function(ChoiceBox<String> choiceBox){
+        String doc=choiceBox.getValue();
+        System.out.println(doc);
+        VBox vBox = new VBox();
+        Scene dictionaryScene = new Scene(vBox);
+        Stage dicwindow = new Stage();
+        //Block events to other windows
+        dicwindow.initModality(Modality.APPLICATION_MODAL);
+        dicwindow.setTitle("The best 5 Terms");
+        dicwindow.setMinWidth(250);
+        dicwindow.setScene(dictionaryScene);
+        dicwindow.show();
+    }
+
     public void finishData() {//present all of the Data that is needed aout the program
         AlertBox.display("Program Information",
                 "time of running:" + totalTime + "\n" +

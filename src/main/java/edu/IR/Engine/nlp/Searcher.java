@@ -24,7 +24,7 @@ public class Searcher {
     StanfordCoreNLP stanfordCoreNLP;
     Map<String, String> mapTerms;
     Map<Integer, String> mapDocs;
-
+    List<DocumentData> documentDataList;
     public Searcher() {
         System.out.println("init searcher");
         mapTerms = new HashMap<>();
@@ -59,10 +59,7 @@ public class Searcher {
     }
 
     public Map<String, Double> runQuery(String query) throws Exception {
-
-
         Map<String, Double> fullMap = new HashMap<>();
-
         //parse query in NLP
         CoreDocument coreDocument = new CoreDocument(query);
         List<CoreSentence> sentences = breakSentences(query);
@@ -96,20 +93,25 @@ public class Searcher {
 
     public void writeQueryResult(Map<String, Double> scores, Integer queryID) throws IOException {
         boolean append = true;
-        FileWriter fw = new FileWriter("d:\\documents\\users\\razyal\\Documents\\posting\\yesStem\\Qresults.txt", append);
+        FileWriter fw = new FileWriter("C:\\Users\\Razi\\Desktop\\ehzor\\posting\\yesStem\\Qresults.txt", append);
         BufferedWriter bw = null;
         bw = new BufferedWriter(fw);
-
-
 
         for (Map.Entry<String, Double> entry : scores.entrySet()) {
             Double score = entry.getValue();
             String docID = entry.getKey();
             bw.write(queryID + " 0 " + docID + " " + score + " 0.0 mt \n");
-
-
         }
         bw.close();
+    }
+
+    public List<String> get5_best_terms(String idDoc){
+        List<String> list=new ArrayList<>();
+//        for(int i=0;i<this.documentDataList.size();i++){
+//            if(this.documentDataList.get(i).strID.equals(idDoc)){
+//            }
+//        }
+        return list;
     }
 
     public void rank(List<DocumentData> documentData) {
@@ -133,7 +135,7 @@ public class Searcher {
 
     public List<DocumentData> getDocStats(TermSearch termSearch) throws Exception {
         //TODO: make separate func
-        List<DocumentData> documentDataList = new ArrayList<>();
+        documentDataList = new ArrayList<>();
         for (TermData termData : termSearch.termData) {
             int docID = termData.document;
             int docTF = termData.frequency;
@@ -302,11 +304,10 @@ public class Searcher {
     }
 
 
-    public void loadDictionary() throws IOException {
+    public void loadDictionary(String path1) throws IOException {
 
         //String path1 = getPath("final");
-        String path1 = "d:\\documents\\users\\razyal\\Documents\\posting\\yesStem\\post.txt";
-
+        //String path1 = "d:\\documents\\users\\razyal\\Documents\\posting\\yesStem\\post.txt";
         FileReader fileReader = new FileReader(path1);
         BufferedReader firstFile = new BufferedReader(fileReader);
 
@@ -315,18 +316,15 @@ public class Searcher {
             Integer index1 = line.indexOf(':');
             String term1 = line.substring(0, index1);
             String value1 = line.substring(index1 + 1);
-
             mapTerms.put(term1, value1);
-
-
         }
         firstFile.close();
         fileReader.close();
     }
 
-    public void loadDocuments() throws IOException {
+    public void loadDocuments(String path1) throws IOException {
         //String path1 = getPath("final");
-        String path1 = "d:\\documents\\users\\razyal\\Documents\\posting\\yesStem\\documents.txt";
+        //String path1 = "d:\\documents\\users\\razyal\\Documents\\posting\\yesStem\\documents.txt";
 
         FileReader fileReader = new FileReader(path1);
         BufferedReader firstFile = new BufferedReader(fileReader);
