@@ -79,6 +79,7 @@ public class Searcher {
                 for (Pair<String, Double> stringDoublePair : pairs) {
                     Map<String, Double> semanticMap = runSingleQuery(stringDoublePair.getKey());
 
+                    //
                     semanticMap.replaceAll((k,v)->v=v*alpha);
                     semanticMap.forEach((k, v) -> map.merge(k, v, (v1, v2) -> v1 + v2));
                 }
