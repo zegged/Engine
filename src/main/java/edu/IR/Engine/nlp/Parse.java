@@ -1151,9 +1151,9 @@ public class Parse {
         List<CoreSentence> sentences = breakSentences(docParsing);
         DocumentTerms documentTerms = new DocumentTerms();
         String str = sentences.toString();
-        List<String> pricesMoreThanMillion = new ArrayList<>();
-        pricesMoreThanMillion = checkPricesMoreThanMillion(docParsing);
-        inserttoDic(pricesMoreThanMillion);
+        //List<String> pricesMoreThanMillion = new ArrayList<>();
+        //pricesMoreThanMillion = checkPricesMoreThanMillion(docParsing);
+        //inserttoDic(pricesMoreThanMillion);
         int counter = 0;
         numOFsentences = 0;
         numofterms = 0;

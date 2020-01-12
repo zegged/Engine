@@ -87,25 +87,9 @@ public class Ranker {
         return rank;
     }
 
-    public static void semantic() {
-        try {
-            Word2VecModel model = Word2VecModel.fromTextFile(new File("word2vec.c.output.model.txt"));
-            com.medallia.word2vec.Searcher semanticSearcher = model.forSearch();
-            int results = 10;
-            List<com.medallia.word2vec.Searcher.Match> matches = semanticSearcher.getMatches("college", results);
-            for (com.medallia.word2vec.Searcher.Match match : matches) {
-                System.out.println(match.match()+"+"+match.distance());
-            }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (com.medallia.word2vec.Searcher.UnknownWordException e) {
-            e.printStackTrace();
-
-        }
-    }
     public static void main(String args[]) throws Exception {
-        semantic();
+//        semantic("college");
     }
 
 

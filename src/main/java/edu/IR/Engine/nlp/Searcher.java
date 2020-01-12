@@ -8,16 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.medallia.word2vec.Word2VecModel;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.CoreDocument;
 import edu.stanford.nlp.pipeline.CoreSentence;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import org.xml.sax.SAXException;
+import javafx.util.Pair;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Searcher {
 
@@ -71,11 +70,21 @@ public class Searcher {
             //String pos = coreLabel.get(CoreAnnotations.PartOfSpeechAnnotation.class);
             //String ner = coreLabel.get(CoreAnnotations.NamedEntityTagAnnotation.class);
             Map<String, Double> map = runSingleQuery(token);
-            //invert map to merge by String
-//            Map<String, Double> invMap = map.entrySet()
-//                    .stream()
-//                    .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+            //Semantics
 
+            if (true) { //semantics
+
+                double alpha = 0.1;
+                List<Pair<String, Double>> pairs = semantic(token);
+                for (Pair<String, Double> stringDoublePair : pairs) {
+                    Map<String, Double> semanticMap = runSingleQuery(stringDoublePair.getKey());
+
+                    semanticMap.replaceAll((k,v)->v=v*alpha);
+                    semanticMap.forEach((k, v) -> map.merge(k, v, (v1, v2) -> v1 + v2));
+                }
+            }
+
+            //merge results (same doc)
             map.forEach((k, v) -> fullMap.merge(k, v, (v1, v2) -> v1 + v2));
             //fullMap.putAll(map);
         }
@@ -93,7 +102,7 @@ public class Searcher {
 
     public void writeQueryResult(Map<String, Double> scores, Integer queryID) throws IOException {
         boolean append = true;
-        FileWriter fw = new FileWriter("C:\\Users\\Razi\\Desktop\\ehzor\\posting\\yesStem\\Qresults.txt", append);
+        FileWriter fw = new FileWriter("C:\\posting\\Qresults.txt", append);
         BufferedWriter bw = null;
         bw = new BufferedWriter(fw);
 
@@ -371,9 +380,35 @@ public class Searcher {
 
         for (IRQuery irQuery : fileDocs){
             Map<String, Double> scores =  runQuery(irQuery.title);
-            //add id
-            //save to stringFile
+
+            //semantics
+          //  List<Pair<String, Double>> pairs = semantic(irQuery.title);
+
             writeQueryResult(scores, irQuery.id);
         }
     }
+
+    public List<Pair<String, Double>> semantic(String term) {
+        List<Pair<String,Double>> pairs = new ArrayList<>();
+        try {
+            Word2VecModel model = Word2VecModel.fromTextFile(new File("word2vec.c.output.model.txt"));
+            com.medallia.word2vec.Searcher semanticSearcher = model.forSearch();
+            int results = 10;
+            List<com.medallia.word2vec.Searcher.Match> matches = semanticSearcher.getMatches(term, results);
+            for (com.medallia.word2vec.Searcher.Match match : matches) {
+                System.out.println(match.match()+"+"+match.distance());
+                pairs.add(new Pair<>(match.match(),match.distance()));
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (com.medallia.word2vec.Searcher.UnknownWordException e) {
+            e.printStackTrace();
+
+        }
+        return pairs;
+    }
+
+
 }
+
