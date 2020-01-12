@@ -14,6 +14,7 @@ import edu.stanford.nlp.pipeline.CoreDocument;
 import edu.stanford.nlp.pipeline.CoreSentence;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import javafx.util.Pair;
+import org.tartarus.snowball.ext.PorterStemmer;
 
 import java.io.*;
 import java.util.*;
@@ -43,6 +44,14 @@ public class Searcher {
     }
 
     public Map<String, Double> runSingleQuery(String str) throws Exception {
+
+        if (true) {// stemming
+            PorterStemmer stemmer = new PorterStemmer();
+            stemmer.setCurrent(str); //set string you need to stem
+            stemmer.stem();  //stem the word
+            str = stemmer.getCurrent();//get the stemmed word
+        }
+
         TermSearch termSearch = getTerm(str);
         List<DocumentData> documentData = getDocStats(termSearch);
         Ranker ranker = new Ranker(termSearch, documentData);
@@ -69,6 +78,8 @@ public class Searcher {
             String token = coreLabel.originalText();
             //String pos = coreLabel.get(CoreAnnotations.PartOfSpeechAnnotation.class);
             //String ner = coreLabel.get(CoreAnnotations.NamedEntityTagAnnotation.class);
+
+
             Map<String, Double> map = runSingleQuery(token);
             //Semantics
 
@@ -404,7 +415,7 @@ public class Searcher {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (com.medallia.word2vec.Searcher.UnknownWordException e) {
-            e.printStackTrace();
+           // e.printStackTrace();
 
         }
         return pairs;
