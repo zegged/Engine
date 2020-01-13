@@ -43,9 +43,9 @@ public class Searcher {
 
     }
 
-    public Map<Integer, Double> runSingleQuery(String str) throws Exception {
+    public Map<Integer, Double> runSingleQuery(String str,boolean stemming) throws Exception {
 
-        if (true) {// stemming
+        if (stemming) {// stemming
             PorterStemmer stemmer = new PorterStemmer();
             stemmer.setCurrent(str); //set string you need to stem
             stemmer.stem();  //stem the word
@@ -66,7 +66,7 @@ public class Searcher {
         return sentences;
     }
 
-    public Map<Integer, Double> runQuery(String query) throws Exception {
+    public Map<Integer, Double> runQuery(String query,boolean stemming ,boolean semantics) throws Exception {
         Map<Integer, Double> fullMap = new HashMap<>();
         //parse query in NLP
         CoreDocument coreDocument = new CoreDocument(query);
@@ -80,15 +80,15 @@ public class Searcher {
             //String ner = coreLabel.get(CoreAnnotations.NamedEntityTagAnnotation.class);
 
 
-            Map<Integer, Double> map = runSingleQuery(token);
+            Map<Integer, Double> map = runSingleQuery(token,stemming);
             //Semantics
 
-            if (true) { //semantics
+            if (semantics) { //semantics
 
                 double alpha = 0.1;
                 List<Pair<String, Double>> pairs = semantic(token);
                 for (Pair<String, Double> stringDoublePair : pairs) {
-                    Map<Integer, Double> semanticMap = runSingleQuery(stringDoublePair.getKey());
+                    Map<Integer, Double> semanticMap = runSingleQuery(stringDoublePair.getKey(),stemming);
 
                     //
                     semanticMap.replaceAll((k,v)->v=v*alpha);
@@ -210,55 +210,55 @@ public class Searcher {
         return new TermSearch("TERM-NOT-FOUND", "");
     }
 
-    public TermSearch searchTerm(String term) throws Exception { //DELETE?
-
-        System.out.println("searching for term " + term);
-
-        //String path1 = getPath("final");
-
-        String path1 = "C:\\posting\\post.txt";
-
-        BufferedReader firstFile = new BufferedReader(new FileReader(path1));
-
-        // List<TermStats> dic = new ArrayList<>();
-
-        String line;
-
-        //dicNumTerms=0;
-        //numUniq=0;
-        while ((line = firstFile.readLine()) != null) {
-            Integer index1 = line.indexOf(':');
-            String term1 = line.substring(0, index1);
-            if (term1.equals(term)) {
-                String value1 = line.substring(index1 + 1);
-
-                ///TODO: return termSearch
-                TermSearch termSearch = new TermSearch(term1, value1);
-
-
-                return termSearch;
-            }
-//            TermStats termStats = new TermStats(term1, value1);
-//            dic.add(termStats);
-//            //dicNumTerms++;
-//            if (termStats.tf==1){
-//                numUniq++;
+//    public TermSearch searchTerm(String term) throws Exception { //DELETE?
+//
+//        System.out.println("searching for term " + term);
+//
+//        //String path1 = getPath("final");
+//
+//        String path1 = "C:\\posting\\post.txt";
+//
+//        BufferedReader firstFile = new BufferedReader(new FileReader(path1));
+//
+//        // List<TermStats> dic = new ArrayList<>();
+//
+//        String line;
+//
+//        //dicNumTerms=0;
+//        //numUniq=0;
+//        while ((line = firstFile.readLine()) != null) {
+//            Integer index1 = line.indexOf(':');
+//            String term1 = line.substring(0, index1);
+//            if (term1.equals(term)) {
+//                String value1 = line.substring(index1 + 1);
+//
+//                ///TODO: return termSearch
+//                TermSearch termSearch = new TermSearch(term1, value1);
+//
+//
+//                return termSearch;
 //            }
-
-        }
-//        StringBuilder stringBuilder = new StringBuilder();
-//        for (TermStats termStats : dic){
-//            stringBuilder.append(termStats).append(System.lineSeparator());
+////            TermStats termStats = new TermStats(term1, value1);
+////            dic.add(termStats);
+////            //dicNumTerms++;
+////            if (termStats.tf==1){
+////                numUniq++;
+////            }
+//
 //        }
-//        String path = getPath("dic");
-//        System.out.println(stringBuilder);
-//        firstFile.close();
-//        writeToFile(stringBuilder.toString(),path);
-
-
-        ////////////TERM-NOT-FOUND///////////////////
-        return new TermSearch("TERM-NOT-FOUND", "");
-    }
+////        StringBuilder stringBuilder = new StringBuilder();
+////        for (TermStats termStats : dic){
+////            stringBuilder.append(termStats).append(System.lineSeparator());
+////        }
+////        String path = getPath("dic");
+////        System.out.println(stringBuilder);
+////        firstFile.close();
+////        writeToFile(stringBuilder.toString(),path);
+//
+//
+//        ////////////TERM-NOT-FOUND///////////////////
+//        return new TermSearch("TERM-NOT-FOUND", "");
+//    }
 
 
 //    public DocumentData searchDocument(int doc) throws Exception {
@@ -380,7 +380,7 @@ public class Searcher {
 
     }
 
-    public void runFileQueries(String path1) throws Exception {
+    public void runFileQueries(String path1,boolean stemming,boolean semantics) throws Exception {
 //        String path1 = "d:\\documents\\users\\razyal\\Documents\\posting\\yesStem\\queries.txt";
 
         ReadFile readFile = new ReadFile();
@@ -401,7 +401,7 @@ public class Searcher {
 
 
         for (IRQuery irQuery : fileDocs){
-            Map<Integer, Double> scores =  runQuery(irQuery.title);
+            Map<Integer, Double> scores =  runQuery(irQuery.title,stemming,semantics);
 
             //semantics
           //  List<Pair<String, Double>> pairs = semantic(irQuery.title);

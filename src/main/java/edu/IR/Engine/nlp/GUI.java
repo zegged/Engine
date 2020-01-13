@@ -244,13 +244,12 @@ public class GUI extends Application {
         GridPane.setConstraints(runQuery, 2, 3);
         runQuery.setOnAction(e -> {
             try {
-                RunButton(loadInput2.getText());
+                RunButton(loadInput2.getText(),semantic.isSelected());
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
         });
         runQuery.disableProperty().bind(Bindings.createBooleanBinding(() -> !((loadInput2.getText() != null)), loadInput2.textProperty()));
-
         //4
         Label enter_query2 = new Label("get file query:");
         enter_query2.setStyle("-fx-font-weight: bold");
@@ -268,7 +267,7 @@ public class GUI extends Application {
         GridPane.setConstraints(runQuery2, 3, 4);
         runQuery2.setOnAction(e -> {
             try {
-                RunButton2(file_query_input.getText());
+                RunButton2(file_query_input.getText(),semantic.isSelected());
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
@@ -603,11 +602,11 @@ public class GUI extends Application {
     /**
      * @param s1: the qury we searching
      */
-    public void RunButton(String s1) throws Exception {
+    public void RunButton(String s1,boolean semantic) throws Exception {
         if (s1 != null) {
             AlertBox.display("Program Information", "the query you are serching is : " + s1);
             String term = s1;
-            Map<Integer, Double> scores = searcher.runQuery(term);
+            Map<Integer, Double> scores = searcher.runQuery(term,doStemming,semantic);
             for (Map.Entry<Integer, Double> pair : scores.entrySet()) {
                 Integer docID = pair.getKey();
                 Double scoreSingle = pair.getValue();
@@ -624,15 +623,14 @@ public class GUI extends Application {
         }
     }
 
-    public void RunButton2(String path) throws Exception {
-        searcher.runFileQueries(path);
+    public void RunButton2(String path,boolean semantic) throws Exception {
+        searcher.runFileQueries(path,doStemming,semantic);
         choiceBox.getItems().add("Doc1");
         choiceBox.getItems().add("Doc2");
         choiceBox.getItems().add("Doc3");
     }
 
     public void get5Function(ChoiceBox<String> choiceBox) {
-
         String docStr = choiceBox.getValue();
         System.out.println(docStr);
         List<String> list_of_best_terms=documentData_map.get(docStr).list_of_best_terms;
