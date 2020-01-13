@@ -52,6 +52,7 @@ public class Searcher {
             str = stemmer.getCurrent();//get the stemmed word
         }
 
+        //TODO: uppercase/lowercase Malvina
         TermSearch termSearch = getTerm(str);
         List<DocumentData> documentData = getDocStats(termSearch);
         Ranker ranker = new Ranker(termSearch, documentData);
@@ -67,6 +68,7 @@ public class Searcher {
     }
 
     public Map<Integer, Double> runQuery(String query,boolean stemming ,boolean semantics) throws Exception {
+        // TODO: blood-alcohol fatalities
         Map<Integer, Double> fullMap = new HashMap<>();
         //parse query in NLP
         CoreDocument coreDocument = new CoreDocument(query);
@@ -90,10 +92,34 @@ public class Searcher {
                 for (Pair<String, Double> stringDoublePair : pairs) {
                     Map<Integer, Double> semanticMap = runSingleQuery(stringDoublePair.getKey(),stemming);
 
-                    //
+                    //TODO: mult double w/ score
                     semanticMap.replaceAll((k,v)->v=v*alpha);
                     semanticMap.forEach((k, v) -> map.merge(k, v, (v1, v2) -> v1 + v2));
                 }
+
+            }
+
+            if (true){// semantics API
+                // TODO: ad  semanticsAPI boolean
+                //String term = "pistol pack";
+                double beta = 0.1;
+                DatamuseQuery datamuseQuery = new DatamuseQuery();
+                String similar =  datamuseQuery.findSimilar(token);
+                //System.out.println(similar);
+                if (similar.length()==0){
+                    break;
+                }
+                JSONParse jsonParse = new JSONParse();
+                int[] scores =  jsonParse.parseScores(similar);
+                String[] words = jsonParse.parseWords(similar);
+
+                for (String word:words){
+                    Map<Integer, Double> semanticMap = runSingleQuery(word,stemming);
+                    semanticMap.replaceAll((k,v)->v=v*beta);
+                    semanticMap.forEach((k, v) -> map.merge(k, v, (v1, v2) -> v1 + v2));
+                }
+
+
             }
 
             //merge results (same doc)
@@ -114,7 +140,7 @@ public class Searcher {
 
     public void writeQueryResult(Map<Integer, Double> scores, Integer queryID) throws IOException {
         boolean append = true;
-        FileWriter fw = new FileWriter("C:\\Users\\Razi\\Desktop\\ehzor\\posting\\yesStem\\Qresults.txt", append);
+        FileWriter fw = new FileWriter("C:\\posting\\yesStem\\Qresults.txt", append);
         BufferedWriter bw = null;
         bw = new BufferedWriter(fw);
 
