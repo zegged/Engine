@@ -135,7 +135,29 @@ public class Searcher {
 //        Map<Double, String> ascSortedMap = new TreeMap();
 //        ascSortedMap.putAll(sigmaMap);
 
-        return fullMap;
+        // SORT
+
+
+        LinkedHashMap<Integer, Double> reverseSortedMap = new LinkedHashMap<>();
+
+//Use Comparator.reverseOrder() for reverse ordering
+        fullMap.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .forEachOrdered(x -> reverseSortedMap.put(x.getKey(), x.getValue()));
+
+
+
+        //top 50
+        LinkedHashMap<Integer, Double> top50 = new LinkedHashMap<>();
+        for (Map.Entry<Integer, Double> entry : reverseSortedMap.entrySet()) {
+            Integer key = entry.getKey();
+            Double value = entry.getValue();
+            top50.put(key,value);
+            if (top50.size()>=50) break;
+        }
+
+        return top50;
     }
 
     public void writeQueryResult(Map<Integer, Double> scores, Integer queryID) throws IOException {
