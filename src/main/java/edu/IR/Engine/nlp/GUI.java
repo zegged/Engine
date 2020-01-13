@@ -607,7 +607,9 @@ public class GUI extends Application {
             AlertBox.display("Program Information", "the query you are serching is : " + s1);
             String term = s1;
             Map<Integer, Double> scores = searcher.runQuery(term,doStemming,semantic);
+            int counter = 50;
             for (Map.Entry<Integer, Double> pair : scores.entrySet()) {
+                counter--;
                 Integer docID = pair.getKey();
                 Double scoreSingle = pair.getValue();
                 DocumentData documentData = searcher.getDoc(docID);
@@ -615,6 +617,9 @@ public class GUI extends Application {
                 documentData_map.put(docStr,documentData);
                 choiceBox.getItems().add(docStr);
                 //List<String> list = documentData.list_of_best_terms;
+                if (counter == 0){
+                    break;
+                }
             }
             searcher.writeQueryResult(scores, 0);
         } else {// the fields are missing

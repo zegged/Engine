@@ -229,7 +229,7 @@ public class Engine {
          searcher.semantic("New York");
 
 
-           searcher.runFileQueries("c:\\posting\\queries.txt");
+           //searcher.runFileQueries("c:\\posting\\queries2.txt");
 
 
 //        TermSearch s = searcher.searchTerm(term);

@@ -189,12 +189,20 @@ public class Searcher {
         Integer numOFsentences = Integer.valueOf(stats[2]);
         Integer numofterms = Integer.valueOf(stats[3]);
         String strID = stats[4];
-        String list_of_best_terms=stats[5];
-        String[] str_list=list_of_best_terms.split("\\^");
+
+
         List<String> list_of_best_terms2=new ArrayList<>();
-        for(String s:str_list){
-            list_of_best_terms2.add(s);
+        if (stats.length==6){
+            String list_of_best_terms=stats[5];
+            String[] str_list=list_of_best_terms.split("\\^");
+            for(String s:str_list){
+                list_of_best_terms2.add(s);
+            }
         }
+
+
+
+
 
         DocumentData documentData = new DocumentData(doc, mostPopularTerm, mostPopular_tf, numOFsentences, numofterms, strID,list_of_best_terms2);
         return documentData;
@@ -351,6 +359,7 @@ public class Searcher {
         }
         firstFile.close();
         fileReader.close();
+        System.out.println("Dictionary loaded");
     }
 
     public void loadDocuments(String path1) throws IOException {
@@ -377,7 +386,7 @@ public class Searcher {
         }
         firstFile.close();
         fileReader.close();
-
+        System.out.println("Documents loaded");
     }
 
     public void runFileQueries(String path1,boolean stemming,boolean semantics) throws Exception {
