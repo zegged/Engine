@@ -1,12 +1,6 @@
 package edu.IR.Engine.nlp;
 
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -22,6 +16,7 @@ public class Indexer {
     List<String> lastDictionaryToView ;
     long dicNumTerms;
     long numUniq;
+    List<TermStats> list_of_best_terms;
 
     //docs:
     public static List<String> docs = new ArrayList<>();
@@ -325,12 +320,9 @@ public class Indexer {
         //raf.writeBytes(lineToAdd);
         //raf.close();
 
-
-
-
         List<TermStats> dic = new ArrayList<>();
         String line;
-
+        list_of_best_terms=new ArrayList<>();
         dicNumTerms=0;
         numUniq=0;
         //Long ptr = raf.getFilePointer();
@@ -341,6 +333,9 @@ public class Indexer {
             String value1 = line.substring(index1 + 1);
             //value1.concat(":").concat(String.valueOf(ptr));
             TermStats termStats = new TermStats(term1, value1);
+            if(value1.contains(",")&&term1.contains(" ")){
+                list_of_best_terms.add(termStats);
+            }
             //update pointer for next term
             //ptr = raf.getFilePointer();
             dic.add(termStats);
@@ -355,11 +350,13 @@ public class Indexer {
                     .append(System.lineSeparator());
         }
         String path = getPath("dic");
-        System.out.println(stringBuilder);
         firstFile.close();
         writeToFile(stringBuilder.toString(),path);
     }
 
+    public List<TermStats> GET_list_of_best_terms_by_id(){
+        return list_of_best_terms;
+    }
 
     void saveDocuments() throws Exception {
         StringBuilder stringBuilder = new StringBuilder();

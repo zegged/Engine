@@ -7,13 +7,13 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import com.medallia.word2vec.Word2VecModel;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.CoreDocument;
 import edu.stanford.nlp.pipeline.CoreSentence;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import javafx.util.Pair;
+import org.apache.commons.lang3.ObjectUtils;
 import org.tartarus.snowball.ext.PorterStemmer;
 
 import java.io.*;
@@ -43,7 +43,7 @@ public class Searcher {
 
     }
 
-    public Map<String, Double> runSingleQuery(String str) throws Exception {
+    public Map<Integer, Double> runSingleQuery(String str) throws Exception {
 
         if (true) {// stemming
             PorterStemmer stemmer = new PorterStemmer();
@@ -55,7 +55,7 @@ public class Searcher {
         TermSearch termSearch = getTerm(str);
         List<DocumentData> documentData = getDocStats(termSearch);
         Ranker ranker = new Ranker(termSearch, documentData);
-        Map<String, Double> map = ranker.get_all_ranked_document();
+        Map<Integer, Double> map = ranker.get_all_ranked_document();
         return map;
     }
 
@@ -66,8 +66,8 @@ public class Searcher {
         return sentences;
     }
 
-    public Map<String, Double> runQuery(String query) throws Exception {
-        Map<String, Double> fullMap = new HashMap<>();
+    public Map<Integer, Double> runQuery(String query) throws Exception {
+        Map<Integer, Double> fullMap = new HashMap<>();
         //parse query in NLP
         CoreDocument coreDocument = new CoreDocument(query);
         List<CoreSentence> sentences = breakSentences(query);
@@ -80,7 +80,7 @@ public class Searcher {
             //String ner = coreLabel.get(CoreAnnotations.NamedEntityTagAnnotation.class);
 
 
-            Map<String, Double> map = runSingleQuery(token);
+            Map<Integer, Double> map = runSingleQuery(token);
             //Semantics
 
             if (true) { //semantics
@@ -88,7 +88,7 @@ public class Searcher {
                 double alpha = 0.1;
                 List<Pair<String, Double>> pairs = semantic(token);
                 for (Pair<String, Double> stringDoublePair : pairs) {
-                    Map<String, Double> semanticMap = runSingleQuery(stringDoublePair.getKey());
+                    Map<Integer, Double> semanticMap = runSingleQuery(stringDoublePair.getKey());
 
                     //
                     semanticMap.replaceAll((k,v)->v=v*alpha);
@@ -112,15 +112,17 @@ public class Searcher {
         return fullMap;
     }
 
-    public void writeQueryResult(Map<String, Double> scores, Integer queryID) throws IOException {
+    public void writeQueryResult(Map<Integer, Double> scores, Integer queryID) throws IOException {
         boolean append = true;
-        FileWriter fw = new FileWriter("C:\\posting\\Qresults.txt", append);
+        FileWriter fw = new FileWriter("C:\\Users\\Razi\\Desktop\\ehzor\\posting\\yesStem\\Qresults.txt", append);
         BufferedWriter bw = null;
         bw = new BufferedWriter(fw);
 
-        for (Map.Entry<String, Double> entry : scores.entrySet()) {
+        for (Map.Entry<Integer, Double> entry : scores.entrySet()) {
             Double score = entry.getValue();
-            String docID = entry.getKey();
+            Integer doc = entry.getKey();
+            DocumentData documentData =   getDoc(doc);
+            String docID = documentData.strID;
             bw.write(queryID + " 0 " + docID + " " + score + " 0.0 mt \n");
         }
         bw.close();
@@ -187,8 +189,14 @@ public class Searcher {
         Integer numOFsentences = Integer.valueOf(stats[2]);
         Integer numofterms = Integer.valueOf(stats[3]);
         String strID = stats[4];
+        String list_of_best_terms=stats[5];
+        String[] str_list=list_of_best_terms.split("^");
+        List<String> list_of_best_terms2=new ArrayList<>();
+        for(String s:str_list){
+            list_of_best_terms2.add(s);
+        }
 
-        DocumentData documentData = new DocumentData(doc, mostPopularTerm, mostPopular_tf, numOFsentences, numofterms, strID);
+        DocumentData documentData = new DocumentData(doc, mostPopularTerm, mostPopular_tf, numOFsentences, numofterms, strID,list_of_best_terms2);
         return documentData;
     }
 
@@ -253,61 +261,62 @@ public class Searcher {
     }
 
 
-    public DocumentData searchDocument(int doc) throws Exception {
-
-        //System.out.println("searching for doc " + doc);
-
-        //String path1 = getPath("final");
-
-        String path1 = "C:\\posting\\documents.txt";
-
-        BufferedReader firstFile = new BufferedReader(new FileReader(path1));
-
-        List<TermStats> dic = new ArrayList<>();
-        String line;
-
-        //dicNumTerms=0;
-        //numUniq=0;
-
-
-        //skip 2?
-        //todo: fix to 1
-        line = firstFile.readLine();
-        line = firstFile.readLine();
-
-        while ((line = firstFile.readLine()) != null) {
-            Integer index1 = line.indexOf(':');
-            String doc1 = line.substring(0, index1);
-            if (doc1.equals(String.valueOf(doc))) {
-                String value1 = line.substring(index1 + 1);
-                //System.out.println("doc found");
-                //System.out.println(line);
-
-                //Integer intID, String mostPopularTerm, int mostPopular_tf,int numOFsentences,int numofterms
-                String[] stats = value1.split(":");
-
-                String mostPopularTerm = stats[0];
-                Integer mostPopular_tf = Integer.valueOf(stats[1]);
-                Integer numOFsentences = Integer.valueOf(stats[2]);
-                Integer numofterms = Integer.valueOf(stats[3]);
-                String strID = stats[4];
-
-                DocumentData documentData = new DocumentData(doc, mostPopularTerm, mostPopular_tf, numOFsentences, numofterms, strID);
-                return documentData;
-
-                //TermSearch termSearch = new TermSearch(term1, value1);
-
-
-                //return termSearch;
-            }
-//            TermStats termStats = new TermStats(term1, value1);
-//            dic.add(termStats);
-//            //dicNumTerms++;
-//            if (termStats.tf==1){
-//                numUniq++;
+//    public DocumentData searchDocument(int doc) throws Exception {
+//
+//        //System.out.println("searching for doc " + doc);
+//
+//        //String path1 = getPath("final");
+//
+//        String path1 = "C:\\posting\\documents.txt";
+//
+//        BufferedReader firstFile = new BufferedReader(new FileReader(path1));
+//
+//        List<TermStats> dic = new ArrayList<>();
+//        String line;
+//
+//        //dicNumTerms=0;
+//        //numUniq=0;
+//
+//
+//        //skip 2?
+//        //todo: fix to 1
+//        line = firstFile.readLine();
+//        line = firstFile.readLine();
+//
+//        while ((line = firstFile.readLine()) != null) {
+//            Integer index1 = line.indexOf(':');
+//            String doc1 = line.substring(0, index1);
+//            if (doc1.equals(String.valueOf(doc))) {
+//                String value1 = line.substring(index1 + 1);
+//                //System.out.println("doc found");
+//                //System.out.println(line);
+//
+//                //Integer intID, String mostPopularTerm, int mostPopular_tf,int numOFsentences,int numofterms
+//                String[] stats = value1.split(":");
+//
+//                String mostPopularTerm = stats[0];
+//                Integer mostPopular_tf = Integer.valueOf(stats[1]);
+//                Integer numOFsentences = Integer.valueOf(stats[2]);
+//                Integer numofterms = Integer.valueOf(stats[3]);
+//                String strID = stats[4];
+//                String list_of_best_terms = stats[5];
+//
+//                DocumentData documentData = new DocumentData(doc, mostPopularTerm, mostPopular_tf, numOFsentences, numofterms, strID);
+//                return documentData;
+//
+//                //TermSearch termSearch = new TermSearch(term1, value1);
+//
+//
+//                //return termSearch;
 //            }
-
-        }
+////            TermStats termStats = new TermStats(term1, value1);
+////            dic.add(termStats);
+////            //dicNumTerms++;
+////            if (termStats.tf==1){
+////                numUniq++;
+////            }
+//
+//        }
 //        StringBuilder stringBuilder = new StringBuilder();
 //        for (TermStats termStats : dic){
 //            stringBuilder.append(termStats).append(System.lineSeparator());
@@ -321,8 +330,9 @@ public class Searcher {
         ////////////TERM-NOT-FOUND///////////////////
         //  return new TermSearch("TERM-NOT-FOUND", "");
         //Integer intID, String mostPopularTerm, int mostPopular_tf,int numOFsentences,int numofterms
-        return new DocumentData(0, "", 0, 0, 0, "");
-    }
+        //return new DocumentData(0, "", 0, 0, 0, "");
+//    }
+//    }
 
 
     public void loadDictionary(String path1) throws IOException {
@@ -391,7 +401,7 @@ public class Searcher {
 
 
         for (IRQuery irQuery : fileDocs){
-            Map<String, Double> scores =  runQuery(irQuery.title);
+            Map<Integer, Double> scores =  runQuery(irQuery.title);
 
             //semantics
           //  List<Pair<String, Double>> pairs = semantic(irQuery.title);

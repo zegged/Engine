@@ -18,7 +18,7 @@ public class Ranker {
     public static int avgDoc = 200; //Average length of document in corpus.???????
     double avgdl; //average document length
     TermSearch term;
-    SortedMap<String, Double> all_doc_returns;
+    SortedMap<Integer, Double> all_doc_returns;
     List<DocumentData> list_of_all_relevant_doc;
     double tf = 0;
     double numberOfDocuments = 0;
@@ -32,7 +32,7 @@ public class Ranker {
         this.avgdl = avgdl;
         this.term = term;
         this.list_of_all_relevant_doc = list_of_all_relevant_doc;
-        this.all_doc_returns = new TreeMap<String, Double>();
+        this.all_doc_returns = new TreeMap<Integer, Double>();
     }
 
     public Map get_all_ranked_document() {
@@ -43,7 +43,7 @@ public class Ranker {
             this.averageDocumentLength = 200;
             this.documentFrequency = list_of_all_relevant_doc.size();
             double score = score(tf, numberOfDocuments, docLength, averageDocumentLength, 0, documentFrequency);
-            all_doc_returns.put(list_of_all_relevant_doc.get(i).strID, score);
+            all_doc_returns.put(list_of_all_relevant_doc.get(i).docID, score);
         }
         //sort the map - UPDATE: by string keys
         Map ascSortedMap = new TreeMap();
@@ -64,7 +64,6 @@ public class Ranker {
      * tf and docLength, and other preset parameters
      * הנוסחה של bm25
      */
-
     // check the best parameters
     private double k_1 = 2.0;//1.2d ???????????????????????????????
     private double k_3 = 8d;//parameter to check term frequency

@@ -784,6 +784,7 @@ public class Parse {
     int numofterms;
     String s = "";
     String docParsing="";
+    List<String> list_of_best_terms;
     static Map<String, String> Months = new HashMap<String, String>() {{
         put("january", "01");
         put("february", "02");
@@ -1143,6 +1144,7 @@ public class Parse {
         String mostPopularTerm = ""; //most popular term
         int mostPopular_tf = 0; //most popular term frequency
         int uniqueTermsInDocument; //amount of unique terms
+        list_of_best_terms=new ArrayList<>();
 
         // STANFORD NLP PARSE
         doc.text = doc.text.replaceAll("[\\(|;|'|:|\\^|\\)|\\]|\\[|\\#|\\]|\\+|\\*|\\@|!|?]", "");
@@ -1309,9 +1311,12 @@ public class Parse {
                             if (upper_words.equals("")) {
                                 upper_words = term;
                             } else {
-                                if(counter_terms<2){
+                                if(counter_terms<4){
                                     upper_words = upper_words + " " + term;
                                     documentTerms.add(upper_words);
+                                    if(counter_terms>1){
+                                        list_of_best_terms.add(upper_words);
+                                    }
                                     counter_terms++;
                                 }
                             }
@@ -1357,7 +1362,7 @@ public class Parse {
                 mostPopularTerm = (String) pair.getKey();
             }
         }
-        DocumentData documentData = new DocumentData(intID, mostPopularTerm, mostPopular_tf, numOFsentences, numUnique, doc.id);
+        DocumentData documentData = new DocumentData(intID, mostPopularTerm, mostPopular_tf, numOFsentences, numUnique, doc.id,list_of_best_terms);
         return new ParseResult(documentData, documentTerms);
 
     }

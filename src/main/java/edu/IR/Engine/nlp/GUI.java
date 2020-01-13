@@ -227,17 +227,21 @@ public class GUI extends Application {
         semantic.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(semantic, 1, 1);
 
+        CheckBox semantic2 = new CheckBox("with semantic API?");
+        semantic2.setStyle("-fx-font-weight: bold");
+        GridPane.setConstraints(semantic2, 1, 2);
+
         //3
         Label enter_query = new Label("Enter query:");
         enter_query.setStyle("-fx-font-weight: bold");
-        GridPane.setConstraints(enter_query, 0, 2);
+        GridPane.setConstraints(enter_query, 0, 3);
         loadInput2 = new TextField();
         loadInput2.setPromptText("search");
         loadInput2.setStyle("-fx-font-weight: bold");
-        GridPane.setConstraints(loadInput2, 1, 2);
+        GridPane.setConstraints(loadInput2, 1, 3);
         Button runQuery = new Button("Run");
         runQuery.setStyle("-fx-background-color: #4169E1");
-        GridPane.setConstraints(runQuery, 2, 2);
+        GridPane.setConstraints(runQuery, 2, 3);
         runQuery.setOnAction(e -> {
             try {
                 RunButton(loadInput2.getText());
@@ -250,18 +254,18 @@ public class GUI extends Application {
         //4
         Label enter_query2 = new Label("get file query:");
         enter_query2.setStyle("-fx-font-weight: bold");
-        GridPane.setConstraints(enter_query2, 0, 3);
+        GridPane.setConstraints(enter_query2, 0, 4);
         file_query_input = new TextField();
         file_query_input.setPromptText("file query input");
         file_query_input.setStyle("-fx-font-weight: bold");
-        GridPane.setConstraints(file_query_input, 1, 3);
+        GridPane.setConstraints(file_query_input, 1, 4);
         Button browseButton5 = new Button("browse");
         browseButton5.setStyle("-fx-font-weight: bold");
-        GridPane.setConstraints(browseButton5, 2, 3);
+        GridPane.setConstraints(browseButton5, 2, 4);
         browseButton5.setOnAction(e -> browserFile());
         Button runQuery2 = new Button("Run");
         runQuery2.setStyle("-fx-background-color: #4169E1");
-        GridPane.setConstraints(runQuery2, 3, 3);
+        GridPane.setConstraints(runQuery2, 3, 4);
         runQuery2.setOnAction(e -> {
             try {
                 RunButton2(file_query_input.getText());
@@ -272,15 +276,15 @@ public class GUI extends Application {
         runQuery.disableProperty().bind(Bindings.createBooleanBinding(() -> !((file_query_input.getText() != null)), file_query_input.textProperty()));
 
         //5
-        Label get5label = new Label("get 5 queries if you want");
+        Label get5label = new Label("get 5 queries ");
         get5label.setStyle("-fx-font-weight: bold");
-        GridPane.setConstraints(get5label, 0, 4);
-        choiceBox=new ChoiceBox<>();
-        GridPane.setConstraints(choiceBox, 1, 4);
+        GridPane.setConstraints(get5label, 0, 5);
+        choiceBox = new ChoiceBox<>();
+        GridPane.setConstraints(choiceBox, 1, 5);
         choiceBox.setValue("5terms");//????
         Button get5 = new Button("GET 5");
         get5.setStyle("-fx-font-weight: bold");
-        GridPane.setConstraints(get5, 2, 4);
+        GridPane.setConstraints(get5, 2, 5);
         get5.setOnAction(e -> {
             try {
                 get5Function(choiceBox);
@@ -292,33 +296,32 @@ public class GUI extends Application {
         //6
         Label enter_save_file = new Label("The path to save file");
         enter_save_file.setStyle("-fx-font-weight: bold");
-        GridPane.setConstraints(enter_save_file, 0, 5);
+        GridPane.setConstraints(enter_save_file, 0, 6);
         loadInput3 = new TextField();
         loadInput3.setPromptText("file");
         loadInput3.setStyle("-fx-font-weight: bold");
-        GridPane.setConstraints(loadInput3, 1, 5);
+        GridPane.setConstraints(loadInput3, 1, 6);
         Button browseButton6 = new Button("browse");
         browseButton6.setStyle("-fx-font-weight: bold");
-        GridPane.setConstraints(browseButton6, 2, 5);
+        GridPane.setConstraints(browseButton6, 2, 6);
         browseButton6.setOnAction(e -> browser());
         Button saveQuery = new Button("Save");
         saveQuery.setStyle("-fx-font-weight: bold");
-        GridPane.setConstraints(saveQuery, 3, 5);
+        GridPane.setConstraints(saveQuery, 3, 6);
 
         Button go_back_Scene = new Button("Go back !");
         go_back_Scene.setStyle("-fx-background-color: #DC143C");
         go_back_Scene.setOnAction(event -> window.setScene(scene));
-        GridPane.setConstraints(go_back_Scene, 1, 6);
+        GridPane.setConstraints(go_back_Scene, 1, 7);
 
 
-        grid2.getChildren().addAll(choiceBox,go_back_Scene, iv2, labelStart, semantic, enter_query, loadInput2, runQuery,
+        grid2.getChildren().addAll(semantic2, choiceBox, go_back_Scene, iv2, labelStart, semantic, enter_query, loadInput2, runQuery,
                 enter_query2, file_query_input, browseButton5, runQuery2, get5, enter_save_file, loadInput3, browseButton6, get5label, saveQuery);
 
         //Add everything to grid
         grid.getChildren().addAll(corpusLabel, corpusInput, postingLabel, postingInput, browseButton, startButton
                 , stemmerCheck, stemmLabel, resetButton, resetLabel,
-                loadButton, loadLabel, browseButton2, dictionaryDisplayButton, displayDictionaryLabel, browseButton4,loadInput, iv, changeScene);
-
+                loadButton, loadLabel, browseButton2, dictionaryDisplayButton, displayDictionaryLabel, browseButton4, loadInput, iv, changeScene);
 
         grid.setStyle("-fx-background-color: #5F9EA0;");
         grid2.setStyle("-fx-background-color: #5F9EA0;");
@@ -469,14 +472,11 @@ public class GUI extends Application {
         for (int i = 0; i < dict.size(); i++) {
             termsDictionary.add(dict.get(i));
         }
-
         dictionary.setItems(termsDictionary);
-
         VBox vBox = new VBox();
         vBox.getChildren().addAll(dictionary);
         Scene dictionaryScene = new Scene(vBox);
         Stage dicwindow = new Stage();
-
         //Block events to other windows
         dicwindow.initModality(Modality.APPLICATION_MODAL);
         dicwindow.setTitle("THE DICTIONARY");
@@ -485,12 +485,11 @@ public class GUI extends Application {
         dicwindow.show();
     }
 
-
     public void loadFiles(String pathToPosting, boolean selected) throws IOException {
-        if(!pathToPosting.equals("")){
+        if (!pathToPosting.equals("")) {
             searcher = new Searcher();
             String path1 = "";
-            String path2="";
+            String path2 = "";
             if (selected) {
                 path1 = pathToPosting + "\\yesStem\\post.txt";
                 path2 = pathToPosting + "\\yesStem\\documents.txt";
@@ -501,7 +500,7 @@ public class GUI extends Application {
             }
             searcher.loadDictionary(path1);
             searcher.loadDocuments(path2);
-        }else{
+        } else {
             AlertBox.display("Load", "Enter path to load Dictionary ");
         }
     }
@@ -543,7 +542,6 @@ public class GUI extends Application {
             postingInput.setText(s);
             pathToPosting = s + "\\";
         } catch (Exception e) {
-
         }
     }
 
@@ -585,16 +583,19 @@ public class GUI extends Application {
             if (file3.exists())
                 file3.delete();
 
-            deleteDirectory(noStem);
-            deleteDirectory(yesStem);
+            deleteDirectory(noStem, yesStem);
             AlertBox.display("Reset", "The dictionary and the posting file are deleted ");
         }
     }
 
-    private static void deleteDirectory(String filePath) {
+    private static void deleteDirectory(String filePath, String filePath2) {
         File file = new File(filePath);
-        if (file.isDirectory()) {
+        File file2 = new File(filePath2);
+        if (file.isDirectory() && file2.isDirectory()) {
             file.delete();
+            file2.delete();
+        } else {
+            AlertBox.display("Reset", "You already deleted the file ");
         }
     }
 
@@ -604,15 +605,17 @@ public class GUI extends Application {
     public void RunButton(String s1) throws Exception {
         if (s1 != null) {
             AlertBox.display("Program Information", "the query you are serching is : " + s1);
-//            Searcher searcher = new Searcher();
-//            searcher.loadDictionary();
-//            searcher.loadDocuments();
             String term = s1;
-            Map<String, Double> scores = searcher.runQuery(term);
+            Map<Integer, Double> scores = searcher.runQuery(term);
+            for (Map.Entry<Integer, Double> pair : scores.entrySet()) {
+                Integer docID = pair.getKey();
+                Double scoreSingle = pair.getValue();
+                DocumentData documentData = searcher.getDoc(docID);
+                String docStr = documentData.strID;
+                choiceBox.getItems().add(docStr);
+                List<String> list = documentData.list_of_best_terms;
+            }
             searcher.writeQueryResult(scores, 0);
-            choiceBox.getItems().add("Doc1");
-            choiceBox.getItems().add("Doc2");
-            choiceBox.getItems().add("Doc3");
         } else {// the fields are missing
             //change scene to alert and back to the main window to let write again
             AlertBox.display("Missing Input", "Error: no query had been written!");
@@ -620,17 +623,14 @@ public class GUI extends Application {
     }
 
     public void RunButton2(String path) throws Exception {
-//        Searcher searcher = new Searcher();
-//        searcher.loadDictionary();
-//        searcher.loadDocuments();
         searcher.runFileQueries(path);
         choiceBox.getItems().add("Doc1");
         choiceBox.getItems().add("Doc2");
         choiceBox.getItems().add("Doc3");
     }
 
-    public void get5Function(ChoiceBox<String> choiceBox){
-        String doc=choiceBox.getValue();
+    public void get5Function(ChoiceBox<String> choiceBox) {
+        String doc = choiceBox.getValue();
         System.out.println(doc);
         VBox vBox = new VBox();
         Scene dictionaryScene = new Scene(vBox);
