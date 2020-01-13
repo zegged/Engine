@@ -190,7 +190,7 @@ public class Searcher {
         Integer numofterms = Integer.valueOf(stats[3]);
         String strID = stats[4];
         String list_of_best_terms=stats[5];
-        String[] str_list=list_of_best_terms.split("^");
+        String[] str_list=list_of_best_terms.split("\\^");
         List<String> list_of_best_terms2=new ArrayList<>();
         for(String s:str_list){
             list_of_best_terms2.add(s);

@@ -599,6 +599,7 @@ public class GUI extends Application {
         }
     }
 
+    HashMap<String,DocumentData> documentData_map=new HashMap<>();
     /**
      * @param s1: the qury we searching
      */
@@ -612,8 +613,9 @@ public class GUI extends Application {
                 Double scoreSingle = pair.getValue();
                 DocumentData documentData = searcher.getDoc(docID);
                 String docStr = documentData.strID;
+                documentData_map.put(docStr,documentData);
                 choiceBox.getItems().add(docStr);
-                List<String> list = documentData.list_of_best_terms;
+                //List<String> list = documentData.list_of_best_terms;
             }
             searcher.writeQueryResult(scores, 0);
         } else {// the fields are missing
@@ -630,9 +632,16 @@ public class GUI extends Application {
     }
 
     public void get5Function(ChoiceBox<String> choiceBox) {
-        String doc = choiceBox.getValue();
-        System.out.println(doc);
+
+        String docStr = choiceBox.getValue();
+        System.out.println(docStr);
+        List<String> list_of_best_terms=documentData_map.get(docStr).list_of_best_terms;
+        System.out.println(list_of_best_terms);
         VBox vBox = new VBox();
+        for(int i=0;i<list_of_best_terms.size();i++){
+            TermSearch termSearch = searcher.getTerm(list_of_best_terms.get(i));
+            vBox.getChildren().addAll(new Label(list_of_best_terms.get(i)+"idf: "+termSearch.df));
+        }
         Scene dictionaryScene = new Scene(vBox);
         Stage dicwindow = new Stage();
         //Block events to other windows
