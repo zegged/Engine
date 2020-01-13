@@ -106,7 +106,7 @@ public class Searcher {
                 DatamuseQuery datamuseQuery = new DatamuseQuery();
                 String similar =  datamuseQuery.findSimilar(token);
                 //System.out.println(similar);
-                if (similar.length()==0){
+                if (similar.compareTo("[]")==0){
                     break;
                 }
                 JSONParse jsonParse = new JSONParse();
