@@ -94,12 +94,12 @@ public class Searcher {
             }
             if (semantics) { //semantics
 
-                double alpha = 0.1;
+                double alpha = 0.5;
                 List<Pair<String, Double>> pairs = semantic(token);
                 for (Pair<String, Double> stringDoublePair : pairs) {
                     Map<Integer, Double> semanticMap = runSingleQuery(stringDoublePair.getKey(),stemming);
                     //TODO: mult double w/ score
-                    semanticMap.replaceAll((k,v)->v=v*alpha);
+                    semanticMap.replaceAll((k,v)->v=v*alpha*stringDoublePair.getValue());
                     semanticMap.forEach((k, v) -> map.merge(k, v, (v1, v2) -> v1 + v2));
                 }
 
@@ -108,7 +108,7 @@ public class Searcher {
             if (semanticsAPI){// semantics API
                 // TODO: ad  semanticsAPI boolean
                 //String term = "pistol pack";
-                double beta = 0.1;
+                double beta = 0.5;
                 DatamuseQuery datamuseQuery = new DatamuseQuery();
                 String similar =  datamuseQuery.findSimilar(token);
                 //System.out.println(similar);
@@ -116,13 +116,15 @@ public class Searcher {
                     break;
                 }
                 JSONParse jsonParse = new JSONParse();
-//                int[] scores =  jsonParse.parseScores(similar);
+                int[] scores =  jsonParse.parseScores(similar); //???????????????????????????????????????????????????????
                 String[] words = jsonParse.parseWords(similar);
-
+                int cnt=0;
                 for (String word:words){
                     Map<Integer, Double> semanticMap = runSingleQuery(word,stemming);
-                    semanticMap.replaceAll((k,v)->v=v*beta);
+                    int finalCnt = cnt;
+                    semanticMap.replaceAll((k, v)->v=v*beta*scores[finalCnt]);
                     semanticMap.forEach((k, v) -> map.merge(k, v, (v1, v2) -> v1 + v2));
+                    cnt++;
                 }
             }
 

@@ -1147,6 +1147,7 @@ public class Parse {
         list_of_best_terms=new ArrayList<>();
 
         // STANFORD NLP PARSE
+
         doc.text = doc.text.replaceAll("[\\(|;|'|:|\\^|\\)|\\]|\\[|\\#|\\]|\\+|\\*|\\@|!|?]", "");
         doc.text = doc.text.replaceAll("-{2,}", "");
         docParsing=doc.text;
@@ -1304,7 +1305,6 @@ public class Parse {
                             Flag = true;
                         }
                     }
-
                     //upper case
                     if (term.matches("[a-zA-Z]+")) {
                         if (Character.isUpperCase(term.charAt(0)) && !(Months.containsKey(term.toLowerCase()))) {
@@ -1321,13 +1321,12 @@ public class Parse {
                                 }
                             }
                         } else {
-                            if (upper_words.equals("")) {
-                                continue;
-                            } else {
+//                            if (upper_words.equals("")) {
+//                                continue;
+//                            } else {
                                 documentTerms.add(upper_words);
                                 upper_words = "";
-                                numOFsentences++;
-                            }
+                            //}
                         }
                     }
                     if (Flag == false) {
