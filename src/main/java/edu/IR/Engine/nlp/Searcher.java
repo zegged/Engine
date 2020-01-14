@@ -13,7 +13,6 @@ import edu.stanford.nlp.pipeline.CoreDocument;
 import edu.stanford.nlp.pipeline.CoreSentence;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import javafx.util.Pair;
-import org.apache.commons.lang3.ObjectUtils;
 import org.tartarus.snowball.ext.PorterStemmer;
 
 import java.io.*;
@@ -52,6 +51,8 @@ public class Searcher {
             str = stemmer.getCurrent();//get the stemmed word
         }
 
+
+
         //TODO: uppercase/lowercase Malvina
         TermSearch termSearch = getTerm(str);
         List<DocumentData> documentData = getDocStats(termSearch);
@@ -67,7 +68,7 @@ public class Searcher {
         return sentences;
     }
 
-    public Map<Integer, Double> runQuery(String query,boolean stemming ,boolean semantics) throws Exception {
+    public Map<Integer, Double> runQuery(String query,boolean stemming ,boolean semantics,boolean semanticsAPI) throws Exception {
         // TODO: blood-alcohol fatalities
         Map<Integer, Double> fullMap = new HashMap<>();
         //parse query in NLP
@@ -84,14 +85,19 @@ public class Searcher {
 
             Map<Integer, Double> map = runSingleQuery(token,stemming);
             //Semantics
-
+            //upper-lowercase
+            if (true){
+                Map<Integer, Double> mapCaseLower = runSingleQuery(token.toLowerCase(),stemming);
+                mapCaseLower.forEach((k, v) -> map.merge(k, v, (v1, v2) -> v1 + v2));
+                Map<Integer, Double> mapCaseUpper = runSingleQuery(token.toUpperCase(),stemming);
+                mapCaseUpper.forEach((k, v) -> map.merge(k, v, (v1, v2) -> v1 + v2));
+            }
             if (semantics) { //semantics
 
                 double alpha = 0.1;
                 List<Pair<String, Double>> pairs = semantic(token);
                 for (Pair<String, Double> stringDoublePair : pairs) {
                     Map<Integer, Double> semanticMap = runSingleQuery(stringDoublePair.getKey(),stemming);
-
                     //TODO: mult double w/ score
                     semanticMap.replaceAll((k,v)->v=v*alpha);
                     semanticMap.forEach((k, v) -> map.merge(k, v, (v1, v2) -> v1 + v2));
@@ -99,7 +105,7 @@ public class Searcher {
 
             }
 
-            if (true){// semantics API
+            if (semanticsAPI){// semantics API
                 // TODO: ad  semanticsAPI boolean
                 //String term = "pistol pack";
                 double beta = 0.1;
@@ -110,7 +116,7 @@ public class Searcher {
                     break;
                 }
                 JSONParse jsonParse = new JSONParse();
-                int[] scores =  jsonParse.parseScores(similar);
+//                int[] scores =  jsonParse.parseScores(similar);
                 String[] words = jsonParse.parseWords(similar);
 
                 for (String word:words){
@@ -118,8 +124,6 @@ public class Searcher {
                     semanticMap.replaceAll((k,v)->v=v*beta);
                     semanticMap.forEach((k, v) -> map.merge(k, v, (v1, v2) -> v1 + v2));
                 }
-
-
             }
 
             //merge results (same doc)
@@ -160,9 +164,11 @@ public class Searcher {
         return top50;
     }
 
-    public void writeQueryResult(Map<Integer, Double> scores, Integer queryID) throws IOException {
+    public void writeQueryResult(Map<Integer, Double> scores, Integer queryID,String path) throws IOException {
         boolean append = true;
-        FileWriter fw = new FileWriter("C:\\posting\\yesStem\\Qresults.txt", append);
+        //FileWriter fw = new FileWriter("C:\\Users\\Razi\\Desktop\\ehzor\\posting\\yesStem\\Qresults.txt", append);
+        path=path+"\\Qresults.txt";
+        FileWriter fw = new FileWriter(path, append);
         BufferedWriter bw = null;
         bw = new BufferedWriter(fw);
 
@@ -437,7 +443,7 @@ public class Searcher {
         System.out.println("Documents loaded");
     }
 
-    public void runFileQueries(String path1,boolean stemming,boolean semantics) throws Exception {
+    public List<Pair<Integer,Map<Integer, Double>>> runFileQueries(String path1,boolean stemming,boolean semantics,boolean semanticsAPI) throws Exception {
 //        String path1 = "d:\\documents\\users\\razyal\\Documents\\posting\\yesStem\\queries.txt";
 
         ReadFile readFile = new ReadFile();
@@ -455,16 +461,24 @@ public class Searcher {
 
 
         IRQuery[] fileDocs = readFile.parseQueryFile(text);
+        HashMap<Integer,Double> result=new HashMap<>();
 
-
+        List<Pair<Integer,Map<Integer, Double>>> result2=new ArrayList<>();
+        int i=0;
         for (IRQuery irQuery : fileDocs){
-            Map<Integer, Double> scores =  runQuery(irQuery.title,stemming,semantics);
-
+            Map<Integer, Double> scores =  runQuery(irQuery.title,stemming,semantics,semanticsAPI);
             //semantics
           //  List<Pair<String, Double>> pairs = semantic(irQuery.title);
-
-            writeQueryResult(scores, irQuery.id);
+            writeQueryResult(scores, irQuery.id,"C:\\Users\\Razi\\Desktop\\ehzor\\posting\\yesStem");
+            for (Map.Entry<Integer, Double> entry : scores.entrySet()) {
+                Double score = entry.getValue();
+                Integer doc = entry.getKey();
+                Map<Integer, Double> m = new HashMap<>();
+                m.put(doc,score);
+                result2.add(new Pair<>(irQuery.id,m));
+            }
         }
+        return result2;
     }
 
     public List<Pair<String, Double>> semantic(String term) {

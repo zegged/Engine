@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import javafx.scene.layout.Background;
+import javafx.util.Pair;
 import org.joda.time.field.FieldUtils;
 
 import static java.nio.file.Files.deleteIfExists;
@@ -244,7 +245,7 @@ public class GUI extends Application {
         GridPane.setConstraints(runQuery, 2, 3);
         runQuery.setOnAction(e -> {
             try {
-                RunButton(loadInput2.getText(),semantic.isSelected());
+                RunButton(loadInput2.getText(), semantic.isSelected(),semantic2.isSelected());
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
@@ -267,7 +268,7 @@ public class GUI extends Application {
         GridPane.setConstraints(runQuery2, 3, 4);
         runQuery2.setOnAction(e -> {
             try {
-                RunButton2(file_query_input.getText(),semantic.isSelected());
+                RunButton2(file_query_input.getText(), semantic.isSelected(),semantic2.isSelected());
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
@@ -303,10 +304,18 @@ public class GUI extends Application {
         Button browseButton6 = new Button("browse");
         browseButton6.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(browseButton6, 2, 6);
-        browseButton6.setOnAction(e -> browser());
+        browseButton6.setOnAction(e -> browserSave());
         Button saveQuery = new Button("Save");
         saveQuery.setStyle("-fx-font-weight: bold");
         GridPane.setConstraints(saveQuery, 3, 6);
+        saveQuery.setOnAction(e -> {
+            try {
+                savingFile(pathToSave);
+            } catch (Exception eIo) {
+                eIo.printStackTrace();
+            }
+
+        });
 
         Button go_back_Scene = new Button("Go back !");
         go_back_Scene.setStyle("-fx-background-color: #DC143C");
@@ -554,6 +563,16 @@ public class GUI extends Application {
         pathToLoad = s;
     }
 
+    public void browserSave() {
+
+        DirectoryChooser dc = new DirectoryChooser();
+        dc.setInitialDirectory((new File("C:\\")));
+        File selectedFile = dc.showDialog(null);
+        s = selectedFile.getAbsolutePath();
+        loadInput3.setText(s);
+        pathToSave = s;
+    }
+
     public void deleteReset() throws IOException {
 
         if (pathToPosting.equals("")) {
@@ -582,31 +601,34 @@ public class GUI extends Application {
             if (file3.exists())
                 file3.delete();
 
-            deleteDirectory(noStem, yesStem);
+            deleteDirectory(noStem);
+            deleteDirectory(yesStem);
             AlertBox.display("Reset", "The dictionary and the posting file are deleted ");
         }
     }
 
-    private static void deleteDirectory(String filePath, String filePath2) {
+    private static void deleteDirectory(String filePath) {
         File file = new File(filePath);
-        File file2 = new File(filePath2);
-        if (file.isDirectory() && file2.isDirectory()) {
+        if (file.isDirectory()) {
             file.delete();
-            file2.delete();
         } else {
             AlertBox.display("Reset", "You already deleted the file ");
         }
     }
 
-    HashMap<String,DocumentData> documentData_map=new HashMap<>();
+    HashMap<String, DocumentData> documentData_map = new HashMap<>();
+    Map<Integer, Double> scores=new HashMap<>();
+    int running=0;
+
     /**
      * @param s1: the qury we searching
      */
-    public void RunButton(String s1,boolean semantic) throws Exception {
+    public void RunButton(String s1, boolean semantic,boolean semanticsAPI) throws Exception {
+        running=1;
         if (s1 != null) {
             AlertBox.display("Program Information", "the query you are serching is : " + s1);
             String term = s1;
-            Map<Integer, Double> scores = searcher.runQuery(term,doStemming,semantic);
+            scores = searcher.runQuery(term, doStemming, semantic,semanticsAPI);
             int counter = 50;
             for (Map.Entry<Integer, Double> pair : scores.entrySet()) {
                 counter--;
@@ -614,36 +636,90 @@ public class GUI extends Application {
                 Double scoreSingle = pair.getValue();
                 DocumentData documentData = searcher.getDoc(docID);
                 String docStr = documentData.strID;
-                documentData_map.put(docStr,documentData);
+                documentData_map.put(docStr, documentData);
                 choiceBox.getItems().add(docStr);
                 //List<String> list = documentData.list_of_best_terms;
-                if (counter == 0){
+                if (counter == 0) {
                     break;
                 }
             }
-            searcher.writeQueryResult(scores, 0);
+            //searcher.writeQueryResult(scores, 0);
         } else {// the fields are missing
             //change scene to alert and back to the main window to let write again
             AlertBox.display("Missing Input", "Error: no query had been written!");
         }
     }
+    List<Pair<Integer,Map<Integer, Double>>> result2=new ArrayList<>();
 
-    public void RunButton2(String path,boolean semantic) throws Exception {
-        searcher.runFileQueries(path,doStemming,semantic);
-        choiceBox.getItems().add("Doc1");
-        choiceBox.getItems().add("Doc2");
-        choiceBox.getItems().add("Doc3");
+    public void RunButton2(String path, boolean semantic,boolean semanticsAPI) throws Exception {
+        running=2;
+        result2 = searcher.runFileQueries(path, doStemming, semantic,semanticsAPI);
+        for(int i=0;i<result2.size();i++){
+            for (Map.Entry<Integer, Double> pair : result2.get(i).getValue().entrySet()) {
+                Integer docID = pair.getKey();
+                Double scoreSingle = pair.getValue();
+                scores.put(docID,scoreSingle);
+                DocumentData documentData = searcher.getDoc(docID);
+                String docStr = documentData.strID;
+                documentData_map.put(docStr, documentData);
+                choiceBox.getItems().add(docStr);
+                //List<String> list = documentData.list_of_best_terms;
+            }
+
+        }
+        System.out.println("finshed");
+//        choiceBox.getItems().add("Doc1");
+//        choiceBox.getItems().add("Doc2");
+//        choiceBox.getItems().add("Doc3");
+
+//        if (path != null) {
+////            AlertBox.display("Program Information", "the query you are serching is : " + s1);
+//            HashMap<Integer,Map<Integer, Double>> map=searcher.runFileQueries(path,doStemming,semantic);
+//            int counter = 50;
+//            for (Map.Entry<Integer,Map<Integer, Double>> pair : map.entrySet()) {
+//                counter--;
+//                Integer docID = pair.getKey();
+//                Map<Integer, Double> scores = pair.getValue();
+//                for (Map.Entry<Integer, Double> pair2 : scores.entrySet()) {
+//                    counter--;
+//                    Integer docID2 = pair2.getKey();
+//                    Double scoreSingle = pair2.getValue();
+//                    DocumentData documentData = searcher.getDoc(docID2);
+//                    String docStr = documentData.strID;
+//                    documentData_map.put(docStr,documentData);
+//                    choiceBox.getItems().add(docStr);
+//                    //List<String> list = documentData.list_of_best_terms;
+//                    if (counter == 0){
+//                        break;
+//                    }
+//                }
+//
+////                DocumentData documentData = searcher.getDoc(docID);
+////                String docStr = documentData.strID;
+////                documentData_map.put(docStr,documentData);
+////                choiceBox.getItems().add(docStr);
+////                //List<String> list = documentData.list_of_best_terms;
+////                if (counter == 0){
+////                    break;
+////                }
+//            }
+//            //searcher.writeQueryResult(scoreSingle, 0);
+//        } else {// the fields are missing
+//            //change scene to alert and back to the main window to let write again
+//            AlertBox.display("Missing Input", "Error: no query had been written!");
+//        }
+//        System.out.println("finshed");
     }
 
     public void get5Function(ChoiceBox<String> choiceBox) {
         String docStr = choiceBox.getValue();
         System.out.println(docStr);
-        List<String> list_of_best_terms=documentData_map.get(docStr).list_of_best_terms;
+        List<String> list_of_best_terms = documentData_map.get(docStr).list_of_best_terms;
         System.out.println(list_of_best_terms);
         VBox vBox = new VBox();
-        for(int i=0;i<list_of_best_terms.size();i++){
+        for (int i = 0; i < list_of_best_terms.size(); i++) {
             TermSearch termSearch = searcher.getTerm(list_of_best_terms.get(i));
-            vBox.getChildren().addAll(new Label(list_of_best_terms.get(i)+"idf: "+termSearch.df));
+            vBox.getChildren().addAll(new Label(list_of_best_terms.get(i) + "idf: " + termSearch.df));
         }
         Scene dictionaryScene = new Scene(vBox);
         Stage dicwindow = new Stage();
@@ -655,6 +731,21 @@ public class GUI extends Application {
         dicwindow.show();
     }
 
+    public void savingFile(String path) {
+        try {
+            if(running==2){
+                for(int i=0;i<result2.size();i++){
+                    searcher.writeQueryResult(result2.get(i).getValue(), result2.get(i).getKey(), path);
+                }
+            }else{
+                searcher.writeQueryResult(scores, 0, path);
+            }
+
+            AlertBox.display("saving","The result saved");
+        } catch (Exception e) {
+            AlertBox.display("Error","Error");
+        }
+    }
     public void finishData() {//present all of the Data that is needed aout the program
         AlertBox.display("Program Information",
                 "time of running:" + totalTime + "\n" +
