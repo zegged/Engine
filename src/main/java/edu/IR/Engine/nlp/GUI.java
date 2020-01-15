@@ -442,7 +442,7 @@ public class GUI extends Application {
         SortedSet<String> sortedKeys;
         ObservableList<String> termsDictionary = FXCollections.observableArrayList();
         List<String> dict;
-        indexer.createDictionary();
+        //indexer.createDictionary(); TODO:can i commemt this?
         if (indexer != null) {
             dict = indexer.lastDictionaryToView;//change to public for dictionary in indexer
 //            sortedKeys = new TreeSet<>(dict.keySet());
@@ -501,14 +501,14 @@ public class GUI extends Application {
             String path1 = "";
             String path2 = "";
             if (selected) {
-                path1 = pathToPosting + "\\yesStem\\post.txt";
+                path1 = pathToPosting + "\\yesStem\\dictionary.txt";
                 path2 = pathToPosting + "\\yesStem\\documents.txt";
 
             } else {
-                path1 = pathToPosting + "\\noStem\\post.txt";
+                path1 = pathToPosting + "\\noStem\\dictionary.txt";
                 path2 = pathToPosting + "\\noStem\\documents.txt";
             }
-            searcher.loadDictionary(path1);
+            searcher.loadDictionaryPtr(path1);
             searcher.loadDocuments(path2);
         } else {
             AlertBox.display("Load", "Enter path to load Dictionary ");

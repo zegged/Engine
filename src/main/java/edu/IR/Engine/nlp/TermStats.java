@@ -12,14 +12,18 @@ public class TermStats {
     Integer tf;
     Integer df;
     //String value;
+    Long ptrStart;
+    Long length;
 
 
 
-    public TermStats(String term, String value){
+    public TermStats(String term, String value, Long start, Long length){
         this.term=term;
         this.df=0;
         this.tf=0;
         //this.value=value;
+        this.ptrStart = start;
+        this.length = length;
 
         //String[] ans = value.split("^(\\[)||$(\\])||( \\d[->]\\d )");
         List<TermData> termData = parse(value);
@@ -61,7 +65,7 @@ public class TermStats {
 
     public String toString() {
 
-        return term + "|tf:"+tf+"|df:"+df;
+        return term + ":|tf:"+tf+"|df:"+df  +":"+ ptrStart.toString() +":" + length.toString();
     }
 }
 

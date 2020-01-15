@@ -22,6 +22,7 @@ public class Searcher {
 
     StanfordCoreNLP stanfordCoreNLP;
     Map<String, String> mapTerms;
+    Map<String, Pair<Long,Long>> mapTermsPtr;
     Map<Integer, String> mapDocs;
     List<DocumentData> documentDataList;
     Map<String, String> mapClickstream;
@@ -31,6 +32,7 @@ public class Searcher {
         mapDocs = new HashMap<>();
         stanfordCoreNLP = Pipeline.getPipeline();
         mapClickstream = new HashMap<>();
+        mapTermsPtr = new HashMap<>();
     }
 
 
@@ -56,7 +58,7 @@ public class Searcher {
 
 
         //TODO: uppercase/lowercase Malvina
-        TermSearch termSearch = getTerm(str);
+        TermSearch termSearch = getTermPtr(str);
         List<DocumentData> documentData = getDocStats(termSearch);
         Ranker ranker = new Ranker(termSearch, documentData);
         Map<Integer, Double> map = ranker.get_all_ranked_document();
@@ -268,6 +270,31 @@ public class Searcher {
     }
 
 
+
+    public TermSearch getTermPtr(String term) throws IOException {
+
+        if (mapTermsPtr.containsKey(term)) {
+            Pair <Long,Long> pointers = mapTermsPtr.get(term);
+            Long start = pointers.getKey();
+            Long length = pointers.getValue();
+
+
+            String path = "c:\\posting\\noStem\\post.txt"; //TODO: FIX
+            RandomAccessFile raf = new RandomAccessFile(path, "r");
+            raf.seek(start);
+            String line = raf.readLine();
+            //System.out.println(value);
+
+            Integer index1 = line.indexOf(':');
+            String term1 = line.substring(0, index1);
+            String value1 = line.substring(index1 + 1);
+
+            return new TermSearch(term, value1);
+        }
+
+        return new TermSearch("TERM-NOT-FOUND", "");
+    }
+
     public TermSearch getTerm(String term) {
 
         if (mapTerms.containsKey(term)) {
@@ -402,6 +429,35 @@ public class Searcher {
 //    }
 
 
+    public void loadDictionaryPtr(String path1) throws IOException {
+        mapTermsPtr.clear();
+        //String path1 = getPath("final");
+        //String path1 = "d:\\documents\\users\\razyal\\Documents\\posting\\yesStem\\post.txt";
+        FileReader fileReader = new FileReader(path1);
+        BufferedReader firstFile = new BufferedReader(fileReader);
+
+        String line;
+        while ((line = firstFile.readLine()) != null) {
+//            System.out.println(line);
+            Integer index1 = line.indexOf(':');
+            if (index1<0){
+                break;
+            }
+            String term1 = line.substring(0, index1);
+            String value1 = line.substring(index1 + 1);
+
+            String[] args = value1.split(":");
+            Long start = Long.valueOf(args[args.length-2]);
+            Long length = Long.valueOf(args[args.length-1]);
+
+            mapTermsPtr.put(term1, new Pair<>(start,length));
+        }
+        firstFile.close();
+        fileReader.close();
+        System.out.println("Dictionary ptr loaded");
+
+
+    }
     public void loadDictionary(String path1) throws IOException {
 mapTerms.clear();
         //String path1 = getPath("final");
@@ -411,6 +467,7 @@ mapTerms.clear();
 
         String line;
         while ((line = firstFile.readLine()) != null) {
+            System.out.println(line);
             Integer index1 = line.indexOf(':');
             if (index1<0){
                 break;

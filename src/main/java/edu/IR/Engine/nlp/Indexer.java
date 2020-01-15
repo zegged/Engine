@@ -310,11 +310,14 @@ public class Indexer {
 
         String path1 = getPath("final");
 
-        //String path1 = "C:\\posting\\yesStem\\post.txt";
+//        String path1 = "C:\\posting\\noStem\\post.txt";
         FileReader fileReader = new FileReader(path1);
         BufferedReader firstFile = new BufferedReader(fileReader);
+
+
+        //pointers
         //File file = new File(path1);
-        //RandomAccessFile raf = new RandomAccessFile(file, "w");
+        //RandomAccessFile raf = new RandomAccessFile(file, "r");
         //raf.seek(start);
         //String line = raf.readLine();
         //Long plStart = raf.getFilePointer();
@@ -328,16 +331,24 @@ public class Indexer {
         numUniq=0;
         //Long ptr = raf.getFilePointer();
         //Long ptr = fileReader
+        Long ptr= Long.valueOf(0);
         while ( (line= firstFile.readLine() )!=null) {
+        //while ( (line= raf.readLine() )!=null) {
             Integer index1 = line.indexOf(':');
             String term1 = line.substring(0, index1);
             String value1 = line.substring(index1 + 1);
-           // System.out.println(line);
+            System.out.println(line);
 //            if (term1.compareTo("year")==0){
 //                System.out.println(line);
 //            }
             //value1.concat(":").concat(String.valueOf(ptr));
-            TermStats termStats = new TermStats(term1, value1);
+            //ptr+=line.
+
+            Long length = Long.valueOf(line.length()+2);
+            TermStats termStats = new TermStats(term1, value1, ptr, length);
+
+            ptr+= length;
+
             if(value1.contains(",")&&term1.contains(" ")){
                 list_of_best_terms.add(termStats);
             }
@@ -382,6 +393,7 @@ public class Indexer {
     }
 
     void saveDocuments() throws Exception {
+        System.out.println("saving documents file");
         String path = getPath("doc");
         try {
             FileWriter writer = new FileWriter(path);
