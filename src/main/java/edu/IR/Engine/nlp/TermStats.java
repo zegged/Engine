@@ -11,7 +11,7 @@ public class TermStats {
     String term;
     Integer tf;
     Integer df;
-    String value;
+    //String value;
 
 
 
@@ -19,9 +19,9 @@ public class TermStats {
         this.term=term;
         this.df=0;
         this.tf=0;
-        this.value=value;
+        //this.value=value;
 
-        String[] ans = value.split("^(\\[)||$(\\])||( \\d[->]\\d )");
+        //String[] ans = value.split("^(\\[)||$(\\])||( \\d[->]\\d )");
         List<TermData> termData = parse(value);
         for (TermData t : termData){
            // System.out.println(t.frequency + " > " + t.document);

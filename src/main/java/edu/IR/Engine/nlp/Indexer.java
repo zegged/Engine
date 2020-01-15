@@ -310,6 +310,7 @@ public class Indexer {
 
         String path1 = getPath("final");
 
+        //String path1 = "C:\\posting\\yesStem\\post.txt";
         FileReader fileReader = new FileReader(path1);
         BufferedReader firstFile = new BufferedReader(fileReader);
         //File file = new File(path1);
@@ -331,6 +332,10 @@ public class Indexer {
             Integer index1 = line.indexOf(':');
             String term1 = line.substring(0, index1);
             String value1 = line.substring(index1 + 1);
+           // System.out.println(line);
+//            if (term1.compareTo("year")==0){
+//                System.out.println(line);
+//            }
             //value1.concat(":").concat(String.valueOf(ptr));
             TermStats termStats = new TermStats(term1, value1);
             if(value1.contains(",")&&term1.contains(" ")){
@@ -344,14 +349,32 @@ public class Indexer {
                 numUniq++;
             }
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        for (TermStats termStats : dic){
-            stringBuilder.append(termStats)//TODO: fix noStem OutOfMemoryError exception
-                    .append(System.lineSeparator());
-        }
-        String path = getPath("dic");
+
         firstFile.close();
-        writeToFile(stringBuilder.toString(),path);
+
+        String path = getPath("dic");
+        try {
+            FileWriter writer = new FileWriter(path);
+             BufferedWriter bw = new BufferedWriter(writer);
+            for (TermStats termStats : dic) {
+                bw.write(termStats.toString()+System.lineSeparator());
+            }
+            bw.flush();
+            bw.close();
+
+        } catch (IOException e) {
+            System.err.format("IOException: %s%n", e);
+        }
+
+
+//        StringBuilder stringBuilder = new StringBuilder();
+//        for (TermStats termStats : dic){
+//            stringBuilder.append(termStats)//TODO: fix noStem OutOfMemoryError exception
+//                    .append(System.lineSeparator());
+//        }
+
+
+//        writeToFile(stringBuilder.toString(),path);
     }
 
     public List<TermStats> GET_list_of_best_terms_by_id(){
@@ -359,12 +382,27 @@ public class Indexer {
     }
 
     void saveDocuments() throws Exception {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String line : docs){
-            stringBuilder.append(line).append(System.lineSeparator());
-        }
         String path = getPath("doc");
-        writeToFile(stringBuilder.toString(),path);
+        try {
+            FileWriter writer = new FileWriter(path);
+            BufferedWriter bw = new BufferedWriter(writer);
+            for (String line : docs){
+         bw.write(line+System.lineSeparator());
+            }
+            bw.flush();
+            bw.close();
+
+        }
+     catch (IOException e) {
+        System.err.format("IOException: %s%n", e);
+    }
+
+//        StringBuilder stringBuilder = new StringBuilder();
+//        for (String line : docs){
+//            stringBuilder.append(line).append(System.lineSeparator());
+//        }
+//
+//        writeToFile(stringBuilder.toString(),path);
     }
 
     //merge for last 2 files

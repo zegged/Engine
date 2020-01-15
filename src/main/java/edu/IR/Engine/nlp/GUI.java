@@ -506,7 +506,7 @@ public class GUI extends Application {
 
             } else {
                 path1 = pathToPosting + "\\noStem\\post.txt";
-                path2 = pathToPosting + "\\yesStem\\documents.txt";
+                path2 = pathToPosting + "\\noStem\\documents.txt";
             }
             searcher.loadDictionary(path1);
             searcher.loadDocuments(path2);

@@ -412,6 +412,9 @@ mapTerms.clear();
         String line;
         while ((line = firstFile.readLine()) != null) {
             Integer index1 = line.indexOf(':');
+            if (index1<0){
+                break;
+            }
             String term1 = line.substring(0, index1);
             String value1 = line.substring(index1 + 1);
             mapTerms.put(term1, value1);
@@ -483,9 +486,9 @@ mapTerms.clear();
             for (Map.Entry<Integer, Double> entry : scores.entrySet()) {
                 Double score = entry.getValue();
                 Integer doc = entry.getKey();
-                Map<Integer, Double> m = new HashMap<>();
-                m.put(doc,score);
-                result2.add(new Pair<>(irQuery.id,m));
+//                Map<Integer, Double> m = new HashMap<>();
+//                m.put(doc,score);
+//                result2.add(new Pair<>(irQuery.id,m));
             }
         }
         return result2;
