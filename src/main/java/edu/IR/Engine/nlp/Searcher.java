@@ -46,7 +46,7 @@ public class Searcher {
 
     }
 
-    public Map<Integer, Double> runSingleQuery(String str,boolean stemming) throws Exception {
+    public Map<Integer, Double> runSingleQuery(String str,boolean stemming, String path) throws Exception {
 
         if (stemming) {// stemming
             PorterStemmer stemmer = new PorterStemmer();
@@ -58,7 +58,7 @@ public class Searcher {
 
 
         //TODO: uppercase/lowercase Malvina
-        TermSearch termSearch = getTermPtr(str);
+        TermSearch termSearch = getTermPtr(str, path);
         List<DocumentData> documentData = getDocStats(termSearch);
         Ranker ranker = new Ranker(termSearch, documentData);
         Map<Integer, Double> map = ranker.get_all_ranked_document();
@@ -72,7 +72,7 @@ public class Searcher {
         return sentences;
     }
 
-    public Map<Integer, Double> runQuery(String query,boolean stemming ,boolean semantics,boolean semanticsAPI) throws Exception {
+    public Map<Integer, Double> runQuery(String query,boolean stemming ,boolean semantics,boolean semanticsAPI, String path) throws Exception {
         // TODO: blood-alcohol fatalities
         Map<Integer, Double> fullMap = new HashMap<>();
         //parse query in NLP
@@ -87,13 +87,13 @@ public class Searcher {
             //String ner = coreLabel.get(CoreAnnotations.NamedEntityTagAnnotation.class);
 
 
-            Map<Integer, Double> map = runSingleQuery(token,stemming);
+            Map<Integer, Double> map = runSingleQuery(token,stemming, path);
             //Semantics
             //upper-lowercase
             if (true){
-                Map<Integer, Double> mapCaseLower = runSingleQuery(token.toLowerCase(),stemming);
+                Map<Integer, Double> mapCaseLower = runSingleQuery(token.toLowerCase(),stemming, path);
                 mapCaseLower.forEach((k, v) -> map.merge(k, v, (v1, v2) -> v1 + v2));
-                Map<Integer, Double> mapCaseUpper = runSingleQuery(token.toUpperCase(),stemming);
+                Map<Integer, Double> mapCaseUpper = runSingleQuery(token.toUpperCase(),stemming, path);
                 mapCaseUpper.forEach((k, v) -> map.merge(k, v, (v1, v2) -> v1 + v2));
             }
             if (semantics) { //semantics
@@ -101,7 +101,7 @@ public class Searcher {
                 double alpha = 0.5;
                 List<Pair<String, Double>> pairs = semantic(token);
                 for (Pair<String, Double> stringDoublePair : pairs) {
-                    Map<Integer, Double> semanticMap = runSingleQuery(stringDoublePair.getKey(),stemming);
+                    Map<Integer, Double> semanticMap = runSingleQuery(stringDoublePair.getKey(),stemming, path);
                     //TODO: mult double w/ score
                     semanticMap.replaceAll((k,v)->v=v*alpha*stringDoublePair.getValue());
                     semanticMap.forEach((k, v) -> map.merge(k, v, (v1, v2) -> v1 + v2));
@@ -124,7 +124,7 @@ public class Searcher {
                 String[] words = jsonParse.parseWords(similar);
                 int cnt=0;
                 for (String word:words){
-                    Map<Integer, Double> semanticMap = runSingleQuery(word,stemming);
+                    Map<Integer, Double> semanticMap = runSingleQuery(word,stemming, path);
                     int finalCnt = cnt;
                     semanticMap.replaceAll((k, v)->v=v*beta*scores[finalCnt]);
                     semanticMap.forEach((k, v) -> map.merge(k, v, (v1, v2) -> v1 + v2));
@@ -174,8 +174,8 @@ public class Searcher {
         boolean append = true;
         //FileWriter fw = new FileWriter("C:\\Users\\Razi\\Desktop\\ehzor\\posting\\yesStem\\Qresults.txt", append);
         path=path+"\\Qresults.txt";
-        String fixPath = "c:\\posting\\Qresults.txt";
-        FileWriter fw = new FileWriter(fixPath, append); //TODO: fix path
+        //String fixPath = "c:\\posting\\Qresults.txt";
+        FileWriter fw = new FileWriter(path, append); //TODO: fix path
         BufferedWriter bw = null;
         bw = new BufferedWriter(fw);
 
@@ -271,7 +271,7 @@ public class Searcher {
 
 
 
-    public TermSearch getTermPtr(String term) throws IOException {
+    public TermSearch getTermPtr(String term, String path) throws IOException {
 
         if (mapTermsPtr.containsKey(term)) {
             Pair <Long,Long> pointers = mapTermsPtr.get(term);
@@ -279,7 +279,7 @@ public class Searcher {
             Long length = pointers.getValue();
 
 
-            String path = "c:\\posting\\noStem\\post.txt"; //TODO: FIX
+           // String path = "c:\\posting\\noStem\\post.txt"; //TODO: FIX
             RandomAccessFile raf = new RandomAccessFile(path, "r");
             raf.seek(start);
             String line = raf.readLine();
@@ -512,7 +512,7 @@ mapTerms.clear();
         System.out.println("Documents loaded");
     }
 
-    public List<Pair<Integer,Map<Integer, Double>>> runFileQueries(String path1,boolean stemming,boolean semantics,boolean semanticsAPI) throws Exception {
+    public List<Pair<Integer,Map<Integer, Double>>> runFileQueries(String path1,boolean stemming,boolean semantics,boolean semanticsAPI, String path) throws Exception {
 //        String path1 = "d:\\documents\\users\\razyal\\Documents\\posting\\yesStem\\queries.txt";
 
         ReadFile readFile = new ReadFile();
@@ -536,20 +536,21 @@ mapTerms.clear();
         int i=0;
         for (IRQuery irQuery : fileDocs){
             System.out.println(irQuery.id+":"+irQuery.title);
-            Map<Integer, Double> scores =  runQuery(irQuery.title,stemming,semantics,semanticsAPI);
+            Map<Integer, Double> scores =  runQuery(irQuery.title,stemming,semantics,semanticsAPI, path);
             //semantics
           //  List<Pair<String, Double>> pairs = semantic(irQuery.title);
-            writeQueryResult(scores, irQuery.id,"C:\\Users\\Razi\\Desktop\\ehzor\\posting\\yesStem");
+//            writeQueryResult(scores, irQuery.id,"C:\\Users\\Razi\\Desktop\\ehzor\\posting\\yesStem");
             for (Map.Entry<Integer, Double> entry : scores.entrySet()) {
                 Double score = entry.getValue();
                 Integer doc = entry.getKey();
-//                Map<Integer, Double> m = new HashMap<>();
-//                m.put(doc,score);
-//                result2.add(new Pair<>(irQuery.id,m));
+                Map<Integer, Double> m = new HashMap<>();
+                m.put(doc,score);
+                result2.add(new Pair<>(irQuery.id,m));
             }
         }
         return result2;
     }
+
 
     public List<Pair<String, Double>> semantic(String term) {
         List<Pair<String,Double>> pairs = new ArrayList<>();

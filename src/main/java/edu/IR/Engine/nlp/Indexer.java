@@ -337,7 +337,6 @@ public class Indexer {
             Integer index1 = line.indexOf(':');
             String term1 = line.substring(0, index1);
             String value1 = line.substring(index1 + 1);
-            System.out.println(line);
 //            if (term1.compareTo("year")==0){
 //                System.out.println(line);
 //            }

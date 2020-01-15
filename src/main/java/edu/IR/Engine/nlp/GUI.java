@@ -191,7 +191,7 @@ public class GUI extends Application {
         GridPane.setConstraints(loadLabel, 0, 9);
         loadButton.setOnAction(e -> {
             try {
-                loadFiles(loadInput.getText(), stemmerCheck.isSelected());
+                loadFiles(loadInput.getText(), stemmerCheck.isSelected(),stemmerCheck.isSelected());
             } catch (IOException e1) {
                 e1.getStackTrace();
             }
@@ -495,8 +495,15 @@ public class GUI extends Application {
         dicwindow.show();
     }
 
-    public void loadFiles(String pathToPosting, boolean selected) throws IOException {
+    public void loadFiles(String pathToPosting, boolean selected,boolean box) throws IOException {
         if (!pathToPosting.equals("")) {
+            if (box) {
+                doStemming = true;
+                //stemming
+            } else {
+                doStemming = false;
+                //no stemming
+            }
             searcher = new Searcher();
             String path1 = "";
             String path2 = "";
@@ -632,7 +639,21 @@ public class GUI extends Application {
         if (!s1.equals("")) {
             AlertBox.display("Program Information", "the query you are serching is : " + s1);
             String term = s1;
-            scores = searcher.runQuery(term, doStemming, semantic,semanticsAPI);
+            String postFilePath = "";
+            if(pathToPosting.equals("")){
+                postFilePath=pathToLoad;
+            }else{
+                postFilePath=pathToPosting;
+            }
+            if (doStemming){
+                postFilePath+="\\yesStem";
+            }
+            else{
+                postFilePath+="\\noStem";
+            }
+            postFilePath+= "\\post.txt";
+
+            scores = searcher.runQuery(term, doStemming, semantic,semanticsAPI,postFilePath );
             int counter = 50;
             for (Map.Entry<Integer, Double> pair : scores.entrySet()) {
                 counter--;
@@ -660,7 +681,20 @@ public class GUI extends Application {
         running=2;
 //        choiceBox=new ChoiceBox<>();
         if(!path.equals("")){
-            result2 = searcher.runFileQueries(path, doStemming, semantic,semanticsAPI);
+            String postFilePath = "";
+            if(pathToPosting.equals("")){
+                postFilePath=pathToLoad;
+            }else{
+                postFilePath=pathToPosting;
+            }
+            if (doStemming){
+                postFilePath+="\\yesStem";
+            }
+            else{
+                postFilePath+="\\noStem";
+            }
+            postFilePath+= "\\post.txt";
+            result2 = searcher.runFileQueries(path, doStemming, semantic,semanticsAPI, postFilePath);
             for(int i=0;i<result2.size();i++){
                 for (Map.Entry<Integer, Double> pair : result2.get(i).getValue().entrySet()) {
                     Integer docID = pair.getKey();
@@ -680,7 +714,20 @@ public class GUI extends Application {
         }
     }
 
-    public void get5Function(ChoiceBox<String> choiceBox) {
+    public void get5Function(ChoiceBox<String> choiceBox) throws IOException {
+        String postFilePath = "";
+        if(pathToPosting.equals("")){
+            postFilePath=pathToLoad;
+        }else{
+            postFilePath=pathToPosting;
+        }
+        if (doStemming){
+            postFilePath+="\\yesStem";
+        }
+        else{
+            postFilePath+="\\noStem";
+        }
+        postFilePath+= "\\post.txt";
         String docStr = choiceBox.getValue();
         System.out.println(docStr);
         List<String> list_of_best_terms = documentData_map.get(docStr).list_of_best_terms;
@@ -689,7 +736,7 @@ public class GUI extends Application {
         //new ReverseComparator
         SortedMap<Integer, String> sm = new TreeMap<Integer, String>(Collections.reverseOrder());
         for (int i = 0; i < list_of_best_terms.size(); i++) {
-            TermSearch termSearch = searcher.getTerm(list_of_best_terms.get(i));
+            TermSearch termSearch = searcher.getTermPtr(list_of_best_terms.get(i),postFilePath);
             sm.put(termSearch.df,list_of_best_terms.get(i));
             //vBox.getChildren().addAll(new Label(list_of_best_terms.get(i) + " idf: " + termSearch.df));
         }

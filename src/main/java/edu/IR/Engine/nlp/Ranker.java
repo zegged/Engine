@@ -81,8 +81,9 @@ public class Ranker {
         numberOfDocuments = N;
         double K = k_1 * ((1 - b) + ((b * docLength) / averageDocumentLength));
         double first = (((k_1 + 1d) * tf) / (K + tf));    //first part
+        //double second = (((k_3 + 1) * queryFrequency) / (k_3 + queryFrequency));    //second part
         double idf = Math.log(numberOfDocuments / documentFrequency);
-        double rank = first * idf;
+        double rank = first* idf;
         return rank;
     }
 
