@@ -201,9 +201,11 @@ public class Engine {
 
         Searcher searcher = new Searcher();
 
-        searcher.loadDictionary("c:\\posting\\post.txt");
+        searcher.loadClickstreamData();
 
-        searcher.loadDocuments("c:\\posting\\documents.txt");
+        //searcher.loadDictionary("c:\\posting\\post.txt");
+
+       // searcher.loadDocuments("c:\\posting\\documents.txt");
 
         //pistol-pack:[1->11936, 1->15621, 1->115]
 
@@ -226,7 +228,7 @@ public class Engine {
 
 
 
-         searcher.semantic("New York");
+         //searcher.semantic("New York");
 
 
            //searcher.runFileQueries("c:\\posting\\queries2.txt");
@@ -266,10 +268,10 @@ public class Engine {
 
         // print docs
         System.out.println("\\\\\\\\\\\\\\\\\\\\\\\\");
-        System.out.println("Document Dictionary:");
-        for (String doc : Indexer.docs){
-            //System.out.println(doc);
-        }
+//        System.out.println("Document Dictionary:");
+//        for (String doc : Indexer.docs){
+//            //System.out.println(doc);
+//        }
 
 
 
@@ -292,7 +294,7 @@ public class Engine {
 
         System.out.println("done");
 
-        System.out.println("a".compareTo("b"));
+        //System.out.println("a".compareTo("b"));
 
     }
 

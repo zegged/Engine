@@ -24,11 +24,13 @@ public class Searcher {
     Map<String, String> mapTerms;
     Map<Integer, String> mapDocs;
     List<DocumentData> documentDataList;
+    Map<String, String> mapClickstream;
     public Searcher() {
         System.out.println("init searcher");
         mapTerms = new HashMap<>();
         mapDocs = new HashMap<>();
         stanfordCoreNLP = Pipeline.getPipeline();
+        mapClickstream = new HashMap<>();
     }
 
 
@@ -400,7 +402,7 @@ public class Searcher {
 
 
     public void loadDictionary(String path1) throws IOException {
-
+mapTerms.clear();
         //String path1 = getPath("final");
         //String path1 = "d:\\documents\\users\\razyal\\Documents\\posting\\yesStem\\post.txt";
         FileReader fileReader = new FileReader(path1);
@@ -422,6 +424,7 @@ public class Searcher {
         //String path1 = getPath("final");
         //String path1 = "d:\\documents\\users\\razyal\\Documents\\posting\\yesStem\\documents.txt";
 
+        mapDocs.clear();
         FileReader fileReader = new FileReader(path1);
         BufferedReader firstFile = new BufferedReader(fileReader);
 
@@ -433,6 +436,9 @@ public class Searcher {
 
         while ((line = firstFile.readLine()) != null) {
             Integer index1 = line.indexOf(':');
+            if (index1<0){
+                break;
+            }
             String term1 = line.substring(0, index1);
             String value1 = line.substring(index1 + 1);
 
@@ -468,6 +474,7 @@ public class Searcher {
         List<Pair<Integer,Map<Integer, Double>>> result2=new ArrayList<>();
         int i=0;
         for (IRQuery irQuery : fileDocs){
+            System.out.println(irQuery.id+":"+irQuery.title);
             Map<Integer, Double> scores =  runQuery(irQuery.title,stemming,semantics,semanticsAPI);
             //semantics
           //  List<Pair<String, Double>> pairs = semantic(irQuery.title);
@@ -504,6 +511,34 @@ public class Searcher {
         return pairs;
     }
 
+
+    public void loadClickstreamData() throws IOException {
+        mapClickstream.clear();
+        String text = null;
+        String path = System.getProperty("user.dir") + "/clickstream.txt";
+        File pathofstopword = new File(path);
+        BufferedReader br = new BufferedReader(new FileReader(pathofstopword));
+        String st;
+        st = br.readLine(); //skip header
+
+
+        while ((st = br.readLine()) != null) {
+           // System.out.println(st);
+
+            String[] sliced = st.split(",");
+            // idx,user_id,doc_id,query
+            String doc_id = sliced[2];
+            String query = sliced[3];
+
+
+            if (mapClickstream.containsKey(query)){
+                mapClickstream.replace(query,doc_id);
+            }
+            else{
+                mapClickstream.put(query,doc_id);
+            }
+        }
+    }
 
 }
 

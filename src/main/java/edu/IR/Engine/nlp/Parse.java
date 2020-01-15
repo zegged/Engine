@@ -785,6 +785,7 @@ public class Parse {
     String s = "";
     String docParsing="";
     List<String> list_of_best_terms;
+    Integer intID;
     static Map<String, String> Months = new HashMap<String, String>() {{
         put("january", "01");
         put("february", "02");
@@ -816,6 +817,7 @@ public class Parse {
     public Parse(Map<String, String> m_StopWords, boolean doStemming) {
         System.out.println("Parse init");
         stanfordCoreNLP = Pipeline.getPipeline();
+        this.intID=0;
         if (this.m_StopWords == null)
             this.m_StopWords = new HashMap<>(m_StopWords);//added new need tot check time to run
         this.doSteming = doStemming;
@@ -1136,7 +1138,10 @@ public class Parse {
 
         // parse docID
         String stringID = doc.id.split("-", 2)[1].trim();
-        Integer intID = Integer.valueOf(stringID);
+        //Integer intID = Integer.valueOf(stringID);
+
+        intID++;
+
         //System.out.println( "doc: " + intID);
 
 
