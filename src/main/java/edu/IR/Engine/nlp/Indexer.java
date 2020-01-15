@@ -346,7 +346,7 @@ public class Indexer {
         }
         StringBuilder stringBuilder = new StringBuilder();
         for (TermStats termStats : dic){
-            stringBuilder.append(termStats)
+            stringBuilder.append(termStats)//TODO: fix noStem OutOfMemoryError exception
                     .append(System.lineSeparator());
         }
         String path = getPath("dic");

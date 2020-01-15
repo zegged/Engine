@@ -172,7 +172,8 @@ public class Searcher {
         boolean append = true;
         //FileWriter fw = new FileWriter("C:\\Users\\Razi\\Desktop\\ehzor\\posting\\yesStem\\Qresults.txt", append);
         path=path+"\\Qresults.txt";
-        FileWriter fw = new FileWriter(path, append);
+        String fixPath = "c:\\posting\\Qresults.txt";
+        FileWriter fw = new FileWriter(fixPath, append); //TODO: fix path
         BufferedWriter bw = null;
         bw = new BufferedWriter(fw);
 
