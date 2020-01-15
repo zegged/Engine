@@ -245,6 +245,7 @@ public class GUI extends Application {
         GridPane.setConstraints(runQuery, 2, 3);
         runQuery.setOnAction(e -> {
             try {
+                choiceBox.getItems().clear();
                 RunButton(loadInput2.getText(), semantic.isSelected(),semantic2.isSelected());
             } catch (Exception e1) {
                 e1.printStackTrace();
@@ -268,6 +269,7 @@ public class GUI extends Application {
         GridPane.setConstraints(runQuery2, 3, 4);
         runQuery2.setOnAction(e -> {
             try {
+                choiceBox.getItems().clear();
                 RunButton2(file_query_input.getText(), semantic.isSelected(),semantic2.isSelected());
             } catch (Exception e1) {
                 e1.printStackTrace();
@@ -625,7 +627,9 @@ public class GUI extends Application {
      */
     public void RunButton(String s1, boolean semantic,boolean semanticsAPI) throws Exception {
         running=1;
-        if (s1 != null) {
+//        choiceBox=new ChoiceBox<>();
+
+        if (!s1.equals("")) {
             AlertBox.display("Program Information", "the query you are serching is : " + s1);
             String term = s1;
             scores = searcher.runQuery(term, doStemming, semantic,semanticsAPI);
@@ -652,63 +656,28 @@ public class GUI extends Application {
     List<Pair<Integer,Map<Integer, Double>>> result2=new ArrayList<>();
 
     public void RunButton2(String path, boolean semantic,boolean semanticsAPI) throws Exception {
+
         running=2;
-        result2 = searcher.runFileQueries(path, doStemming, semantic,semanticsAPI);
-        for(int i=0;i<result2.size();i++){
-            for (Map.Entry<Integer, Double> pair : result2.get(i).getValue().entrySet()) {
-                Integer docID = pair.getKey();
-                Double scoreSingle = pair.getValue();
-                scores.put(docID,scoreSingle);
-                DocumentData documentData = searcher.getDoc(docID);
-                String docStr = documentData.strID;
-                documentData_map.put(docStr, documentData);
-                choiceBox.getItems().add(docStr);
-                //List<String> list = documentData.list_of_best_terms;
+//        choiceBox=new ChoiceBox<>();
+        if(!path.equals("")){
+            result2 = searcher.runFileQueries(path, doStemming, semantic,semanticsAPI);
+            for(int i=0;i<result2.size();i++){
+                for (Map.Entry<Integer, Double> pair : result2.get(i).getValue().entrySet()) {
+                    Integer docID = pair.getKey();
+                    Double scoreSingle = pair.getValue();
+                    scores.put(docID,scoreSingle);
+                    DocumentData documentData = searcher.getDoc(docID);
+                    String docStr = documentData.strID;
+                    documentData_map.put(docStr, documentData);
+                    choiceBox.getItems().add(docStr);
+                    //List<String> list = documentData.list_of_best_terms;
+                }
+
             }
-
+            System.out.println("finshed");
+        }else {
+            AlertBox.display("Missing Input", "Error: no query had been written!");
         }
-        System.out.println("finshed");
-//        choiceBox.getItems().add("Doc1");
-//        choiceBox.getItems().add("Doc2");
-//        choiceBox.getItems().add("Doc3");
-
-//        if (path != null) {
-////            AlertBox.display("Program Information", "the query you are serching is : " + s1);
-//            HashMap<Integer,Map<Integer, Double>> map=searcher.runFileQueries(path,doStemming,semantic);
-//            int counter = 50;
-//            for (Map.Entry<Integer,Map<Integer, Double>> pair : map.entrySet()) {
-//                counter--;
-//                Integer docID = pair.getKey();
-//                Map<Integer, Double> scores = pair.getValue();
-//                for (Map.Entry<Integer, Double> pair2 : scores.entrySet()) {
-//                    counter--;
-//                    Integer docID2 = pair2.getKey();
-//                    Double scoreSingle = pair2.getValue();
-//                    DocumentData documentData = searcher.getDoc(docID2);
-//                    String docStr = documentData.strID;
-//                    documentData_map.put(docStr,documentData);
-//                    choiceBox.getItems().add(docStr);
-//                    //List<String> list = documentData.list_of_best_terms;
-//                    if (counter == 0){
-//                        break;
-//                    }
-//                }
-//
-////                DocumentData documentData = searcher.getDoc(docID);
-////                String docStr = documentData.strID;
-////                documentData_map.put(docStr,documentData);
-////                choiceBox.getItems().add(docStr);
-////                //List<String> list = documentData.list_of_best_terms;
-////                if (counter == 0){
-////                    break;
-////                }
-//            }
-//            //searcher.writeQueryResult(scoreSingle, 0);
-//        } else {// the fields are missing
-//            //change scene to alert and back to the main window to let write again
-//            AlertBox.display("Missing Input", "Error: no query had been written!");
-//        }
-//        System.out.println("finshed");
     }
 
     public void get5Function(ChoiceBox<String> choiceBox) {
@@ -717,9 +686,24 @@ public class GUI extends Application {
         List<String> list_of_best_terms = documentData_map.get(docStr).list_of_best_terms;
         System.out.println(list_of_best_terms);
         VBox vBox = new VBox();
+        //new ReverseComparator
+        SortedMap<Integer, String> sm = new TreeMap<Integer, String>(Collections.reverseOrder());
         for (int i = 0; i < list_of_best_terms.size(); i++) {
             TermSearch termSearch = searcher.getTerm(list_of_best_terms.get(i));
-            vBox.getChildren().addAll(new Label(list_of_best_terms.get(i) + "idf: " + termSearch.df));
+            sm.put(termSearch.df,list_of_best_terms.get(i));
+            //vBox.getChildren().addAll(new Label(list_of_best_terms.get(i) + " idf: " + termSearch.df));
+        }
+        Set s = sm.entrySet();
+        Iterator i = s.iterator();
+        int cnt=0;
+        while ( i.hasNext()&&cnt<5)
+        {
+            Map.Entry m = (Map.Entry)i.next();
+            int key = (Integer)m.getKey();
+            String value = (String)m.getValue();
+            System.out.println("Key : " + key + "  value : " + value);
+            vBox.getChildren().addAll(new Label(value+" idf: "+key));
+            cnt++;
         }
         Scene dictionaryScene = new Scene(vBox);
         Stage dicwindow = new Stage();

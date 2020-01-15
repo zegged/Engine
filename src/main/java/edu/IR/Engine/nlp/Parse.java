@@ -1177,7 +1177,8 @@ public class Parse {
                 // PARSE DONE
                 // SAVE TERM IN TEMP DICTIONARY
                 int term_frequency = 1;
-                if ((m_StopWords.containsKey(term.toLowerCase()) || term.equals(",") || term.equals("."))) {
+                if ((m_StopWords.containsKey(term.toLowerCase()) ||token.equals("Article")
+                        ||token.equals("FBIS")||token.equals("Type")||token.equals("SUMMARY")|| term.equals(",") || term.equals("."))) {
                     continue;
                 } else {
                     //Porter's stemmer
@@ -1309,12 +1310,15 @@ public class Parse {
                     if (term.matches("[a-zA-Z]+")) {
                         if (Character.isUpperCase(term.charAt(0)) && !(Months.containsKey(term.toLowerCase()))) {
                             if (upper_words.equals("")) {
-                                upper_words = term;
+                                documentTerms.add(term);
+                                upper_words =  term;
+                                counter_terms++;
                             } else {
                                 if(counter_terms<4){
+                                    documentTerms.add(term);
                                     upper_words = upper_words + " " + term;
                                     documentTerms.add(upper_words);
-                                    if(counter_terms>1){
+                                    if(counter_terms>=1){
                                         list_of_best_terms.add(upper_words);
                                     }
                                     counter_terms++;
@@ -1324,21 +1328,22 @@ public class Parse {
 //                            if (upper_words.equals("")) {
 //                                continue;
 //                            } else {
-                                documentTerms.add(upper_words);
+                                documentTerms.add(term);
                                 upper_words = "";
+                                counter_terms=0;
                             //}
                         }
                     }
-                    if (Flag == false) {
-                        if (term.matches("[A-Za-z].*[0-9]|[0-9].*[A-Za-z]")) {
-                            continue;
-                        } else {
-                            if (!(term.equals("%") || term.equals(",k") || term.equals("$") || term.equals("") || term.equals("-"))) {
-                                documentTerms.add(term);
-
-                            }
-                        }
-                    }
+//                    if (Flag == false) {
+//                        if (term.matches("[A-Za-z].*[0-9]|[0-9].*[A-Za-z]")) {
+//                            continue;
+//                        } else {
+//                            if (!(term.equals("%") || term.equals(",k") || term.equals("$") || term.equals("") || term.equals("-"))) {
+//                                documentTerms.add(term);
+//
+//                            }
+//                        }
+//                    }
                     numofterms++;
                 }
             }
